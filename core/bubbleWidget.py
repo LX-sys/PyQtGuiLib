@@ -1,119 +1,246 @@
+# -*- coding:utf-8 -*-
+# @time:2022/12/109:49
+# @author:LX
+# @file:bubbleWidget.py
+# @software:PyCharm
+
+
 from header import (
     sys,
     QApplication,
     QWidget,
-    QHBoxLayout,
-    Qt,
     QPainter,
+    QPainterPath,
     QPaintEvent,
-    QRect,
-    QColor,
-    QSize,
+    QPoint,
+    QPolygonF,
+    QRectF,
+    Qt,
     QPen,
-    QPainterPath
+    QFont,
+    QColor,
+    QLinearGradient,
+    re,
+    QPushButton,
+    QResizeEvent
 )
-
-
 
 '''
     气泡窗口
+    种类一
+          /\
+    ------  -------
+    |             |
+    ---------------
+    # 后续更新动画
 '''
+
 class BubbleWidget(QWidget):
+    Top = "top"
+    Down = "Down"
+    Left = "Left"
+    Right = "Right"
+    NoNone = "None"
     def __init__(self,*args,**kwargs):
+        self.triangle_km = 20  # 三角形的开口大小
+        self.w, self.h = 160, 60
         super(BubbleWidget, self).__init__(*args,**kwargs)
-
-
-        self.km = 0 # 默认三角形开口大小是宽度度六分之一
-        self.triangle_h = 20 # 三角形高度
-        self.w,self.h = 0,0 # 气泡大小
-        self.base_edge_color = QColor(232, 232, 232)  # 底边颜色
-        self.border_color = QColor(102, 204, 255) # 气泡边框颜色
-        self.text = "Bubble"  # 默认文字
-        self.resize(200,80)
-
         self.setObjectName("BubbleW")
-        self.setAttribute(Qt.WA_TintedBackground)
-        self.setWindowFlags(Qt.WindowShadeButtonHint|Qt.FramelessWindowHint)
 
-        self.hlay = QHBoxLayout(self)
-        self.hlay.setContentsMargins(1,1,1,1)
-        self.setStyleSheet('''
-/*#bubble{
-border:1px solid gray;
-border-radius:5px;
-background-color:rgb(192, 245, 255);
-}*/
-        ''')
+        self.box = 2  # 边距
+        self.triangle_h = 20  # 三角形高度
+        self.triangle_dis = self.w // 2 - self.triangle_km  # 三角形的位置(默认在中心)
+        self.direction = BubbleWidget.Top  # 三级形的位置(默认三角形在上面)
+        self.radius = 5 # 半径
+        self.bcolor = QColor(152, 167, 255)  # 气泡颜色
+        self.text = "Bubble"
+        self.text_color = QColor(0,85,0)  # 文字颜色
+        self.text_size = 15  # 文字大小
 
-        self.bubble = QWidget()
-        self.bubble.setObjectName("bubble")
-        self.hlay.addWidget(self.bubble)
+    # 追踪控件
+    def setTrack(self,widget:QWidget,offset:int=0):
+        w, h = widget.width() // 2, widget.height()
+        x, y = widget.x(), widget.y()
+        xw, hy = x + w, h + y
+        ww = self.w - self.triangle_dis - self.triangle_km - offset
+        if self.direction == BubbleWidget.Top:
+            self.move(xw-ww,hy)
+        elif self.direction == BubbleWidget.Down:
+            self.move(xw - ww, y-self.h-self.triangle_h)
+        elif self.direction == BubbleWidget.Right:
+            self.move(x-self.w,self.h+self.triangle_dis)
+        elif self.direction == BubbleWidget.Left:
+            self.move(x+widget.width(),y+widget.height()//2-self.triangle_dis)
 
-    def resize(self, w:int,h:int) -> None:
-        self.w,self.h=w,h
-        self.km = w//6
+    def resize(self,w,h) -> None:
+        self.w,self.h =w,h
         super(BubbleWidget, self).resize(w,h)
-
-    def setBorderColor(self,bcolor:QColor):
-        self.border_color = bcolor
 
     def setText(self,text:str):
         self.text = text
 
-    # 设置开口大小
-    def setKm(self,km:int):
-        self.km = km
+    def setTextColor(self,color:QColor):
+        self.text_color = color
+
+    def setTextSize(self,size:int):
+        self.text_size = size
+
+    def setAllText(self,text:int,size=None,color:QColor=None):
+        self.setText(text)
+        if size:
+            self.setTextSize(size)
+        if color:
+            self.setTextColor(color)
+
+    def setKmDis(self,dis:int):
+        self.triangle_dis = dis
+
+    def setKmM(self,km:int):
+        self.triangle_km = km
+
+    def setKm(self,dis:int,km:int):
+        self.setKmDis(dis)
+        self.setKmM(km)
+
+    # 设置方向
+    def setDirection(self,d):
+        self.direction = d
+        if self.direction in [BubbleWidget.Top,BubbleWidget.Down]:
+            self.triangle_dis = self.w // 2 - self.triangle_km  # 三角形的位置(默认在中心)
+        if self.direction in [BubbleWidget.Left,BubbleWidget.Right]:
+            self.triangle_dis = self.h // 2   # 三角形的位置(默认在中心)
+
+
+    def setBColor(self,bcolor:QColor):
+        self.bcolor = bcolor
 
     # 三角形
-    def delta(self,painter:QPainter,x:int,km):
+    def delta(self,ppath:QPainterPath):
+        if self.direction == BubbleWidget.Top:
+            h = self.triangle_h + self.box
+            ploys = [QPoint(self.triangle_dis, h),
+                     QPoint(self.triangle_dis + self.triangle_km, self.box),
+                     QPoint(self.triangle_dis+self.triangle_km*2, h)]
+        elif self.direction == BubbleWidget.Down:
+            h = self.h-self.triangle_h-self.box
+            ploys = [QPoint(self.triangle_dis, h+self.box),
+                     QPoint(self.triangle_dis+self.triangle_km,h+self.triangle_h),
+                     QPoint(self.triangle_dis+self.triangle_km*2, h+self.box)]
+        elif self.direction == BubbleWidget.Left:
+            ploys = [QPoint(self.box,self.triangle_dis),
+                     QPoint(self.triangle_km+self.box,self.triangle_dis-self.triangle_km),
+                     QPoint(self.triangle_km+self.box,self.triangle_dis+self.triangle_km)]
+        elif self.direction == BubbleWidget.Right:
+            ploys = [QPoint(self.w-self.triangle_km,self.triangle_dis-self.triangle_km),
+                     QPoint(self.w-self.box,self.triangle_dis),
+                     QPoint(self.w-self.triangle_km,self.triangle_dis+self.triangle_km)]
+        else:
+            return
+        ppath.addPolygon(QPolygonF(ploys))
+
+    # 矩形
+    def ract_(self,ppath:QPainterPath):
+        if self.direction == BubbleWidget.Top:
+            rectf = QRectF(self.box, self.box + self.triangle_h,
+                           self.w - self.box, self.h - self.triangle_h - self.box)
+        elif self.direction == BubbleWidget.Down:
+            rectf = QRectF(self.box, self.box,
+                           self.w - self.box, self.h - self.triangle_h - self.box)
+        elif self.direction == BubbleWidget.Left:
+            rectf = QRectF(self.triangle_km+self.box,self.box,
+                           self.w-self.triangle_km,self.h-self.box)
+        elif self.direction == BubbleWidget.Right:
+            rectf = QRectF(self.box,self.box,
+                           self.w-self.triangle_km-self.box,
+                           self.h-self.box)
+        else:
+            rectf = QRectF(self.box, self.box,
+                           self.w - self.box, self.h - self.box)
+        ppath.addRoundedRect(rectf, self.radius,self.radius)
+
+    # 文字
+    def text_(self,painter:QPainter):
+        f = QFont()
+        f.setPointSize(self.text_size)
+        painter.setFont(f)
+        painter.setPen(self.text_color)
         '''
-
-        :param painter: 对象
-        :param x: 位置
-        :param km: 开口大小
-        :return:
+            文字居中位置计算 - 宽
+            英文:
+                文字长度*文字大小//3
+            中文:
+                文字长度*文字大小*2//3
         '''
-        # 反锯齿渲染
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setPen(QPen(self.border_color, 1, Qt.SolidLine, Qt.RoundCap, Qt.RoundJoin))
-        painter.drawLine(x,self.triangle_h,x+km,0)
-        painter.drawLine(x+km,self.triangle_h,x+km,0)
-        painter.setPen(self.base_edge_color)
-        painter.drawLine(x+1,self.triangle_h,x+km-1,self.triangle_h)
+        n = 1
+        if re.findall(r"[\u4e00-\u9fa5]", self.text):
+            n = 2
+        if self.direction == BubbleWidget.Top:
+            painter.drawText(self.w // 2 - len(self.text) * self.text_size*n // 3, self.h//2+self.triangle_h, self.text)
+        elif self.direction == BubbleWidget.Down:
+            painter.drawText(self.w // 2 - len(self.text) * self.text_size * n // 3, self.h//2,
+                             self.text)
+        else:
+            painter.drawText(self.w // 2 - len(self.text) * self.text_size * n // 3, self.h // 2+self.text_size//2,
+                             self.text)
 
-
-    def paintEvent(self, e: QPaintEvent) -> None:
+    def paintEvent(self, e:QPaintEvent) -> None:
         painter = QPainter()
         painter.begin(self)
-        painter.setPen(self.border_color)
-        painter.drawRoundedRect(QRect(1,self.triangle_h,self.w-2,self.h-self.triangle_h-2),5,5)
-        painter.drawText(self.w//2-20,self.h//2+15,self.text)
-        self.delta(painter,self.w//2,self.km)
+        # -------------------
+        ppath = QPainterPath()
+        # 绘制矩形
+        self.ract_(ppath)
+        # 绘制三角形
+        self.delta(ppath)
+        # -------------------
+        painter.fillPath(ppath,self.bcolor)
+        # 绘制文字
+        self.text_(painter)
         painter.end()
-        # super(BubbleWidget, self).paintEvent(e)
+
+
 
 class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super(Test, self).__init__(*args,**kwargs)
         self.resize(500,500)
 
+        self.btn = QPushButton("一号玩家",self)
+        self.btn.resize(130,100)
+        self.btn.move(100,100)
+
         self.bu = BubbleWidget(self)
-        self.bu.setText("蔚蓝色")
-        self.bu.setKm(30)  # 气泡开口大小
-        self.bu.move(100,50)
+        self.bu.resize(160, 80)
+        self.bu.setDirection(BubbleWidget.Left)
+        self.bu.setTrack(self.btn)
+        self.bu.setText("二号是笨蛋")
+        # self.bu.move(80,100) # 如果不想手动设置位置可以用下面控件追踪功能
 
-        self.bu1 = BubbleWidget(self)
-        self.bu1.setKm(60)
-        self.bu1.resize(100,80)
-        self.bu1.setBorderColor(QColor(89, 90, 255))
-        self.bu1.move(100,150)
 
-        self.bu2 = BubbleWidget(self)
-        self.bu2.resize(100,100)
-        self.bu2.setKm(-40)
-        self.bu2.setText("少女粉")
-        self.bu2.setBorderColor(QColor(255, 69, 135))
-        self.bu2.move(100,250)
+
+        # # --------
+        # self.btn2 = QPushButton("二号玩家",self)
+        # self.btn2.resize(130,40)
+        # self.btn2.move(400,350)
+        #
+        # self.bu2 = BubbleWidget(self)
+        # self.bu2.setText("你才是哼")
+        # # 反向的设置一定要在追踪前面
+        # self.bu2.setDirection(BubbleWidget.Down)
+        # self.bu2.setTrack(self.btn2)
+        # self.bu2.setTextColor(QColor(255, 255, 0))
+        # self.bu2.setBColor(QColor(170, 0, 255))
+        # self.bu2.setKm(30,10)
+        # self.bu2.resize(160,80)
+        #
+        # self.bu3 = BubbleWidget(self)
+        # self.bu3.setText("绿色")
+        # self.bu3.setDirection(BubbleWidget.NoNone)
+        # self.bu3.setBColor(QColor(170, 255, 127))
+        # self.bu3.move(80,300)
+        # self.bu3.setKm(80,25)
+        # self.bu3.resize(160,80)
+
 
 
 if __name__ == '__main__':
