@@ -4,15 +4,15 @@
 # @file:test_BubbleWidget.py
 # @software:PyCharm
 
-from header.versions import PYQT_VERSIONS
-from header import (
+from PyQtGuiLib.header.versions import PYQT_VERSIONS
+from PyQtGuiLib.header import (
     sys,
     QApplication,
     QWidget,
     QPushButton
 )
-from core.bubbleWidget import BubbleWidget
 
+from PyQtGuiLib.core.bubbleWidget import BubbleWidget
 
 '''
     气泡窗口的测试用例

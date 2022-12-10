@@ -1,4 +1,4 @@
-from header import (
+from PyQtGuiLib.header import (
     sys,
     QApplication,
     QWidget,

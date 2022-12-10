@@ -1,4 +1,4 @@
-from header.versions import PYQT_VERSIONS
+from PyQtGuiLib.header.versions import PYQT_VERSIONS
 
 if PYQT_VERSIONS == "PyQt5":
     from PyQt5.QtGui import (

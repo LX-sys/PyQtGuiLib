@@ -3,7 +3,7 @@
 # @author:LX
 # @file:bubbleWidget.py
 # @software:PyCharm
-from header import (
+from PyQtGuiLib.header import (
     sys,
     QApplication,
     QWidget,
