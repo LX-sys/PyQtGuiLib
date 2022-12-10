@@ -4,23 +4,19 @@
 # @file:bubbleWidget.py
 # @software:PyCharm
 from PyQtGuiLib.header import (
-    sys,
-    QApplication,
     QWidget,
     QPainter,
     QPainterPath,
     QPaintEvent,
     QPolygonF,
     QRectF,
-    Qt,
-    QPen,
     QFont,
     QColor,
-    QLinearGradient,
     re,
-    QPushButton,
-    QResizeEvent,
-    QPointF
+    QPointF,
+    Signal,
+    QThread,
+    QSize
 )
 
 '''
@@ -33,16 +29,44 @@ from PyQtGuiLib.header import (
     # 后续更新动画
 '''
 
+# 弹窗持续时间
+class DurationTimeThread(QThread):
+    def __init__(self,bub,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.bub = bub  # type:BubbleWidget
+        self.dur_time = 3  # 默认秒
+
+    def setDurationTime(self,seconds:int):
+        self.dur_time = seconds
+
+    def run(self) -> None:
+        if self.dur_time == -1:
+            return
+
+        n = 0
+        while n != self.dur_time:
+            self.sleep(1)
+            n+=1
+        self.bub.close()
+
+
 class BubbleWidget(QWidget):
+    # 启动/结束事件
+    ended = Signal()
+
     Top = "top"
     Down = "Down"
     Left = "Left"
     Right = "Right"
     NoNone = "None"
+
+    # 弹窗永远存在,不好消失
+    Be_Forever = -1
+
     def __init__(self,*args,**kwargs):
         self.triangle_km = 20  # 三角形的开口大小
         self.w, self.h = 160, 60
-        super(BubbleWidget, self).__init__(*args,**kwargs)
+        super().__init__(*args,**kwargs)
         self.setObjectName("BubbleW")
 
         self.box = 2  # 边距
@@ -54,6 +78,14 @@ class BubbleWidget(QWidget):
         self.text = "Bubble"
         self.text_color = QColor(0,85,0)  # 文字颜色
         self.text_size = 15  # 文字大小
+
+        # ==
+        self.dtthread = DurationTimeThread(self)
+        self.dtthread.start()
+
+    # 弹窗持续时间
+    def setDurationTime(self,seconds:int):
+        self.dtthread.setDurationTime(seconds)
 
     # 追踪控件
     def setTrack(self,widget:QWidget,offset:int=0):
@@ -70,9 +102,15 @@ class BubbleWidget(QWidget):
         elif self.direction == BubbleWidget.Left:
             self.move(x+widget.width(),y+widget.height()//2-self.triangle_dis)
 
-    def resize(self,w,h) -> None:
-        self.w,self.h =w,h
-        super(BubbleWidget, self).resize(w,h)
+    def resize(self,*args) -> None:
+        '''
+            兼容qt原本的实现
+        '''
+        if len(args) == 1 and isinstance(args[0],QSize):
+            self.w,self.h = args[0].width(),args[0].height()
+        else:
+            self.w,self.h =args
+        super().resize(*args)
 
     def setText(self,text:str):
         self.text = text
@@ -83,7 +121,7 @@ class BubbleWidget(QWidget):
     def setTextSize(self,size:int):
         self.text_size = size
 
-    def setAllText(self,text:int,size=None,color:QColor=None):
+    def setAllText(self,text:str,size=None,color:QColor=None):
         self.setText(text)
         if size:
             self.setTextSize(size)
@@ -107,7 +145,6 @@ class BubbleWidget(QWidget):
             self.triangle_dis = self.w // 2 - self.triangle_km  # 三角形的位置(默认在中心)
         if self.direction in [BubbleWidget.Left,BubbleWidget.Right]:
             self.triangle_dis = self.h // 2   # 三角形的位置(默认在中心)
-
 
     def setBColor(self,bcolor:QColor):
         self.bcolor = bcolor
