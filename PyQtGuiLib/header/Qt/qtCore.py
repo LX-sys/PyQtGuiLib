@@ -11,6 +11,8 @@ if PYQT_VERSIONS == "PyQt5":
         QUrl,
         QRectF,
         QRect,
+        QPropertyAnimation,
+        QThread
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -24,7 +26,8 @@ if PYQT_VERSIONS == "PyQt6":
         QUrl,
         QRectF,
         QRect,
-
+        QPropertyAnimation,
+        QThread
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -38,6 +41,8 @@ if PYQT_VERSIONS == "PySide2":
         QUrl,
         QRectF,
         QRect,
+        QPropertyAnimation,
+        QThread
     )
 if PYQT_VERSIONS == "PySide6":
     from PySide6.QtCore import (
@@ -50,4 +55,6 @@ if PYQT_VERSIONS == "PySide6":
         QUrl,
         QRectF,
         QRect,
+        QPropertyAnimation,
+        QThread
     )
