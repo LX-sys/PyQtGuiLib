@@ -4,7 +4,7 @@
 # @file:test_BubbleWidget.py
 # @software:PyCharm
 
-from PyQtGuiLib.header.versions import PYQT_VERSIONS
+from PyQtGuiLib.header import PYQT_VERSIONS
 from PyQtGuiLib.header import (
     sys,
     QApplication,
@@ -20,7 +20,7 @@ from PyQtGuiLib.core.bubbleWidget import BubbleWidget
 
 class Test(QWidget):
     def __init__(self,*args,**kwargs):
-        super(Test, self).__init__(*args,**kwargs)
+        super().__init__(*args,**kwargs)
         self.resize(500,500)
 
         self.btn = QPushButton("一号玩家",self)
@@ -56,7 +56,6 @@ class Test(QWidget):
         # self.bu3.move(80,300)
         # self.bu3.setKm(80,25)
         # self.bu3.resize(160,80)
-
 
 
 if __name__ == '__main__':
