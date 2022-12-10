@@ -3,8 +3,6 @@
 # @author:LX
 # @file:bubbleWidget.py
 # @software:PyCharm
-
-
 from header import (
     sys,
     QApplication,
@@ -12,7 +10,6 @@ from header import (
     QPainter,
     QPainterPath,
     QPaintEvent,
-    QPoint,
     QPolygonF,
     QRectF,
     Qt,
@@ -22,7 +19,8 @@ from header import (
     QLinearGradient,
     re,
     QPushButton,
-    QResizeEvent
+    QResizeEvent,
+    QPointF
 )
 
 '''
@@ -118,22 +116,22 @@ class BubbleWidget(QWidget):
     def delta(self,ppath:QPainterPath):
         if self.direction == BubbleWidget.Top:
             h = self.triangle_h + self.box
-            ploys = [QPoint(self.triangle_dis, h),
-                     QPoint(self.triangle_dis + self.triangle_km, self.box),
-                     QPoint(self.triangle_dis+self.triangle_km*2, h)]
+            ploys = [QPointF(self.triangle_dis, h),
+                     QPointF(self.triangle_dis + self.triangle_km, self.box),
+                     QPointF(self.triangle_dis+self.triangle_km*2, h)]
         elif self.direction == BubbleWidget.Down:
             h = self.h-self.triangle_h-self.box
-            ploys = [QPoint(self.triangle_dis, h+self.box),
-                     QPoint(self.triangle_dis+self.triangle_km,h+self.triangle_h),
-                     QPoint(self.triangle_dis+self.triangle_km*2, h+self.box)]
+            ploys = [QPointF(self.triangle_dis, h+self.box),
+                     QPointF(self.triangle_dis+self.triangle_km,h+self.triangle_h),
+                     QPointF(self.triangle_dis+self.triangle_km*2, h+self.box)]
         elif self.direction == BubbleWidget.Left:
-            ploys = [QPoint(self.box,self.triangle_dis),
-                     QPoint(self.triangle_km+self.box,self.triangle_dis-self.triangle_km),
-                     QPoint(self.triangle_km+self.box,self.triangle_dis+self.triangle_km)]
+            ploys = [QPointF(self.box,self.triangle_dis),
+                     QPointF(self.triangle_km+self.box,self.triangle_dis-self.triangle_km),
+                     QPointF(self.triangle_km+self.box,self.triangle_dis+self.triangle_km)]
         elif self.direction == BubbleWidget.Right:
-            ploys = [QPoint(self.w-self.triangle_km,self.triangle_dis-self.triangle_km),
-                     QPoint(self.w-self.box,self.triangle_dis),
-                     QPoint(self.w-self.triangle_km,self.triangle_dis+self.triangle_km)]
+            ploys = [QPointF(self.w-self.triangle_km,self.triangle_dis-self.triangle_km),
+                     QPointF(self.w-self.box,self.triangle_dis),
+                     QPointF(self.w-self.triangle_km,self.triangle_dis+self.triangle_km)]
         else:
             return
         ppath.addPolygon(QPolygonF(ploys))
@@ -200,51 +198,3 @@ class BubbleWidget(QWidget):
 
 
 
-class Test(QWidget):
-    def __init__(self,*args,**kwargs):
-        super(Test, self).__init__(*args,**kwargs)
-        self.resize(500,500)
-
-        self.btn = QPushButton("一号玩家",self)
-        self.btn.resize(130,100)
-        self.btn.move(100,100)
-
-        self.bu = BubbleWidget(self)
-        self.bu.resize(160, 80)
-        self.bu.setDirection(BubbleWidget.Left)
-        self.bu.setTrack(self.btn)
-        self.bu.setText("二号是笨蛋")
-        # self.bu.move(80,100) # 如果不想手动设置位置可以用下面控件追踪功能
-
-
-
-        # # --------
-        # self.btn2 = QPushButton("二号玩家",self)
-        # self.btn2.resize(130,40)
-        # self.btn2.move(400,350)
-        #
-        # self.bu2 = BubbleWidget(self)
-        # self.bu2.setText("你才是哼")
-        # # 反向的设置一定要在追踪前面
-        # self.bu2.setDirection(BubbleWidget.Down)
-        # self.bu2.setTrack(self.btn2)
-        # self.bu2.setTextColor(QColor(255, 255, 0))
-        # self.bu2.setBColor(QColor(170, 0, 255))
-        # self.bu2.setKm(30,10)
-        # self.bu2.resize(160,80)
-        #
-        # self.bu3 = BubbleWidget(self)
-        # self.bu3.setText("绿色")
-        # self.bu3.setDirection(BubbleWidget.NoNone)
-        # self.bu3.setBColor(QColor(170, 255, 127))
-        # self.bu3.move(80,300)
-        # self.bu3.setKm(80,25)
-        # self.bu3.resize(160,80)
-
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = Test()
-    win.show()
-    sys.exit(app.exec_())
