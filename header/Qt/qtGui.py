@@ -6,5 +6,9 @@ from PyQt5.QtGui import (
     QPaintEvent,
     QColor,
     QPen,
-    QPainterPath
+    QPainterPath,
+    QPolygon,
+    QPolygonF,
+    QFont,
+    QLinearGradient
 )
