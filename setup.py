@@ -15,7 +15,7 @@ with open("README.md","r",encoding="utf8") as f:
 setup(
     name="PyQtGuiLib",
     packages =find_packages(),
-    version="0.0.1.2",
+    version="0.0.1.3",
     author="LX",
     author_email = "lx984608061@163.com",
     description = "Python version of the qt component library.",
