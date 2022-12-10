@@ -1,26 +1,17 @@
+import importlib
+
 # 当前python qt使用的版本
 PYQT_VERSIONS = None
 
-try:
-    import PyQt5
-    PYQT_VERSIONS = "PyQt5"
-except:
-    pass
+VERSIONS = ["PyQt5","PyQt6","PySide2","PySide6"]
 
-try:
-    import PyQt6
-    PYQT_VERSIONS = "PyQt6"
-except:
-    pass
+for module in VERSIONS:
+    try:
+        importlib.import_module(module)
+        PYQT_VERSIONS = module
+        break
+    except:
+        pass
 
-try:
-    import PySide2
-    PYQT_VERSIONS = "PySide2"
-except:
-    pass
-
-try:
-    import PySide6
-    PYQT_VERSIONS = "PySide6"
-except:
-    pass
+if PYQT_VERSIONS is None:
+    raise ModuleNotFoundError("Module not found,support:PyQt5,PyQt6,PySide2,PySide6")
