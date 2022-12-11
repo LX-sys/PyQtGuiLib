@@ -23,34 +23,35 @@ from PyQtGuiLib.core.bubbleWidget import BubbleWidget
 class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.resize(500,500)
+        self.resize(800,500)
 
         self.btn = QPushButton("一号玩家",self)
         self.btn.resize(130,100)
-        self.btn.move(100,100)
+        self.btn.move(200,200)
 
         self.bu = BubbleWidget(self)
-        self.bu.resize(160, 80)
-        self.bu.setDurationTime(2)
-        self.bu.setDirection(BubbleWidget.Left)
+        self.bu.setDurationTime(BubbleWidget.Be_Forever)
+        self.bu.setDirection(BubbleWidget.Down)
         self.bu.setTrack(self.btn)
         self.bu.setText("二号是笨蛋")
+        self.bu.resize(150, 100)
         # self.bu.move(80,100) # 如果不想手动设置位置可以用下面控件追踪功能
 
         # # --------
-        self.btn2 = QPushButton("二号玩家",self)
-        self.btn2.resize(130,40)
-        self.btn2.move(400,350)
-
-        self.bu2 = BubbleWidget(self)
-        self.bu2.setText("你才是哼")
-        # 反向的设置一定要在追踪前面
-        self.bu2.setDirection(BubbleWidget.Down)
-        self.bu2.setTrack(self.btn2)
-        self.bu2.setTextColor(QColor(255, 255, 0))
-        self.bu2.setBColor(QColor(170, 0, 255))
-        self.bu2.setKm(30,10)
-        self.bu2.resize(160,80)
+        # self.btn2 = QPushButton("二号玩家",self)
+        # self.btn2.resize(150,80)
+        # self.btn2.move(400,350)
+        #
+        # self.bu2 = BubbleWidget(self)
+        # self.bu2.setText("你才是哼")
+        # # 反向的设置一定要在追踪前面
+        # self.bu2.setDurationTime(BubbleWidget.Be_Forever)
+        # self.bu2.setDirection(BubbleWidget.Left)
+        # self.bu2.setTrack(self.btn2)
+        # self.bu2.setTextColor(QColor(255, 255, 0))
+        # self.bu2.setBColor(QColor(170, 0, 255))
+        # # self.bu2.setKm(30,10)
+        # self.bu2.resize(260,80)
         #
         # self.bu3 = BubbleWidget(self)
         # self.bu3.setText("绿色")
