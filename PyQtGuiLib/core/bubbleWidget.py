@@ -16,7 +16,8 @@ from PyQtGuiLib.header import (
     QPointF,
     Signal,
     QThread,
-    QSize
+    QSize,
+    QFontMetricsF
 )
 
 '''
@@ -65,13 +66,13 @@ class BubbleWidget(QWidget):
 
     def __init__(self,*args,**kwargs):
         self.triangle_km = 20  # 三角形的开口大小
-        self.w, self.h = 160, 60
+        self.w, self.h = 160, 60  # 默认大小
         super().__init__(*args,**kwargs)
         self.setObjectName("BubbleW")
 
         self.box = 2  # 边距
-        self.triangle_h = 20  # 三角形高度
-        self.triangle_dis = self.w // 2 - self.triangle_km  # 三角形的位置(默认在中心)
+        self.triangle_pos = 20  # 三角形在矩形x/y轴的什么位置
+        self.triangle_diameter = 20 # 三角形的高度
         self.direction = BubbleWidget.Top  # 三级形的位置(默认三角形在上面)
         self.radius = 5 # 半径
         self.bcolor = QColor(152, 167, 255)  # 气泡颜色
@@ -89,18 +90,24 @@ class BubbleWidget(QWidget):
 
     # 追踪控件
     def setTrack(self,widget:QWidget,offset:int=0):
-        w, h = widget.width() // 2, widget.height()
+        '''
+            widget:需要跟踪的控件
+            offset:偏移距离(默认居中)
+        '''
+        w, h = widget.width(), widget.height()
         x, y = widget.x(), widget.y()
         xw, hy = x + w, h + y
-        ww = self.w - self.triangle_dis - self.triangle_km - offset
+        # 横轴的顶点居中位置
+        center_vertex_x = w//2-self.triangle_pos-self.triangle_km+offset
+        center_vertex_y = h//2-self.triangle_pos-self.triangle_km+offset
         if self.direction == BubbleWidget.Top:
-            self.move(xw-ww,hy)
+            self.move(x+center_vertex_x,y+h)
         elif self.direction == BubbleWidget.Down:
-            self.move(xw - ww, y-self.h-self.triangle_h)
+            self.move(x+center_vertex_x,y-h)
         elif self.direction == BubbleWidget.Right:
-            self.move(x-self.w,self.h+self.triangle_dis)
+            self.move(x-self.w,y+center_vertex_y)
         elif self.direction == BubbleWidget.Left:
-            self.move(x+widget.width(),y+widget.height()//2-self.triangle_dis)
+            self.move(xw,y+center_vertex_y)
 
     def resize(self,*args) -> None:
         '''
@@ -128,23 +135,28 @@ class BubbleWidget(QWidget):
         if color:
             self.setTextColor(color)
 
-    def setKmDis(self,dis:int):
-        self.triangle_dis = dis
+    def setKmPos(self,pos:int):
+        self.triangle_pos = pos
+
+    def setKmDiameter(self,diameter:int):
+        self.triangle_diameter = diameter
 
     def setKmM(self,km:int):
         self.triangle_km = km
 
-    def setKm(self,dis:int,km:int):
-        self.setKmDis(dis)
+    def setKm(self,pos:int,diameter:int,km:int):
+        '''
+            pos:三角形在矩形的距离
+            diameter:三角形的高度
+            km:三角形开口大小
+        '''
+        self.setKmPos(pos)
+        self.setKmDiameter(diameter)
         self.setKmM(km)
 
     # 设置方向
     def setDirection(self,d):
         self.direction = d
-        if self.direction in [BubbleWidget.Top,BubbleWidget.Down]:
-            self.triangle_dis = self.w // 2 - self.triangle_km  # 三角形的位置(默认在中心)
-        if self.direction in [BubbleWidget.Left,BubbleWidget.Right]:
-            self.triangle_dis = self.h // 2   # 三角形的位置(默认在中心)
 
     def setBColor(self,bcolor:QColor):
         self.bcolor = bcolor
@@ -152,23 +164,21 @@ class BubbleWidget(QWidget):
     # 三角形
     def delta(self,ppath:QPainterPath):
         if self.direction == BubbleWidget.Top:
-            h = self.triangle_h + self.box
-            ploys = [QPointF(self.triangle_dis, h),
-                     QPointF(self.triangle_dis + self.triangle_km, self.box),
-                     QPointF(self.triangle_dis+self.triangle_km*2, h)]
+            ploys = [QPointF(self.triangle_pos,self.triangle_diameter+self.box),
+                     QPointF(self.triangle_pos+self.triangle_km,self.box),
+                     QPointF(self.triangle_pos+self.triangle_km*2,self.triangle_diameter+self.box)]
         elif self.direction == BubbleWidget.Down:
-            h = self.h-self.triangle_h-self.box
-            ploys = [QPointF(self.triangle_dis, h+self.box),
-                     QPointF(self.triangle_dis+self.triangle_km,h+self.triangle_h),
-                     QPointF(self.triangle_dis+self.triangle_km*2, h+self.box)]
+            ploys = [QPointF(self.triangle_pos,self.h-self.triangle_diameter),
+                     QPointF(self.triangle_pos+self.triangle_km,self.h-self.box),
+                     QPointF(self.triangle_pos+self.triangle_km*2,self.h-self.triangle_diameter)]
         elif self.direction == BubbleWidget.Left:
-            ploys = [QPointF(self.box,self.triangle_dis),
-                     QPointF(self.triangle_km+self.box,self.triangle_dis-self.triangle_km),
-                     QPointF(self.triangle_km+self.box,self.triangle_dis+self.triangle_km)]
+            ploys = [QPointF(self.triangle_diameter+self.box,self.triangle_pos),
+                     QPointF(self.box,self.triangle_pos+self.triangle_km),
+                     QPointF(self.triangle_diameter+self.box,self.triangle_pos+self.triangle_km*2)]
         elif self.direction == BubbleWidget.Right:
-            ploys = [QPointF(self.w-self.triangle_km,self.triangle_dis-self.triangle_km),
-                     QPointF(self.w-self.box,self.triangle_dis),
-                     QPointF(self.w-self.triangle_km,self.triangle_dis+self.triangle_km)]
+            ploys=[QPointF(self.w-self.triangle_diameter,self.triangle_pos),
+                   QPointF(self.w-self.box,self.triangle_pos+self.triangle_km),
+                   QPointF(self.w-self.triangle_diameter,self.triangle_pos+self.triangle_km*2)]
         else:
             return
         ppath.addPolygon(QPolygonF(ploys))
@@ -176,17 +186,18 @@ class BubbleWidget(QWidget):
     # 矩形
     def ract_(self,ppath:QPainterPath):
         if self.direction == BubbleWidget.Top:
-            rectf = QRectF(self.box, self.box + self.triangle_h,
-                           self.w - self.box, self.h - self.triangle_h - self.box)
+            rectf = QRectF(self.box, self.box + self.triangle_diameter,
+                           self.w - self.box, self.h - self.triangle_diameter - self.box)
         elif self.direction == BubbleWidget.Down:
             rectf = QRectF(self.box, self.box,
-                           self.w - self.box, self.h - self.triangle_h - self.box)
+                           self.w - self.box, self.h - self.triangle_diameter - self.box)
         elif self.direction == BubbleWidget.Left:
-            rectf = QRectF(self.triangle_km+self.box,self.box,
-                           self.w-self.triangle_km,self.h-self.box)
+            # self.triangle_diameter+self.box 三角占用的空间
+            rectf = QRectF(self.triangle_diameter+self.box,self.box,
+                           self.w-self.triangle_diameter,self.h-self.box)
         elif self.direction == BubbleWidget.Right:
             rectf = QRectF(self.box,self.box,
-                           self.w-self.triangle_km-self.box,
+                           self.w-self.triangle_diameter-self.box,
                            self.h-self.box)
         else:
             rectf = QRectF(self.box, self.box,
@@ -196,27 +207,38 @@ class BubbleWidget(QWidget):
     # 文字
     def text_(self,painter:QPainter):
         f = QFont()
-        f.setPointSize(self.text_size)
         painter.setFont(f)
         painter.setPen(self.text_color)
-        '''
-            文字居中位置计算 - 宽
-            英文:
-                文字长度*文字大小//3
-            中文:
-                文字长度*文字大小*2//3
-        '''
-        n = 1
-        if re.findall(r"[\u4e00-\u9fa5]", self.text):
-            n = 2
+        # '''
+        #     文字居中位置计算 - 宽
+        #     英文:
+        #         文字长度*文字大小//3
+        #     中文:
+        #         文字长度*文字大小*2//3
+        # '''
+        # n = 1
+        # if re.findall(r"[\u4e00-\u9fa5]", self.text):
+        #     n = 2
+
+        fs = QFontMetricsF(f)
+        fw = int(fs.width(self.text))
+        fh = int(fs.height())
         if self.direction == BubbleWidget.Top:
-            painter.drawText(self.w // 2 - len(self.text) * self.text_size*n // 3, self.h//2+self.triangle_h, self.text)
+            x = self.w // 2 - fw // 2
+            y = self.h // 2+self.triangle_pos
         elif self.direction == BubbleWidget.Down:
-            painter.drawText(self.w // 2 - len(self.text) * self.text_size * n // 3, self.h//2,
-                             self.text)
+            x = self.w // 2 - fw // 2
+            y = (self.h-self.triangle_pos//2) // 2
+        elif self.direction == BubbleWidget.Left:
+            x = (self.w-self.triangle_pos)//2-fw//6
+            y = self.h//2+fh//2
+        elif self.direction == BubbleWidget.Right:
+            x = (self.w-self.triangle_pos)//2-fw//2
+            y = self.h//2+fh//2
         else:
-            painter.drawText(self.w // 2 - len(self.text) * self.text_size * n // 3, self.h // 2+self.text_size//2,
-                             self.text)
+            x,y=0,0
+            self.text = ""
+        painter.drawText(x,y,self.text)
 
     def paintEvent(self, e:QPaintEvent) -> None:
         painter = QPainter()
