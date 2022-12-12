@@ -20,6 +20,7 @@ from PyQtGuiLib.header import (
     QFontMetricsF
 )
 
+from PyQtGuiLib.animation.lmlm import LmLmAnimation
 '''
     气泡窗口
     种类一
@@ -65,14 +66,15 @@ class BubbleWidget(QWidget):
     Be_Forever = -1
 
     def __init__(self,*args,**kwargs):
-        self.triangle_km = 20  # 三角形的开口大小
-        self.w, self.h = 160, 60  # 默认大小
+        self.triangle_km = 10  # 三角形的开口大小
+        self.w, self.h = 160, 70  # 默认大小
         super().__init__(*args,**kwargs)
+        self.resize(self.w,self.h)
         self.setObjectName("BubbleW")
 
         self.box = 2  # 边距
         self.triangle_pos = 20  # 三角形在矩形x/y轴的什么位置
-        self.triangle_diameter = 20 # 三角形的高度
+        self.triangle_diameter = 10 # 三角形的高度
         self.direction = BubbleWidget.Top  # 三级形的位置(默认三角形在上面)
         self.radius = 5 # 半径
         self.bcolor = QColor(152, 167, 255)  # 气泡颜色
@@ -83,6 +85,11 @@ class BubbleWidget(QWidget):
         # ==
         self.dtthread = DurationTimeThread(self)
         self.dtthread.start()
+        # 动画
+        self.lmlm = LmLmAnimation()
+        self.lmlm.setTargetObject(self)
+        self.setDurationTime(4000)
+        self.lmlm.start()
 
     # 弹窗持续时间
     def setDurationTime(self,seconds:int):
@@ -103,7 +110,7 @@ class BubbleWidget(QWidget):
         if self.direction == BubbleWidget.Top:
             self.move(x+center_vertex_x,y+h)
         elif self.direction == BubbleWidget.Down:
-            self.move(x+center_vertex_x,y-h)
+            self.move(x+center_vertex_x,y-self.h)
         elif self.direction == BubbleWidget.Right:
             self.move(x-self.w,y+center_vertex_y)
         elif self.direction == BubbleWidget.Left:
