@@ -14,7 +14,6 @@ from PyQtGuiLib.header import (
     QWidget,
     QPushButton,
     PYQT_VERSIONS,
-    QRect,
     QGraphicsOpacityEffect,
     QThread,
     Signal
