@@ -11,7 +11,8 @@ from PyQtGuiLib.header import (
     QWidget,
     QPushButton,
     QColor,
-    QSize
+    QSize,
+    Qt
 )
 
 from PyQtGuiLib.core.bubbleWidget import BubbleWidget
@@ -31,9 +32,11 @@ class Test(QWidget):
 
         self.bu = BubbleWidget(self)
         self.bu.setDirection(BubbleWidget.Down)
-        self.bu.setDurationTime(BubbleWidget.Be_Forever)
+        self.bu.setDurationTime(3)
+        self.bu.setAnimationEnabled(True)
         self.bu.setTrack(self.btn)
         self.bu.setText("二号是笨蛋")
+        self.bu.finished.connect(lambda :print("111111111"))
         # self.bu.move(80,100) # 如果不想手动设置位置可以用下面控件追踪功能
 
         # # --------
