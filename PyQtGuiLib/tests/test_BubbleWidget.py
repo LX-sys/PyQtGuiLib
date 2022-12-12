@@ -30,11 +30,10 @@ class Test(QWidget):
         self.btn.move(200,200)
 
         self.bu = BubbleWidget(self)
-        self.bu.setDurationTime(BubbleWidget.Be_Forever)
         self.bu.setDirection(BubbleWidget.Down)
+        self.bu.setDurationTime(BubbleWidget.Be_Forever)
         self.bu.setTrack(self.btn)
         self.bu.setText("二号是笨蛋")
-        self.bu.resize(150, 100)
         # self.bu.move(80,100) # 如果不想手动设置位置可以用下面控件追踪功能
 
         # # --------
