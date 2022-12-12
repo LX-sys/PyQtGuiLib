@@ -20,7 +20,8 @@ if PYQT_VERSIONS == "PyQt5":
         QTableWidget,
         QScrollArea,
         QWidgetItem,
-        QSplitter
+        QSplitter,
+        QGraphicsOpacityEffect
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -44,7 +45,8 @@ if PYQT_VERSIONS == "PyQt6":
         QTableWidget,
         QScrollArea,
         QWidgetItem,
-        QSplitter
+        QSplitter,
+        QGraphicsOpacityEffect
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -68,7 +70,8 @@ if PYQT_VERSIONS == "PySide2":
         QTableWidget,
         QScrollArea,
         QWidgetItem,
-        QSplitter
+        QSplitter,
+        QGraphicsOpacityEffect
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -92,5 +95,6 @@ if PYQT_VERSIONS == "PySide6":
         QTableWidget,
         QScrollArea,
         QWidgetItem,
-        QSplitter
+        QSplitter,
+        QGraphicsOpacityEffect
     )
