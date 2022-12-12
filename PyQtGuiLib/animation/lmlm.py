@@ -16,33 +16,55 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QRect,
     QGraphicsOpacityEffect,
-    QThread
+    QThread,
+    Signal
 )
 
 # 时间
 class DurationTimeThread(QThread):
+    finished = Signal()
+
     def __init__(self,lmlm:QGraphicsOpacityEffect,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.lmlm = lmlm
-        self.dur_time = 2
+        self.mode = "show"
+        self.dur_time = 3
+
+    def setMode(self,mode:str):
+        self.mode = mode
 
     def setDurationTime(self, seconds: int):
         self.dur_time = seconds
 
     def run(self):
+        n = round((1 / self.dur_time) / 10, 2)
         opacity_v = 0
-        n = round((1/self.dur_time)/10,2)
-        # 从无到有
+        if self.mode == "hide":
+            opacity_v = 1
+            n = -n
+
         while self.dur_time:
             self.lmlm.setOpacity(opacity_v)
             self.msleep(100)
-            opacity_v+=n
+            opacity_v += n
+            if opacity_v >= 1 or opacity_v <= 0:
+                break
+        self.finished.emit()
 
 
+# 若隐若现 动画
 class LmLmAnimation(QGraphicsOpacityEffect):
+    finished = Signal()  # 完成信号
+
+    Show = "show"
+    Hide = "hide"
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.dtt = DurationTimeThread(self)
+
+    def setMode(self,mode:str="show"):
+        self.dtt.setMode(mode)
 
     # 这样写是为了,统一api的用法
     def setTargetObject(self,widget:QWidget):
@@ -53,6 +75,7 @@ class LmLmAnimation(QGraphicsOpacityEffect):
 
     def start(self):
         self.dtt.start()
+        self.dtt.finished.connect(self.finished)
 
 
 
@@ -66,9 +89,11 @@ class Test(QWidget):
         self.btn.move(100,100)
 
         self.op =LmLmAnimation()
+        self.op.setMode(LmLmAnimation.Hide)
         self.op.setTargetObject(self.btn)
         self.op.setDuration(5000)
         self.op.start()
+        self.op.finished.connect(lambda :print("Dasdasd"))
 
 
         '''
@@ -78,10 +103,10 @@ class Test(QWidget):
         windowOpacity 透明度
         alpha  自定义
         '''
-        self.ani = QPropertyAnimation()
+        # self.ani = QPropertyAnimation()
         # self.ani.setTargetObject(self.btn)
         # self.ani.setPropertyName(b"windowOpacity")
-        self.ani.setDuration(10000)
+        # self.ani.setDuration(10000)
         # self.ani.setStartValue(1)
         # self.ani.setEndValue(0.3)
         # self.ani.setStartValue(QRect(150, 30, 100, 100))
