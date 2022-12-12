@@ -21,7 +21,9 @@ if PYQT_VERSIONS == "PyQt5":
         QScrollArea,
         QWidgetItem,
         QSplitter,
-        QGraphicsOpacityEffect
+        QGraphicsOpacityEffect,
+        QMainWindow,
+        QDesktopWidget
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -46,8 +48,10 @@ if PYQT_VERSIONS == "PyQt6":
         QScrollArea,
         QWidgetItem,
         QSplitter,
-        QGraphicsOpacityEffect
-    )
+        QGraphicsOpacityEffect,
+        QMainWindow,
+        QDesktopWidget
+)
 
 if PYQT_VERSIONS == "PySide2":
     from PySide2.QtWidgets import (
@@ -71,7 +75,9 @@ if PYQT_VERSIONS == "PySide2":
         QScrollArea,
         QWidgetItem,
         QSplitter,
-        QGraphicsOpacityEffect
+        QGraphicsOpacityEffect,
+        QMainWindow,
+        QDesktopWidget
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -96,5 +102,7 @@ if PYQT_VERSIONS == "PySide6":
         QScrollArea,
         QWidgetItem,
         QSplitter,
-        QGraphicsOpacityEffect
+        QGraphicsOpacityEffect,
+        QMainWindow,
+        QDesktopWidget
     )

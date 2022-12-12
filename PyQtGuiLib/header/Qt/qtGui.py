@@ -15,6 +15,7 @@ if PYQT_VERSIONS == "PyQt5":
         QFont,
         QLinearGradient,
         QFontMetricsF,
+        QCloseEvent,
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -31,7 +32,8 @@ if PYQT_VERSIONS == "PyQt6":
         QPolygonF,
         QFont,
         QLinearGradient,
-        QFontMetricsF
+        QFontMetricsF,
+        QCloseEvent
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -48,7 +50,8 @@ if PYQT_VERSIONS == "PySide2":
         QPolygonF,
         QFont,
         QLinearGradient,
-        QFontMetricsF
+        QFontMetricsF,
+        QCloseEvent
     )
 
 
@@ -66,5 +69,6 @@ if PYQT_VERSIONS == "PySide6":
         QPolygonF,
         QFont,
         QLinearGradient,
-        QFontMetricsF
+        QFontMetricsF,
+        QCloseEvent
     )
