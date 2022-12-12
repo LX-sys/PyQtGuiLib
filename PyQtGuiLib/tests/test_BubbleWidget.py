@@ -32,7 +32,7 @@ class Test(QWidget):
 
         self.bu = BubbleWidget(self)
         self.bu.setDirection(BubbleWidget.Down)
-        self.bu.setDurationTime(3)
+        self.bu.setDurationTime(BubbleWidget.Be_Forever)
         self.bu.setAnimationEnabled(True)
         self.bu.setTrack(self.btn)
         self.bu.setText("二号是笨蛋")
