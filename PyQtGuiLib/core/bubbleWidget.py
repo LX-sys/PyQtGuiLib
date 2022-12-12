@@ -12,7 +12,6 @@ from PyQtGuiLib.header import (
     QRectF,
     QFont,
     QColor,
-    re,
     QPointF,
     Signal,
     QThread,
@@ -20,7 +19,7 @@ from PyQtGuiLib.header import (
     QFontMetricsF
 )
 
-from PyQtGuiLib.animation.lmlm import LmLmAnimation
+from PyQtGuiLib.animation.lmlmAni import LmLmAnimation
 '''
     气泡窗口
     种类一
@@ -214,7 +213,7 @@ class BubbleWidget(QWidget):
                      QPointF(self.box,self.triangle_pos+self.triangle_km),
                      QPointF(self.triangle_diameter+self.box,self.triangle_pos+self.triangle_km*2)]
         elif self.direction == BubbleWidget.Right:
-            ploys=[QPointF(self.w-self.triangle_diameter,self.triangle_pos),
+            ploys =[QPointF(self.w-self.triangle_diameter,self.triangle_pos),
                    QPointF(self.w-self.box,self.triangle_pos+self.triangle_km),
                    QPointF(self.w-self.triangle_diameter,self.triangle_pos+self.triangle_km*2)]
         else:
