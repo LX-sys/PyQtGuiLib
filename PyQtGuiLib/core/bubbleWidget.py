@@ -33,6 +33,7 @@ from PyQtGuiLib.animation.lmlm import LmLmAnimation
 
 # 弹窗持续时间
 class DurationTimeThread(QThread):
+    finished = Signal()  # 完成信号
     def __init__(self,bub,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.bub = bub  # type:BubbleWidget
@@ -43,18 +44,19 @@ class DurationTimeThread(QThread):
 
     def run(self) -> None:
         if self.dur_time == -1:
+            self.finished.emit()
             return
 
         n = 0
         while n != self.dur_time:
             self.sleep(1)
             n+=1
-        self.bub.close()
+        self.finished.emit()
 
 
 class BubbleWidget(QWidget):
     # 启动/结束事件
-    ended = Signal()
+    finished = Signal()
 
     Top = "top"
     Down = "Down"
@@ -75,25 +77,54 @@ class BubbleWidget(QWidget):
         self.box = 2  # 边距
         self.triangle_pos = 20  # 三角形在矩形x/y轴的什么位置
         self.triangle_diameter = 10 # 三角形的高度
-        self.direction = BubbleWidget.Top  # 三级形的位置(默认三角形在上面)
+        self.direction = BubbleWidget.Top  # 三级形的方向(默认三角形在上面)
         self.radius = 5 # 半径
         self.bcolor = QColor(152, 167, 255)  # 气泡颜色
-        self.text = "Bubble"
+        self.text = "Bubble"  # 文本
         self.text_color = QColor(0,85,0)  # 文字颜色
         self.text_size = 15  # 文字大小
+        self.is_aim = False # 判断是否需要动画(动画的优先级姚高于持续时间 先执行动画->在执行气泡持续时间)
+        self.is_durtime = False # 是否开启气泡窗口的持续时间
+        # ===
+        self.dtthread = DurationTimeThread(self)  # 气泡持续时间线程
+        self.lmlm = LmLmAnimation()  # 动画
+        self.lmlm.setTargetObject(self) # 设置动画的目标
+        #
+        self.dtthread.finished.connect(self.finish_event)
 
-        # ==
-        self.dtthread = DurationTimeThread(self)
-        self.dtthread.start()
-        # 动画
-        self.lmlm = LmLmAnimation()
-        self.lmlm.setTargetObject(self)
-        self.setDurationTime(4000)
-        self.lmlm.start()
+    # 气泡启动动画
+    def setAnimationEnabled(self,b:bool,duration_time:int=2000):
+        if b:
+            self.is_aim = True
+            self.lmlm.setDuration(duration_time)
+            self.lmlm.start()
+            if self.is_durtime:
+                def _(self):
+                    self.dtthread.start()
+                    self.lmlm.disconnect()  # 这里必须断开链接,
+                self.lmlm.finished.connect(lambda :_(self))
 
-    # 弹窗持续时间
-    def setDurationTime(self,seconds:int):
-        self.dtthread.setDurationTime(seconds)
+        else:
+            self.is_aim = False
+
+    # 气泡持续时间
+    def setDurationTime(self, seconds: int):
+        if seconds != BubbleWidget.Be_Forever:
+            self.is_durtime = True
+            self.dtthread.setDurationTime(seconds)
+            if self.is_aim is False:
+                self.dtthread.start()
+        else:
+            self.is_durtime = False
+
+    # 完成事件
+    def finish_event(self):
+        if self.is_durtime and self.is_aim is False:
+            self.close()
+        else:
+            self.lmlm.setMode(self.lmlm.Hide)
+            self.lmlm.start()
+            # self.lmlm.finished.connect(self.finished.emit())
 
     # 追踪控件
     def setTrack(self,widget:QWidget,offset:int=0):
@@ -104,7 +135,7 @@ class BubbleWidget(QWidget):
         w, h = widget.width(), widget.height()
         x, y = widget.x(), widget.y()
         xw, hy = x + w, h + y
-        # 横轴的顶点居中位置
+        # 轴上的顶点居中位置
         center_vertex_x = w//2-self.triangle_pos-self.triangle_km+offset
         center_vertex_y = h//2-self.triangle_pos-self.triangle_km+offset
         if self.direction == BubbleWidget.Top:
@@ -216,17 +247,7 @@ class BubbleWidget(QWidget):
         f = QFont()
         painter.setFont(f)
         painter.setPen(self.text_color)
-        # '''
-        #     文字居中位置计算 - 宽
-        #     英文:
-        #         文字长度*文字大小//3
-        #     中文:
-        #         文字长度*文字大小*2//3
-        # '''
-        # n = 1
-        # if re.findall(r"[\u4e00-\u9fa5]", self.text):
-        #     n = 2
-
+        # 文字
         fs = QFontMetricsF(f)
         fw = int(fs.width(self.text))
         fh = int(fs.height())
