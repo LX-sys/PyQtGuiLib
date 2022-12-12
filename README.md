@@ -21,6 +21,18 @@ win
 mac
 ```
 
+### 项目目录说明	
+
+```python
+PyQtGuiLib
+|- abandonCase   # 存放已经放弃的的案例
+|- animation     # 动画功能文件
+|- core          # 组件的核心实现文件
+|- header        # 公共模块,函数文件
+|- Log           # 更新日志
+|- tests         # 组件测试文件
+```
+
 ### 组件功能完成进度
 
 ```python
