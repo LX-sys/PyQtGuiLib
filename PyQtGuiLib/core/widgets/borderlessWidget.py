@@ -15,6 +15,7 @@ from PyQtGuiLib.header import (
 
 '''
     无边框窗口
+        可自由拉伸八个方位
 '''
 
 class BorderlessWidget(QWidget):
@@ -38,7 +39,7 @@ background-color:green;
         self.setMouseTracking(True)
 
         self.scope = 9  # 检测鼠标是否在边缘按下的范围
-        self.pressDirection = None  # 记录鼠标点击的边的方向
+        self.pressDirection = []  # 记录鼠标点击的边的方向
         self.pressPos = QPoint(0,0) # 鼠标按下时的位置
         self.pressState = False  # 按下状态
 
@@ -48,15 +49,13 @@ background-color:green;
         w,h = self.width(),self.height()
 
         if x <= self.scope and x >= 0:
-            self.pressDirection = BorderlessWidget.Left
-        elif w - x <= self.scope:
-            self.pressDirection = BorderlessWidget.Right
-        elif y >= 0 and y <= self.scope:
-            self.pressDirection = BorderlessWidget.Top
-        elif h - y <= self.scope:
-            self.pressDirection = BorderlessWidget.Down
-        else:
-            self.pressDirection = None
+            self.pressDirection.append(BorderlessWidget.Left)
+        if w - x <= self.scope:
+            self.pressDirection.append(BorderlessWidget.Right)
+        if y >= 0 and y <= self.scope:
+            self.pressDirection.append(BorderlessWidget.Top)
+        if h - y <= self.scope:
+            self.pressDirection.append(BorderlessWidget.Down)
 
         if self.pressDirection:
             return True
@@ -66,13 +65,9 @@ background-color:green;
         x, y = pos.x(), pos.y()
         w, h = self.width(), self.height()
 
-        if x <= self.scope and x >= 0:
+        if (x <= self.scope and x >= 0) or (w - x <= self.scope):
             self.setCursor(Qt.SizeHorCursor)
-        elif w - x <= self.scope:
-            self.setCursor(Qt.SizeHorCursor)
-        elif y >= 0 and y <= self.scope:
-            self.setCursor(Qt.SizeVerCursor)
-        elif h - y <= self.scope:
+        elif (y >= 0 and y <= self.scope) or (h - y <= self.scope):
             self.setCursor(Qt.SizeVerCursor)
         else:
             self.setCursor(Qt.ArrowCursor)
@@ -84,24 +79,35 @@ background-color:green;
     def expandEdge(self,pos:QPoint):
         if not self.pressState:
             return
-        print(pos,self.pressPos)
 
         x,y = self.pos().x(),self.pos().y()
-
-        if self.pressDirection == BorderlessWidget.Right:
-            distance = pos - self.pressPos
-            distance_ = self.width() + distance.x()
-            self.resize(distance_, self.height())
-            self.pressPos = QPoint(distance_, 0)
-        elif self.pressDirection == BorderlessWidget.Down:
-            distance = pos - self.pressPos
-            distance_ = self.height() + distance.y()
-            self.resize(self.width(),distance_)
-            self.pressPos = QPoint(0,distance_)
-        elif self.pressDirection == BorderlessWidget.Left:
-            pass
-        elif self.pressDirection == BorderlessWidget.Top:
-            pass
+        for direction in self.pressDirection:
+            if direction == BorderlessWidget.Right:
+                distance = pos - self.pressPos
+                distance_ = self.width() + distance.x()
+                self.resize(distance_, self.height())
+                if BorderlessWidget.Down not in self.pressDirection:
+                    self.pressPos = QPoint(distance_, 0)
+            if direction == BorderlessWidget.Down:
+                distance = pos - self.pressPos
+                distance_ = self.height() + distance.y()
+                if BorderlessWidget.Right in self.pressDirection:
+                    distance_w = self.width() + distance.x()
+                    self.resize(distance_w, distance_)
+                    self.pressPos = QPoint(distance_w, distance_)
+                else:
+                    self.resize(self.width(),distance_)
+                    self.pressPos = QPoint(0,distance_)
+            if direction == BorderlessWidget.Left:
+                distance_ = x+pos.x()
+                self.resize(self.width()-pos.x(),self.height())
+                self.move(distance_, y)
+            if direction == BorderlessWidget.Top:
+                distance_ = y + pos.y()
+                self.resize(self.width(), self.height()-pos.y())
+                if BorderlessWidget.Left in self.pressDirection:
+                    x = x+pos.x()
+                self.move(x,distance_)
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
         if self.isEdge(e.pos()):
@@ -110,7 +116,7 @@ background-color:green;
         super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e:QMouseEvent) -> None:
-        self.pressDirection = None
+        self.pressDirection.clear()
         self.pressPos = QPoint(0, 0)
         self.pressState = False
         super().mouseReleaseEvent(e)
