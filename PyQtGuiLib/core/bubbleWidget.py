@@ -75,13 +75,13 @@ class BubbleWidget(QWidget):
 
         self.box = 2  # 边距
         self.triangle_pos = 20  # 三角形在矩形x/y轴的什么位置
-        self.triangle_diameter = 10 # 三角形的高度
+        self.triangle_diameter = 15 # 三角形的高度
         self.direction = BubbleWidget.Top  # 三级形的方向(默认三角形在上面)
         self.radius = 5 # 半径
         self.bcolor = QColor(152, 167, 255)  # 气泡颜色
         self.text = "Bubble"  # 文本
         self.text_color = QColor(0,85,0)  # 文字颜色
-        self.text_size = 15  # 文字大小
+        self.text_size = 16  # 文字大小
         self.is_aim = False # 判断是否需要动画(动画的优先级姚高于持续时间 先执行动画->在执行气泡持续时间)
         self.is_durtime = False # 是否开启气泡窗口的持续时间
         # ===
@@ -203,19 +203,19 @@ class BubbleWidget(QWidget):
         if self.direction == BubbleWidget.Top:
             ploys = [QPointF(self.triangle_pos,self.triangle_diameter+self.box),
                      QPointF(self.triangle_pos+self.triangle_km,self.box),
-                     QPointF(self.triangle_pos+self.triangle_km*2,self.triangle_diameter+self.box)]
+                     QPointF(self.triangle_pos+self.triangle_km<<1,self.triangle_diameter+self.box)]
         elif self.direction == BubbleWidget.Down:
             ploys = [QPointF(self.triangle_pos,self.h-self.triangle_diameter),
                      QPointF(self.triangle_pos+self.triangle_km,self.h-self.box),
-                     QPointF(self.triangle_pos+self.triangle_km*2,self.h-self.triangle_diameter)]
+                     QPointF(self.triangle_pos+self.triangle_km<<1,self.h-self.triangle_diameter)]
         elif self.direction == BubbleWidget.Left:
             ploys = [QPointF(self.triangle_diameter+self.box,self.triangle_pos),
                      QPointF(self.box,self.triangle_pos+self.triangle_km),
-                     QPointF(self.triangle_diameter+self.box,self.triangle_pos+self.triangle_km*2)]
+                     QPointF(self.triangle_diameter+self.box,self.triangle_pos+self.triangle_km<<1)]
         elif self.direction == BubbleWidget.Right:
             ploys =[QPointF(self.w-self.triangle_diameter,self.triangle_pos),
                    QPointF(self.w-self.box,self.triangle_pos+self.triangle_km),
-                   QPointF(self.w-self.triangle_diameter,self.triangle_pos+self.triangle_km*2)]
+                   QPointF(self.w-self.triangle_diameter,self.triangle_pos+self.triangle_km<<1)]
         else:
             return
         ppath.addPolygon(QPolygonF(ploys))
@@ -244,26 +244,28 @@ class BubbleWidget(QWidget):
     # 文字
     def text_(self,painter:QPainter):
         f = QFont()
+        f.setPointSize(self.text_size)
         painter.setFont(f)
         painter.setPen(self.text_color)
         # 文字
         fs = QFontMetricsF(f)
         fw = int(fs.width(self.text))
         fh = int(fs.height())
+        print(fw,fh)
         if self.direction == BubbleWidget.Top:
-            x = self.w // 2 - fw // 2
-            y = self.h // 2+self.triangle_pos
+            x = (self.w - fw) // 2
+            y = self.h // 2+self.triangle_diameter
         elif self.direction == BubbleWidget.Down:
-            x = self.w // 2 - fw // 2
-            y = (self.h-self.triangle_pos//2) // 2
+            x = (self.w - fw) // 2
+            y = (self.h-self.triangle_diameter+fh) // 2
         elif self.direction == BubbleWidget.Left:
-            x = (self.w-self.triangle_pos)//2-fw//6
-            y = self.h//2+fh//2
+            x = (self.w-self.triangle_diameter-fw//2)//2
+            y = (self.h + fh)//2
         elif self.direction == BubbleWidget.Right:
-            x = (self.w-self.triangle_pos)//2-fw//2
-            y = self.h//2+fh//2
+            x = (self.w-self.triangle_diameter)//2-fw//2
+            y = (self.h + fh) // 2
         else:
-            x,y=0,0
+            x,y = 0,0
             self.text = ""
         painter.drawText(x,y,self.text)
 
