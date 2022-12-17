@@ -31,11 +31,14 @@ class Test(QWidget):
         self.btn.move(200,200)
 
         self.bu = BubbleWidget(self)
-        self.bu.setDirection(BubbleWidget.Down)
+        self.bu.resize(150,100)
+        self.bu.setDirection(BubbleWidget.Top)
         self.bu.setDurationTime(BubbleWidget.Be_Forever)
         self.bu.setAnimationEnabled(True)
         self.bu.setTrack(self.btn)
-        self.bu.setText("二号是笨蛋")
+        self.bu.setText("你好世界")
+        # self.bu.setText("hello world")
+
         self.bu.finished.connect(lambda :print("111111111"))
         # self.bu.move(80,100) # 如果不想手动设置位置可以用下面控件追踪功能
 
