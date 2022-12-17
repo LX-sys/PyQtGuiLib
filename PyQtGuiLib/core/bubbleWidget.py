@@ -251,7 +251,6 @@ class BubbleWidget(QWidget):
         fs = QFontMetricsF(f)
         fw = int(fs.width(self.text))
         fh = int(fs.height())
-        print(fw,fh)
         if self.direction == BubbleWidget.Top:
             x = (self.w - fw) // 2
             y = self.h // 2+self.triangle_diameter
