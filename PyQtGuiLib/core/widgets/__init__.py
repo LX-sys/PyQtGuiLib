@@ -3,3 +3,11 @@
 # @author:LX
 # @file:__init__.py.py
 # @software:PyCharm
+
+from PyQtGuiLib.core.widgets.borderlessWidget import (
+    BorderlessMainWindow,
+    BorderlessFrame,
+    BorderlessWidget,
+    BorderlessStackedWidget
+)
+
