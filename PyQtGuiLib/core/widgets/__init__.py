@@ -10,4 +10,5 @@ from PyQtGuiLib.core.widgets.borderlessWidget import (
     BorderlessWidget,
     BorderlessStackedWidget
 )
+from PyQtGuiLib.core.widgets.roundWidget import RoundWidget
 
