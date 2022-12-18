@@ -5,19 +5,16 @@ from PyQtGuiLib.header import (
     sys,
     QApplication,
     QWidget,
-    QFrame,
-    QStackedWidget,
-    QMainWindow,
-    QMouseEvent,
     QThread,
     QCloseEvent,
     Signal,
     QPoint,
     QPropertyAnimation,
     QEasingCurve,
-    QPushButton,
-    QDesktopWidget
+    QDesktopWidget,
 )
+
+from PyQtGuiLib.core.widgets import ButtonWidget
 
 
 class MonitoThread(QThread):
@@ -48,19 +45,20 @@ class MonitoThread(QThread):
             self.msleep(self.monito_ms)
 
 
-class ShowPushButton(QPushButton):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.resize(50,50)
-        self.setText("S")
-
-
 class PullOverWidget(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(500,500)
 
-        self.show_btn = ShowPushButton()
+        self.show_btn = ButtonWidget()
+        self.show_btn.resize(70, 70)
+        self.show_btn.setObjectName("show_btn")
+        self.show_btn.setStyleSheet('''
+        #show_btn{
+        background-color:green;
+        border-radius:35px;
+        }
+        ''')
         self.show_btn.clicked.connect(self.show_win_event)
         # 动画
         self.move_ani = QPropertyAnimation(self)
@@ -109,6 +107,7 @@ class PullOverWidget(QWidget):
         # 在关闭之前,先终止线程
         self.monitoth.setTermination(True)
         super().closeEvent(event)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
