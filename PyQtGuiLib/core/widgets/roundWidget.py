@@ -12,7 +12,7 @@ from PyQtGuiLib.core.widgets import BorderlessWidget
 '''
     该窗口一定要通过qss样式,设置背景
     窗口的圆角也需要通过qss来实现,例如: border-radius:50px;
-                            
+                                
 '''
 # 圆角窗口
 class RoundWidget(BorderlessWidget):
@@ -34,7 +34,7 @@ border-radius:50px;
         self.__builtin_style = ""
 
         self.__hlay = QHBoxLayout(self)
-        self.__hlay.setContentsMargins(5,5,5,5)
+        self.__hlay.setContentsMargins(0,0,0,0)
         self.__hlay.setSpacing(0)
 
         self.__widget = QWidget()
