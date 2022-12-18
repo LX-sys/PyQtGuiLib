@@ -36,7 +36,7 @@ class Borderless:
     Right = "Right"
 
     def __init__(self,*args,**kwargs):
-        self.scope = 5  # 检测鼠标是否在边缘按下的范围
+        self.scope = 8  # 检测鼠标是否在边缘按下的范围
         self.pressDirection = []  # 记录鼠标点击的边的方向
         self.pressPos = QPoint(0, 0)  # 鼠标按下时的位置
         self.pressState = False  # 按下状态
