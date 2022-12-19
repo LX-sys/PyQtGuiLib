@@ -10,9 +10,6 @@ from PyQtGuiLib.header import (
     QApplication,
     QWidget,
     QPushButton,
-    QColor,
-    QSize,
-    Qt
 )
 
 from PyQtGuiLib.core.bubbleWidget import BubbleWidget
