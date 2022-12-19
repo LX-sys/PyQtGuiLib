@@ -15,4 +15,6 @@
     --- 气泡窗口 优化了代码,修复了文字大小无法设置的BUG,以及文字位置的问题
     --- 新增无边框窗口 BorderlessWidget 类,导入方式 from PyQtGuiLib.core.widgets import BorderlessWidget
     --- 新增圆角窗口 RoundWidget 类,导入方式 from PyQtGuiLib.core.widgets import RoundWidget
+    --- 靠边窗口功能完成,PullOver类 导入方式 from PyQtGuiLib.core.pullOver import PullOver
+    --- 靠边窗口功能的测试用例已编写
 '''
