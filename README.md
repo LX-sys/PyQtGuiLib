@@ -38,7 +38,7 @@ PyQtGuiLib
 ### 气泡窗口(BubbleWidget)
 
 ```python
-气泡窗口  ---> 99%  已经可以正常使用
+气泡窗口  ---> 100%  完成
 导入方式 from PyQtGuiLib.core.bubbleWidget import BubbleWidget
 气泡窗口 -- BubbleWidget API介绍
 # ---类变量
@@ -72,10 +72,11 @@ setBColor() # 设置背景颜色
 ### 靠边窗口(PullOverWidget)
 
 ```python
-靠边窗口  ----> 60% 已经可以正常使用(仅限左停靠)
+靠边窗口  ----> 100% 完成
 导入方式 from PyQtGuiLib.core.pullOver import PullOver
 
 靠边窗口 -- PullOver API介绍
 pullover() # 设置一个点击显示的按钮,窗口显示的位置,以及缩小后的位置
+setEasingCurve() # 设置东西
 ```
 
