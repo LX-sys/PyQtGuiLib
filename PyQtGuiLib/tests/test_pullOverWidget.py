@@ -3,11 +3,13 @@ from PyQtGuiLib.header import (
     sys,
     QApplication,
     QWidget,
+    QMainWindow
 )
 from PyQtGuiLib.core.widgets import ButtonWidget
 from PyQtGuiLib.core.pullOver import PullOver
 
-class TestPullOverWidget(QWidget):
+
+class TestPullOverWidget(QMainWindow):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(500,500)
@@ -24,6 +26,7 @@ class TestPullOverWidget(QWidget):
 
         # 窗口靠边功能
         self.pullOver = PullOver(self)
+        # self.pullOver.setEasingCurve(PullOver.OutBounce)
         self.pullOver.pullover(self.show_btn)
 
 
