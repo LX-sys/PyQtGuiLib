@@ -15,7 +15,7 @@ setup(
     author="LX",
     author_email = "lx984608061@163.com",
     description = "Python version of the qt component library.",
-    long_description=open('README.md', 'r').read(),
+    long_description=open('README.md', 'r',encoding="utf8").read(),
     long_description_content_type="text/markdown",
     url = "https://github.com/LX-sys/PyQtGuiLib",
     classifiers = [
