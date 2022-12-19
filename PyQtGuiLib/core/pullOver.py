@@ -88,7 +88,8 @@ class PullOver:
     # 靠边隐藏
     def winHide_event(self,btn_obj:QWidget,pos:QPoint,small_btn_pos:QPoint=None):
         x,y = pos.x(),pos.y()
-        desktop_w = QApplication.desktop().width()
+        s_count = QApplication.desktop().screenCount()
+        desktop_w = QApplication.desktop().width()//s_count
         desktop_h = QApplication.desktop().height()
 
         def _t(parent, self):
