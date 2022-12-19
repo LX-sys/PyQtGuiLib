@@ -20,9 +20,12 @@ class ButtonWidget(RoundWidget):
         super().__init__(*args,**kwargs)
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
+        super().mousePressEvent(e)
+
+    def mouseReleaseEvent(self, e:QMouseEvent) -> None:
         if e.button() == Qt.LeftButton:
             self.clicked.emit()
-        super().mousePressEvent(e)
+        super().mouseReleaseEvent(e)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
