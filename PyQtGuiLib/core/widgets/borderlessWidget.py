@@ -107,7 +107,7 @@ class Borderless:
                     parent.resize(parent.width(),distance_)
                     self.pressPos = QPoint(0,distance_)
             if direction == Borderless.Left:
-                distance_ = x+pos.x()
+                distance_ = x + pos.x()
                 parent.resize(parent.width()-pos.x(),parent.height())
                 parent.move(distance_, y)
             if direction == Borderless.Top:
