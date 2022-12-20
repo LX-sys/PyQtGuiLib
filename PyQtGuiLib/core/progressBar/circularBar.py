@@ -88,7 +88,7 @@ class CircularBar(QWidget):
     def setTextSize(self,size:int):
         self.text_size = size
 
-    def setTextGeometry(self,text:str,color:QColor,size:int):
+    def setAllText(self,text:str,color:QColor,size:int):
         self.setText(text)
         self.setTextColor(color)
         self.setTextSize(size)
@@ -109,7 +109,7 @@ class CircularBar(QWidget):
     def setInnerStyle(self,style):
         self.inner_style = style
 
-    # 变化的线段
+    # 设置变化的线段
     def setVariableLineSegment(self,mode):
         self.variableLine = mode
 
