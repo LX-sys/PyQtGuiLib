@@ -40,6 +40,7 @@ PyQtGuiLib
 ```python
 气泡窗口  ---> 100%  完成
 导入方式 from PyQtGuiLib.core.bubbleWidget import BubbleWidget
+
 气泡窗口 -- BubbleWidget API介绍
 # ---类变量
 Top  # 气泡方向 - 上
@@ -69,7 +70,7 @@ setBColor() # 设置背景颜色
 设置方向的代码一定要在追踪前面
 ```
 
-### 靠边窗口(PullOverWidget)
+### 靠边窗口(PullOver)
 
 ```python
 靠边窗口  ----> 100% 完成
@@ -78,5 +79,44 @@ setBColor() # 设置背景颜色
 靠边窗口 -- PullOver API介绍
 pullover() # 设置一个点击显示的按钮,窗口显示的位置,以及缩小后的位置
 setEasingCurve() # 设置东西
+```
+
+### 圆环进度条(CircularBar)
+
+```python
+圆环进度条  ----> 99%
+导入方式 from PyQtGuiLib.core.progressBar import CircularBar
+
+圆环进度条 -- PullOver API介绍
+# ---信号
+valueChange  # 进度条变化时触发
+
+# --- 类变量
+# 变化的圈
+OuterRing   # 仅外圈变化
+InnerRing   # 仅内圈变化
+Double      # 内外圈一起变化
+# 线段的风格
+SolidLine   # 直线
+DashLine    # 短线
+DotLine     # 点
+DashDotLine # 短线和点的交替
+DashDotDotLine # 短线和两个点的交替
+CustomDashLine # 自定义样式(这个必须配合api使用才会生效)
+
+# --- Api
+setText()  # 设置文本
+setTextColor() # 设置文本颜色
+setTextSize()  # 设置文本大小
+setAllText() # 同时设置文本,颜色,大小
+setOuterColor() # 设置外圈颜色
+setInnerColor() # 设置内圈颜色
+setOuterStyle() # 设置外圈风格(线段的风格类变量)
+setInnerStyle() # 设置内圈风格(线段的风格类变量)
+setVariableLineSegment() # 设置变化的线段(这里的参数就前3个类变量)
+setValue() # 设置进度条的值0~100
+value() # 返回进度条的值
+setOuterDashPattern() # 设置外圈自定义线段样式(必须配合CustomDashLine类变量才生效)
+setInnerDashPattern() # 设置内圈自定义线段样式(必须配合CustomDashLine类变量才生效)
 ```
 
