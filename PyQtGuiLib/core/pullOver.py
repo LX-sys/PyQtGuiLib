@@ -1,20 +1,13 @@
-
-
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    sys,
     QApplication,
     QWidget,
     QThread,
-    QCloseEvent,
     Signal,
     QPoint,
     QPropertyAnimation,
     QEasingCurve,
     QDesktopWidget,
 )
-
-from PyQtGuiLib.core.widgets import ButtonWidget
 
 
 class MonitoThread(QThread):
