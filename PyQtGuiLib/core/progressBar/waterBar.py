@@ -17,7 +17,11 @@ from PyQtGuiLib.header import (
     QPaintEvent,
     QFontMetricsF,
     QSize,
-    QResizeEvent
+    QResizeEvent,
+    QPropertyAnimation,
+    QPoint,
+    QThread,
+    QPushButton
 )
 
 '''
@@ -31,6 +35,19 @@ class SmallBubble(QWidget):
         super().__init__(*args,**kwargs)
         self.w,self.h = 15,15
 
+        self.ani = QPropertyAnimation(self)
+        self.ani.setPropertyName(b"pos")
+        self.ani.setTargetObject(self)
+        self.ani.setDuration(randint(1200,4000))
+        self.ani.finished.connect(self.close)
+
+    def setStartValue(self,pos:QPoint):
+        self.ani.setStartValue(pos)
+
+    def setEndValue(self,pos:QPoint):
+        self.ani.setEndValue(pos)
+        self.ani.start()
+
     # 随机产生气泡
     def randomBubble(self,painter:QPainter):
         painter.setPen(QPen(QColor(255,255,255),2))
@@ -42,6 +59,7 @@ class SmallBubble(QWidget):
 
         self.randomBubble(painter)
         painter.end()
+
 
 class WaterBar(QWidget):
     def __init__(self,*args,**kwargs):
@@ -56,12 +74,22 @@ class WaterBar(QWidget):
         self.water_vat_border_color = QColor(21, 185, 255) # 水缸边的颜色
         self.water_color = QColor(21, 185, 255) # 水的颜色
 
-        # 气泡群
-        for i in range(5):
+        # 产生气泡
+        # self.createBubble()
+
+    # 产生气泡
+    def createBubble(self):
+        for i in range(randint(1,5)):
             rondomw = randint(5,15)
             sm = SmallBubble(self)
+            sm.show()
             sm.w,sm.h= rondomw,rondomw
-            sm.move(randint(2,150),randint(100,200))
+            sm.move(randint(self.w//2-self.w//4,self.w//2-self.w//10),
+                    self.h-randint(20,40))
+            sm.setStartValue(sm.pos())
+            sm.setEndValue(QPoint(self.w//2-randint(10,40),
+                                  self.h//2-randint(10,40)))
+
 
     def paintEvent(self, e: QPaintEvent) -> None:
         painter = QPainter()

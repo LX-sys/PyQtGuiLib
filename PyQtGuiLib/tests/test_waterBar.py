@@ -61,18 +61,21 @@ background-color: rgb(0, 0, 0);
         self.se.setMaximum(360)
         self.se.setOrientation(Qt.Horizontal)
         self.se.move(250,350)
-
+        self.waterbar.createBubble()
         self.ss.valueChanged.connect(self.test1)
         self.se.valueChanged.connect(self.test2)
         # self.th = DurationTimeThread()
-        # self.th.added.connect(self.test)
+        # self.th.added.connect(self.test1)
         # self.th.start()
 
     def test1(self,v):
         self.waterbar.sn = v
         self.waterbar.update()
+
+
     def test2(self,v):
         self.waterbar.en = v
+        self.waterbar.createBubble()
         self.waterbar.update()
 
 
