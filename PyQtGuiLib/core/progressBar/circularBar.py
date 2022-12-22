@@ -75,7 +75,7 @@ class CircularBar(QWidget):
         if len(args) == 1 and isinstance(args[0],QSize):
             self.w = args[0].width(),args[0].height()
         else:
-            self.w,self.h = args
+            self.w,self.h = args[0],args[1]
 
         super().resize(self.w+10,self.h+10)
 

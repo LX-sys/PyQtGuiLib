@@ -43,7 +43,7 @@ background-color: rgb(25, 25, 25);
 
 
         self.cir = CircularBar(self)
-        self.cir.resize(100,100)
+        self.cir.resize(150,150)
         self.cir.setVariableLineSegment(CircularBar.Double)
         self.cir.setOuterStyle(CircularBar.CustomDashLine)
         self.cir.setOuterDashPattern([2,3,5,6])
