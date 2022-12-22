@@ -120,3 +120,26 @@ setOuterDashPattern() # 设置外圈自定义线段样式(必须配合CustomDash
 setInnerDashPattern() # 设置内圈自定义线段样式(必须配合CustomDashLine类变量才生效)
 ```
 
+### 加载进度条(LoadBar)
+
+```python
+加载进度条  ----> 99%
+导入方式 from PyQtGuiLib.core.progressBar import LoadBar
+
+加载进度条 -- LoadBar API介绍
+
+# ---信号
+valueChange  # 进度条变化时触发
+
+# --- Api
+setText()  # 设置文本
+setTextColor() # 设置文本颜色
+setTextSize()  # 设置文本大小
+setAllText() # 同时设置文本,颜色,大小
+isHideText() # 设置是否需要显示进度的文字
+setOuterRadius() # 设置进度条的外圆角大小(默认是20)
+setInnerRadius() # 设置进度条的内圆角大小(默认是15)
+setRadius() # 设置进度条的内外圆角
+setBorderWidth() # 设置进度条边的宽(默认是3)
+```
+
