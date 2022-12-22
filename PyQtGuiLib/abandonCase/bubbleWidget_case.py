@@ -16,7 +16,7 @@ from PyQtGuiLib.header import (
 
 
 '''
-    气泡窗口弃按
+    气泡窗口弃案
 '''
 class BubbleWidget(QWidget):
     def __init__(self,*args,**kwargs):
