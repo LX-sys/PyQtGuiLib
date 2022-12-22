@@ -24,7 +24,8 @@ if PYQT_VERSIONS == "PyQt5":
         QGraphicsOpacityEffect,
         QMainWindow,
         QDesktopWidget,
-        QGraphicsDropShadowEffect
+        QGraphicsDropShadowEffect,
+        QSlider
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -52,7 +53,8 @@ if PYQT_VERSIONS == "PyQt6":
         QGraphicsOpacityEffect,
         QMainWindow,
         QDesktopWidget,
-        QGraphicsDropShadowEffect
+        QGraphicsDropShadowEffect,
+        QSlider
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -80,7 +82,8 @@ if PYQT_VERSIONS == "PySide2":
         QGraphicsOpacityEffect,
         QMainWindow,
         QDesktopWidget,
-        QGraphicsDropShadowEffect
+        QGraphicsDropShadowEffect,
+        QSlider
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -108,5 +111,6 @@ if PYQT_VERSIONS == "PySide6":
         QGraphicsOpacityEffect,
         QMainWindow,
         QDesktopWidget,
-        QGraphicsDropShadowEffect
+        QGraphicsDropShadowEffect,
+        QSlider
     )
