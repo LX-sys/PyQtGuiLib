@@ -4,9 +4,6 @@
 # @file:waterBar.py
 # @software:PyCharm
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    sys,
-    QApplication,
     QWidget,
     Signal,
     Qt,
@@ -20,8 +17,7 @@ from PyQtGuiLib.header import (
     QResizeEvent,
     QPropertyAnimation,
     QPoint,
-    QThread,
-    QPushButton
+    QThread
 )
 
 '''
@@ -67,6 +63,7 @@ class SmallBubble(QWidget):
 class WaterBar(QWidget):
     # 进度改变时,发出信号
     valueChange = Signal(int)
+
     def __init__(self,*args,**kwargs):
         self.ball_interval = [1, 1] # 每次数值改变产生球的数量区间
         self.speed_interval = [1200,4000] # 小球运动的速度区间
@@ -151,7 +148,7 @@ class WaterBar(QWidget):
     def setWaterVatColor(self,color:QColor):
         self.water_vat_color = color
 
-    # 设置水缸边的颜色
+    # 设置水缸边缘的颜色
     def setWaterVatBorderColor(self,color:QColor):
         self.water_vat_border_color = color
 
@@ -198,7 +195,7 @@ class WaterBar(QWidget):
 
         # 画水位
         self.drawWaterLevel(painter)
-
+        # 画文字
         self.drawText_(painter)
 
         painter.end()
@@ -215,14 +212,3 @@ class WaterBar(QWidget):
         self.w = e.size().width()
         self.h = e.size().height()
         super().resizeEvent(e)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = WaterBar()
-    win.show()
-
-    if PYQT_VERSIONS == "PyQt6":
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())

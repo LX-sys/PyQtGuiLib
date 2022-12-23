@@ -27,7 +27,7 @@ class DurationTimeThread(QThread):
         n=1
         while True:
             self.added.emit(n)
-            n+=1
+            n += 1
             self.msleep(100)
             if n == 100+1:
                 print("完成")
