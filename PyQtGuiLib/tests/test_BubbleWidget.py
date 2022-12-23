@@ -12,7 +12,7 @@ from PyQtGuiLib.header import (
     QPushButton,
 )
 
-from PyQtGuiLib.core.bubbleWidget import BubbleWidget
+from PyQtGuiLib.core import BubbleWidget
 
 '''
     气泡窗口的测试用例

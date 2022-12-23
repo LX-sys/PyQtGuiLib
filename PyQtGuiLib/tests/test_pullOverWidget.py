@@ -6,7 +6,7 @@ from PyQtGuiLib.header import (
     QMainWindow
 )
 from PyQtGuiLib.core.widgets import ButtonWidget
-from PyQtGuiLib.core.pullOver import PullOver
+from PyQtGuiLib.core import PullOver
 
 
 class TestPullOverWidget(QMainWindow):
