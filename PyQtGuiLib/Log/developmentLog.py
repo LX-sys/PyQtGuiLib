@@ -26,4 +26,10 @@
 2022.12.22  0.0.5.0版本
     --- 新增水球进度条
     --- 新增进度条的集合测试
+    --- 修改了气泡窗口的导入方式
+         原来的导入方式: from PyQtGuiLib.core.bubbleWidget import BubbleWidget
+         现在的导入方式: from PyQtGuiLib.core import BubbleWidget
+    --- 修改了窗口靠边功能的导入方式
+         原来的导入方式: from PyQtGuiLib.core.pullOver import PullOver
+         现在的导入方式: from PyQtGuiLib.core import PullOver
 '''
