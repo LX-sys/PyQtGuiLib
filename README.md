@@ -143,3 +143,28 @@ setRadius() # 设置进度条的内外圆角
 setBorderWidth() # 设置进度条边的宽(默认是3)
 ```
 
+### 水球进度条(WaterBar)
+
+```python
+水球进度条  ----> 90%
+导入方式 from PyQtGuiLib.core.progressBar import WaterBar
+
+加载进度条 -- WaterBar API介绍
+
+# ---信号
+valueChange  # 进度条变化时触发
+
+# --- Api
+setText()  # 设置文本
+setTextColor() # 设置文本颜色
+setTextSize()  # 设置文本大小
+setAllText() # 同时设置文本,颜色,大小
+isHideText() # 设置是否需要显示进度的文字
+setBallInterval() # 设置每个数值变化,球产生的个数区间(默认[1,1])
+setBallSpeedInterval() # 设置每颗球移动的速度区间(默认[1200,4000])
+setBallSizeInterval() # # 设置每颗球生成的大小区间(默认[5,15])
+setWaterColor() # 设置水的颜色
+setWaterVatColor() # 设置水缸中没有被水覆盖的颜色
+setWaterVatBorderColor() # 设置水缸边缘的颜色
+```
+
