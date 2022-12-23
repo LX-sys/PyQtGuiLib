@@ -14,8 +14,12 @@ if PYQT_VERSIONS == "PyQt5":
         QPolygonF,
         QFont,
         QLinearGradient,
+        QRadialGradient,
+        QConicalGradient,
         QFontMetricsF,
         QCloseEvent,
+        QBrush,
+        QPalette
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -32,8 +36,12 @@ if PYQT_VERSIONS == "PyQt6":
         QPolygonF,
         QFont,
         QLinearGradient,
+        QRadialGradient,
+        QConicalGradient,
         QFontMetricsF,
-        QCloseEvent
+        QCloseEvent,
+        QBrush,
+        QPalette
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -50,8 +58,12 @@ if PYQT_VERSIONS == "PySide2":
         QPolygonF,
         QFont,
         QLinearGradient,
+        QRadialGradient,
+        QConicalGradient,
         QFontMetricsF,
-        QCloseEvent
+        QCloseEvent,
+        QBrush,
+        QPalette
     )
 
 
@@ -69,6 +81,10 @@ if PYQT_VERSIONS == "PySide6":
         QPolygonF,
         QFont,
         QLinearGradient,
+        QRadialGradient,
+        QConicalGradient,
         QFontMetricsF,
-        QCloseEvent
+        QCloseEvent,
+        QBrush,
+        QPalette
     )
