@@ -17,7 +17,6 @@ from PyQtGuiLib.header import (
 
 from PyQtGuiLib.core.progressBar import WaterBar
 
-
 class DurationTimeThread(QThread):
     added = Signal(int)
     def __init__(self,*args,**kwargs):
@@ -30,7 +29,7 @@ class DurationTimeThread(QThread):
             self.added.emit(n)
             n+=1
             self.msleep(100)
-            if n == 360+1:
+            if n == 100+1:
                 print("完成")
                 break
 
@@ -40,43 +39,23 @@ class TestPullOverWidget(QMainWindow):
         self.resize(800,500)
 
         self.setObjectName("test")
-        self.setStyleSheet('''
-#test{
-background-color: rgb(0, 0, 0);
-}
-        ''')
+#         self.setStyleSheet('''
+# #test{
+# background-color: rgb(0, 0, 0);
+# }
+#         ''')
 
         self.waterbar = WaterBar(self)
+        self.waterbar.resize(120,120)
+        self.waterbar.setTextSize(30)
         self.waterbar.move(50,100)
 
-
-        self.ss = QSlider(self)
-        self.ss.setMinimum(0)
-        self.ss.setMaximum(360)
-        self.ss.setOrientation(Qt.Horizontal)
-        self.ss.move(50,350)
-
-        self.se = QSlider(self)
-        self.se.setMinimum(0)
-        self.se.setMaximum(360)
-        self.se.setOrientation(Qt.Horizontal)
-        self.se.move(250,350)
-        self.waterbar.createBubble()
-        self.ss.valueChanged.connect(self.test1)
-        self.se.valueChanged.connect(self.test2)
-        # self.th = DurationTimeThread()
-        # self.th.added.connect(self.test1)
-        # self.th.start()
+        self.th = DurationTimeThread()
+        self.th.added.connect(self.test1)
+        self.th.start()
 
     def test1(self,v):
-        self.waterbar.sn = v
-        self.waterbar.update()
-
-
-    def test2(self,v):
-        self.waterbar.en = v
-        self.waterbar.createBubble()
-        self.waterbar.update()
+        self.waterbar.setValue(v)
 
 
 if __name__ == '__main__':
