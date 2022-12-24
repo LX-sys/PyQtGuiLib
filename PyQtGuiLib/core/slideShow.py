@@ -11,7 +11,7 @@ from PyQtGuiLib.header import (
     QResizeEvent,
     QPushButton,
     QStackedWidget,
-    QVBoxLayout
+    QMouseEvent
 )
 
 
@@ -35,7 +35,7 @@ class SlideShow(QWidget):
         self.resize(700, 300)
 
         # 展示模式
-        self.mode = SlideShow.FlatMode
+        self.mode = SlideShow.CardMode
 
         self.index = 0 # 索引
 
@@ -43,17 +43,21 @@ class SlideShow(QWidget):
         self.is_auto_carousel = False
         self.directionFun = None # 方向函数
 
+        if self.mode == SlideShow.FlatMode:
+            self.__core_widget = QStackedWidget(self)
+            self.__core_widget.lower() # 窗口放置在底层
+            self.__core_widget.setStyleSheet("border:1px solid red;")
+        self.widgets = [] # 窗口列表
+
         # 左右按钮
         self.__left_btn = QPushButton("左",self)
         self.__right_btn = QPushButton("右",self)
-
-        self.__core_widget = QStackedWidget(self)
-        self.__core_widget.setStyleSheet("border:1px solid red;")
-        self.widgets = [] # 窗口列表
+        self.__left_btn.resize(50,50)
+        self.__right_btn.resize(50,50)
 
         # 切换窗口
-        self.__left_btn.clicked.connect(self.up)
-        self.__right_btn.clicked.connect(self.next)
+        self.__left_btn.clicked.connect(lambda :self.roll_event(SlideShow.Left))
+        self.__right_btn.clicked.connect(lambda :self.roll_event(SlideShow.Right))
 
         t = QWidget()
         t.setStyleSheet("background-color:red;")
@@ -62,23 +66,27 @@ class SlideShow(QWidget):
         t2 = QWidget()
         t2.setStyleSheet("background-color:green;")
         self.addWidget(t)
-        self.addWidget(t1)
-        self.addWidget(t2)
+        # self.addWidget(t1)
+        # self.addWidget(t2)
 
         # self.setAutoCarousel(True,1000,SlideShow.Left)
+        # 鼠标跟踪
+        # self.setMouseTracking(True)
 
+    # 轮动事件
+    def roll_event(self,direction:str):
+        if direction == SlideShow.Right:
+            self.index += 1
+            if self.index > len(self.widgets) - 1:
+                self.index = 0
+        elif direction == SlideShow.Left:
+            self.index -= 1
+            if self.index < 0:
+                self.index = len(self.widgets) - 1
 
-    def next(self):
-        self.index +=1
-        if self.index > len(self.widgets)-1:
-            self.index = 0
-        self.__core_widget.setCurrentIndex(self.index)
+        if self.mode == SlideShow.FlatMode:
+            self.__core_widget.setCurrentIndex(self.index)
 
-    def up(self):
-        self.index -= 1
-        if self.index < 0:
-            self.index = len(self.widgets)-1
-        self.__core_widget.setCurrentIndex(self.index)
 
     # 设置展示模式
     def setMode(self,mode:str):
@@ -99,7 +107,8 @@ class SlideShow(QWidget):
 
     # 添加窗口
     def addWidget(self,widget:QWidget):
-        self.__core_widget.addWidget(widget)
+        if self.mode == SlideShow.FlatMode:
+            self.__core_widget.addWidget(widget)
         self.widgets.append(widget)
 
     def getWidgets(self)->list:
@@ -109,8 +118,16 @@ class SlideShow(QWidget):
         self.__left_btn.move(5,self.height()//2-self.__left_btn.height()//2)
         self.__right_btn.move(self.width()-self.__right_btn.width()-5,
                               self.height()//2-self.__left_btn.height()//2)
-        self.__core_widget.move(self.__left_btn.width() + 5, 0)
-        self.__core_widget.resize(self.width() - self.__right_btn.width()*2-10, self.height())
+        if self.mode == SlideShow.FlatMode:
+            self.__core_widget.resize(self.size())
+
+        if self.mode == SlideShow.CardMode:
+            if len(self.widgets) == 1:
+                self.widgets[0].setParent(self)
+                self.widgets[0].move(self.width()//2-self.widgets[0].width()//2,
+                                     self.height()//2-self.widgets[0].height()//2)
+                self.widgets[0].resize(self.width()//2,self.height()//2)
+
 
     def resizeEvent(self, e: QResizeEvent) -> None:
         self.__pos()
