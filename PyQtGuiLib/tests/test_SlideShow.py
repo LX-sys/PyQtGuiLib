@@ -11,7 +11,6 @@ from PyQtGuiLib.header import (
     QLabel,
     Qt,
     QHBoxLayout,
-    QStackedWidget
 )
 
 from PyQtGuiLib.core import SlideShow
@@ -22,14 +21,23 @@ class Test(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(1000,600)
 
+        self.flag = True
+
+
         # 窗口轮播功能
         self.ss = SlideShow(self)
+        # self.ss.setAutoSlideShow(True)
         self.ss.move(50,50)
         self.ss.resize(600,300)
-        self.test()
-        print(self.ss.getIndex())
-        # self.ss.setCurrentIndex(1)
-        # self.ss.up()
+        self.test()  # 添加测试窗口
+
+        self.ss.switchWidgeted.connect(self.my_event)
+
+    def my_event(self,index:int):
+        print("当前索引:",index)
+        # if self.flag:
+        #     self.ss.removeWidget(2)
+        #     self.flag = False
 
     def test(self):
         t = QWidget()
