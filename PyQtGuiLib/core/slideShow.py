@@ -10,14 +10,10 @@ from PyQtGuiLib.header import (
     QWidget,
     QResizeEvent,
     QPushButton,
-    QStackedWidget,
-    QMouseEvent,
     QPoint,
     QSize,
     QPropertyAnimation,
-    QLabel,
-    QHBoxLayout,
-    Qt
+    Signal
 )
 
 
@@ -28,6 +24,9 @@ from PyQtGuiLib.header import (
         风格: 扁平
 '''
 class SlideShow(QWidget):
+    # 切换窗口事件
+    switchWidgeted = Signal(int)
+
     # 扁平 风格
     FlatMode = "flat"  # 经典
     # 方向
@@ -47,6 +46,7 @@ class SlideShow(QWidget):
         self.animation_time = 300 # 毫秒
 
         self.index = [-1,0]  # 索引
+        self.cu_index = self.index[1]  # 当前索引
 
         # 设置自动轮播,方向
         self.is_auto_slide = False
@@ -83,6 +83,12 @@ border-radius:5px;
 
     # 自动轮播
     def setAutoSlideShow(self,b:bool,interval:int=2000,direction: str="right",is_not_show_btn:bool=True):
+        '''
+            b: 是否启动自动轮播
+            interval:切换窗口的事件间隔
+            direction:轮播方向
+            is_not_show_btn:是否需要显示左右按钮
+        '''
         self.is_auto_slide = b
         if b:
             self.startTimer(interval)
@@ -102,11 +108,7 @@ border-radius:5px;
             self.left_btn.show()
             self.right_btn.show()
 
-    # 返回当前窗口上已经展示的轮播对象窗口
-    def currentWidgets(self) -> QWidget:
-        return self.current_widgets
-
-    # 获取当前的数量
+    # 获取当前窗口的数量
     def getWidgetCount(self) -> int:
         return len(self.widgets)
 
@@ -127,6 +129,8 @@ border-radius:5px;
             if self.index[1] > widgets_count - 1:
                 self.index[1] = 0
 
+            self.cu_index = self.index[1] # 设置当前索引
+            self.switchWidgeted.emit(self.index[1]) # 发送事件
             self.rollShow(direction)
 
     # 通过索引获取窗口
@@ -142,7 +146,6 @@ border-radius:5px;
         widget2 = self.widgets[self.index[1]] # type:QWidget
         self.__createWidget(widget2)
         self.animation_(direction,widget,widget2)
-        print("当前索引",self.getIndex())
 
     # 添加窗口
     def addWidget(self,widget:QWidget):
@@ -150,29 +153,41 @@ border-radius:5px;
         # 展示
         self.show_()
 
-    # 切换到指定窗口
-    def setCurrentIndex(self,index:int=0,is_animation:bool=False):
-        if not is_animation:
-            widget = self.getWidget(index)
+    # 移除窗口(2022.12.26该方法处于测试中,可能有BUG)
+    def removeWidget(self,obj_or_index):
+        '''
+            obj_or_index: 窗口对象,或者是索引
+        '''
 
-            self.__createWidget(widget)
+        if isinstance(obj_or_index,int):
+            widget = self.widgets[obj_or_index] # type:QWidget
+            self.widgets.remove(widget)
+            widget.hide()
+        else:
+            obj_or_index.hide()
+            self.widgets.remove(obj_or_index)
 
-    # 当前当前索引
+
+    # 切换到指定窗口(暂时放弃改函数)
+    # def setCurrentIndex(self,index:int=0,is_animation:bool=False):
+    #     pass
+        # if not is_animation:
+        #     widget = self.getWidget(index)
+        #
+        #     self.__createWidget(widget)
+
+    # 获取当前索引
     def getIndex(self)->int:
         if self.isEmpty():
            return None
 
-        cu_index = self.index[0]
-        # if cu_index == -1 or cu_index == 0:
-        #     return 0
-        return self.index[0]+1
+        return self.cu_index
 
-
-    # 下一个窗口
+    # 切换到下一个窗口
     def next(self):
         self.roll_event(SlideShow.Right)
 
-    # 上一个窗口
+    # 切换到上一个窗口
     def up(self):
         self.roll_event(SlideShow.Left)
 
@@ -207,6 +222,10 @@ border:2px solid #00557f;
 }
                 ''')
 
+    # 返回左右按钮对象
+    def getButtons(self) -> tuple:
+        return self.left_btn,self.right_btn
+
     # 展示
     def show_(self):
         if self.show_mode == SlideShow.FlatMode:  # 经典模式
@@ -215,8 +234,13 @@ border:2px solid #00557f;
                 return
 
             # 优先展示第一个窗口
-            widget = self.widgets[0]  # type:QWidget
+            widget = self.widgets[self.cu_index]  # type:QWidget
             self.__createWidget(widget)
+
+            # 隐藏除了显示的以外的所有窗口
+            for i in range(self.getWidgetCount()):
+                if i != self.getIndex():
+                    self.getWidget(i).hide()
 
     # 创建窗口
     def __createWidget(self,widget:QWidget):
@@ -248,6 +272,7 @@ border:2px solid #00557f;
 
                 move_ani.setDuration(self.animation_time)
                 move_ani2.setDuration(self.animation_time)
+
                 move_ani.start()
                 move_ani2.start()
 
