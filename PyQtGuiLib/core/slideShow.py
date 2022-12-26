@@ -14,7 +14,10 @@ from PyQtGuiLib.header import (
     QMouseEvent,
     QPoint,
     QSize,
-    QPropertyAnimation
+    QPropertyAnimation,
+    QLabel,
+    QHBoxLayout,
+    Qt
 )
 
 
@@ -45,6 +48,10 @@ class SlideShow(QWidget):
 
         self.index = [-1,0]  # 索引
 
+        # 设置自动轮播,方向
+        self.is_auto_slide = False
+        self.direction = SlideShow.Right
+
         # 左右按钮
         self.left_btn = QPushButton("左",self)
         self.right_btn = QPushButton("右",self)
@@ -54,41 +61,62 @@ class SlideShow(QWidget):
         self.right_btn.resize(50,50)
         self.left_btn.clicked.connect(lambda :self.roll_event(SlideShow.Left))
         self.right_btn.clicked.connect(lambda :self.roll_event(SlideShow.Right))
+        self.btnStyle()
 
         # 窗口
         self.widgets = []  # 所有已经添加的窗口
-        self.current_widgets = [] # 当前已经展示出来的轮播窗口对象
+        self.current_widgets = None # 当前已经展示出来的轮播窗口对象
 
-        self.move_ani = QPropertyAnimation(self)
-        self.move_ani.setPropertyName(b"pos")
+        self.defaultBackground()
 
-        # 测试
-        self.test()
+    def defaultBackground(self):
+        '''
+            默认背景,只有当前没有添加任何窗口时显示
+        :return:
+        '''
+        print(self.isEmpty())
+        if self.isEmpty():
+            self.setStyleSheet('''
+background-color:gray;
+border-radius:5px;
+            ''')
 
-    def test(self):
-        t = QWidget()
-        t.setStyleSheet("background-color:red;")
-        t2 = QWidget()
-        t2.setStyleSheet("background-color:blue;")
-        t3 = QWidget()
-        t3.setStyleSheet("background-color:green;")
-        self.addWidget(t)
-        self.addWidget(t2)
-        self.addWidget(t3)
+    # 自动轮播
+    def setAutoSlideShow(self,b:bool,interval:int=2000,direction: str="right",is_not_show_btn:bool=True):
+        self.is_auto_slide = b
+        if b:
+            self.startTimer(interval)
+
+        self.setHideButtons(is_not_show_btn)
+
+        self.direction = direction
+        self.left_btn.setEnabled(not b)
+        self.right_btn.setEnabled(not b)
+
+    # 设置隐藏/显示左右按钮
+    def setHideButtons(self,b:bool=False):
+        if b:
+            self.left_btn.hide()
+            self.right_btn.hide()
+        else:
+            self.left_btn.show()
+            self.right_btn.show()
 
     # 返回当前窗口上已经展示的轮播对象窗口
-    def currentWidgets(self) -> list:
+    def currentWidgets(self) -> QWidget:
         return self.current_widgets
 
-    # 隐藏当前已经展示的轮播对象窗口
-    def hideCurrentWidgets(self):
-        for widget in self.currentWidgets():
-            widget.hide()
+    # 获取当前的数量
+    def getWidgetCount(self) -> int:
+        return len(self.widgets)
 
     # 轮播事件
     def roll_event(self, direction: str):
         if self.show_mode == SlideShow.FlatMode:  # 经典模式
-            widgets_count = len(self.widgets)
+            widgets_count = self.getWidgetCount()
+
+            if self.isEmpty():
+                return
 
             self.index[0] += 1
             self.index[1] += 1
@@ -101,17 +129,52 @@ class SlideShow(QWidget):
 
             self.rollShow(direction)
 
+    # 通过索引获取窗口
+    def getWidget(self,index:int) -> QWidget:
+        return self.widgets[index]
+
+    def isEmpty(self) -> bool:
+        return True if not self.widgets else False
+
     # 滚动显示
     def rollShow(self,direction: str):
         widget = self.widgets[self.index[0]] # type:QWidget
         widget2 = self.widgets[self.index[1]] # type:QWidget
         self.__createWidget(widget2)
         self.animation_(direction,widget,widget2)
+        print("当前索引",self.getIndex())
 
+    # 添加窗口
     def addWidget(self,widget:QWidget):
         self.widgets.append(widget)
         # 展示
         self.show_()
+
+    # 切换到指定窗口
+    def setCurrentIndex(self,index:int=0,is_animation:bool=False):
+        if not is_animation:
+            widget = self.getWidget(index)
+
+            self.__createWidget(widget)
+
+    # 当前当前索引
+    def getIndex(self)->int:
+        if self.isEmpty():
+           return None
+
+        cu_index = self.index[0]
+        # if cu_index == -1 or cu_index == 0:
+        #     return 0
+        return self.index[0]+1
+
+
+    # 下一个窗口
+    def next(self):
+        self.roll_event(SlideShow.Right)
+
+    # 上一个窗口
+    def up(self):
+        self.roll_event(SlideShow.Left)
 
     # 两侧的按钮
     def btnPos(self):
@@ -119,9 +182,38 @@ class SlideShow(QWidget):
         self.right_btn.move(self.width() - self.right_btn.width() - 5,
                             self.height() // 2 - self.left_btn.height() // 2)
 
+    # 按钮样式
+    def btnStyle(self):
+        self.left_btn.setStyleSheet('''
+#left_btn{
+background-color:transparent;
+border:2px solid #73ffcc;
+color:#73ffcc;
+border-radius:5px;
+}
+#left_btn:hover{
+border:2px solid #00557f;
+}
+        ''')
+        self.right_btn.setStyleSheet('''
+#right_btn{
+background-color:transparent;
+border:2px solid #73ffcc;
+color:#73ffcc;
+border-radius:5px;
+}
+#right_btn:hover{
+border:2px solid #00557f;
+}
+                ''')
+
     # 展示
     def show_(self):
         if self.show_mode == SlideShow.FlatMode:  # 经典模式
+
+            if self.isEmpty():
+                return
+
             # 优先展示第一个窗口
             widget = self.widgets[0]  # type:QWidget
             self.__createWidget(widget)
@@ -147,11 +239,9 @@ class SlideShow(QWidget):
 
                 move_ani.setStartValue(widget.pos())
                 if direction == SlideShow.Right:
-                    end_value = QPoint(widget.width(), 0)
-                    start_value = QPoint(-widget.width(), 0)
+                    end_value,start_value = QPoint(widget.width(), 0),QPoint(-widget.width(), 0)
                 elif direction == SlideShow.Left:
-                    end_value = QPoint(-widget.width(), 0)
-                    start_value = QPoint(widget.width(), 0)
+                    end_value,start_value = QPoint(-widget.width(), 0),QPoint(widget.width(), 0)
                 move_ani.setEndValue(end_value)
                 move_ani2.setStartValue(start_value)
                 move_ani2.setEndValue(QPoint(0, 0))
@@ -166,6 +256,9 @@ class SlideShow(QWidget):
         self.show_()
         super().resizeEvent(e)
 
+    def timerEvent(self, e) -> None:
+        if self.is_auto_slide:
+            self.roll_event(self.direction)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
