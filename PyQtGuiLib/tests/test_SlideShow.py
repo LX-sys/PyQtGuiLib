@@ -7,7 +7,11 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
     sys,
-    QWidget
+    QWidget,
+    QLabel,
+    Qt,
+    QHBoxLayout,
+    QStackedWidget
 )
 
 from PyQtGuiLib.core import SlideShow
@@ -18,10 +22,40 @@ class Test(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(1000,600)
 
+        # 窗口轮播功能
         self.ss = SlideShow(self)
-        # self.ss.setMode(SlideShow.CardMode)
         self.ss.move(50,50)
         self.ss.resize(600,300)
+        self.test()
+        print(self.ss.getIndex())
+        # self.ss.setCurrentIndex(1)
+        # self.ss.up()
+
+    def test(self):
+        t = QWidget()
+        tl = QLabel("1")
+        tl.setAlignment(Qt.AlignCenter)
+        lh = QHBoxLayout(t)
+        lh.addWidget(tl)
+        tl.setStyleSheet('font: 60pt "微软雅黑";')
+        t.setStyleSheet("background-color:#00aa7f;")
+        t2 = QWidget()
+        tl2 = QLabel("2")
+        tl2.setAlignment(Qt.AlignCenter)
+        lh2 = QHBoxLayout(t2)
+        lh2.addWidget(tl2)
+        tl2.setStyleSheet('font: 60pt "微软雅黑";')
+        t2.setStyleSheet("background-color:#aaaaff;")
+        t3 = QWidget()
+        tl3 = QLabel("3", t3)
+        tl3.setAlignment(Qt.AlignCenter)
+        lh3 = QHBoxLayout(t3)
+        lh3.addWidget(tl3)
+        tl3.setStyleSheet('font: 60pt "微软雅黑";')
+        t3.setStyleSheet("background-color:green;")
+        self.ss.addWidget(t)
+        self.ss.addWidget(t2)
+        self.ss.addWidget(t3)
 
 
 
