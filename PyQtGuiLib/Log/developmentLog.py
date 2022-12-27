@@ -36,4 +36,7 @@
     --- 新增轮播组件,2022.12.22  已经基本完成,可能还存在BUG,以后修改(测试发布)
 2022.12.26  0.0.6.1版本
     --- 新增轮播组件 新增两个方法,setAnimationTime(),setAinDirectionMode()
+2022.12.26  0.0.7.0版本
+    --- 新增颜色渐变进度条,到目前为止,这是唯一个不提供文字显示的进度条
+    --- 更新的所有进度条的抗锯齿写法 painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
 '''
