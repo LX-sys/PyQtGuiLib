@@ -17,7 +17,7 @@ from PyQtGuiLib.header import (
 
 
 '''
-    节点进度条
+    节点进度条(暂时停止研究)
 '''
 class NodeBar(QWidget):
     def __init__(self,*args,**kwargs):
