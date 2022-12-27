@@ -140,8 +140,7 @@ class LoadBar(QWidget):
     def paintEvent(self, event:QPaintEvent) -> None:
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setRenderHint(QPainter.HighQualityAntialiasing)
+        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
 
         # 绘制进度条
         self.drawBar(painter)

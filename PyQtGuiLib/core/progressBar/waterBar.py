@@ -191,7 +191,7 @@ class WaterBar(QWidget):
     def paintEvent(self, e: QPaintEvent) -> None:
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
 
         # 画水位
         self.drawWaterLevel(painter)

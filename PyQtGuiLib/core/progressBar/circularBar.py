@@ -179,7 +179,7 @@ class CircularBar(QWidget):
     def paintEvent(self, event:QPaintEvent) -> None:
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHint(QPainter.Antialiasing)
+        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
 
         self.drawLoopBar(painter,6,6)
 
