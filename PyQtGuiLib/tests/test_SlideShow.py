@@ -23,12 +23,13 @@ class Test(QWidget):
 
         self.flag = True
 
-
         # 窗口轮播功能
         self.ss = SlideShow(self)
-        # self.ss.setAutoSlideShow(True)
+        # self.ss.setAinDirectionMode((SlideShow.Ani_Up,SlideShow.Ani_Down))
+        self.ss.setAutoSlideShow(True,direction=SlideShow.Ani_Down,is_not_show_btn=False)
+        # self.ss.setHideButtons(True)
         self.ss.move(50,50)
-        self.ss.resize(600,300)
+        self.ss.resize(600,200)
         self.test()  # 添加测试窗口
 
         self.ss.switchWidgeted.connect(self.my_event)
