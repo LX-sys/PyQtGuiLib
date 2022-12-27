@@ -201,3 +201,28 @@ up() # 切换到上一个窗口
 getButtons() # 返回左右按钮对象(可以通过这个方法来重写左右按钮样式)
 ```
 
+### 线性渐变进度条(GradientBar)
+
+```python
+线性渐变进度条  ----> 99%
+导入方式 from PyQtGuiLib.core.progressBar import GradientBar
+
+线性渐变进度条 -- WaterBar API介绍
+
+# ---信号
+valueChange  # 进度条变化时触发
+
+# --- Api
+setValue() # 设置当前进度0-100
+setRadius() # 设置圆角半径(默认没有圆角)
+setColorAts() # 设置颜色比重和颜色例如 [(颜色比重0-1,QColor()),...]
+appendColor() # 添加一种颜色  (颜色比重0-1,QColor())
+removeColor() # 移除一种颜色 (颜色比重0-1,QColor())
+getColors()  # 返回所有的颜色和比重
+
+# -----
+注意,这个进度条不提供文字显示,如果需要请自行编写
+```
+
+
+
