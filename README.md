@@ -207,7 +207,7 @@ getButtons() # 返回左右按钮对象(可以通过这个方法来重写左右�
 线性渐变进度条  ----> 99%
 导入方式 from PyQtGuiLib.core.progressBar import GradientBar
 
-线性渐变进度条 -- WaterBar API介绍
+线性渐变进度条 -- GradientBar API介绍
 
 # ---信号
 valueChange  # 进度条变化时触发
