@@ -34,4 +34,6 @@
          现在的导入方式: from PyQtGuiLib.core import PullOver
 2022.12.26  0.0.6.0版本
     --- 新增轮播组件,2022.12.22  已经基本完成,可能还存在BUG,以后修改(测试发布)
+2022.12.26  0.0.6.1版本
+    --- 新增轮播组件 新增两个方法,setAnimationTime(),setAinDirectionMode()
 '''
