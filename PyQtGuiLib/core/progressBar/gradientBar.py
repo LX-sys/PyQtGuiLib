@@ -73,6 +73,10 @@ class GradientBar(QWidget):
         '''
         self.line_color_lists = colors
 
+    # 设置背景底色
+    def setBackGroundColor(self,bg_color:QColor):
+        self.bg_color = bg_color
+
     # 添加一种颜色
     def appendColor(self,color:tuple):
         '''
