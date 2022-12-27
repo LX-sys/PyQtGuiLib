@@ -168,10 +168,10 @@ setWaterVatColor() # 设置水缸中没有被水覆盖的颜色
 setWaterVatBorderColor() # 设置水缸边缘的颜色
 ```
 
-### 轮播组件(SlideShow)
+### 窗口轮播组件(SlideShow)
 
 ```python
-轮播组件  ----> 90%
+窗口轮播组件  ----> 90%
 导入方式 from PyQtGuiLib.core import SlideShow
 
 轮播组件 -- WaterBar API介绍
@@ -179,9 +179,18 @@ setWaterVatBorderColor() # 设置水缸边缘的颜色
 # ---信号
 switchWidgeted  # 切换窗口时触发
 
+# ---- 类变量
+# 动画方向模式类变量
+Ani_Left
+Ani_Right
+Ani_Down
+Ani_Up
+
 # --- Api
 addWidget()  # 添加窗口
 removeWidget() # 移除窗口(仅仅只有移除轮播组件,如果需要销毁窗口,需要自己编写代码)
+setAnimationTime() # 设置动画间隔时间(默认300毫秒)
+setAinDirectionMode() # 设置动画方向模式(例如:上下方向(SlideShow.Ani_Up,SlideShow.Ani_Down))
 setHideButtons() # 设置隐藏/显示左右按钮(默认显示)
 setAutoSlideShow() # 设置自动轮播
 getWidgetCount() # 获取当前窗口的数量
