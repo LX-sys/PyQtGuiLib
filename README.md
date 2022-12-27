@@ -215,6 +215,7 @@ valueChange  # 进度条变化时触发
 # --- Api
 setValue() # 设置当前进度0-100
 setRadius() # 设置圆角半径(默认没有圆角)
+setBackGroundColor() # 设置进度条底色
 setColorAts() # 设置颜色比重和颜色例如 [(颜色比重0-1,QColor()),...]
 appendColor() # 添加一种颜色  (颜色比重0-1,QColor())
 removeColor() # 移除一种颜色 (颜色比重0-1,QColor())
