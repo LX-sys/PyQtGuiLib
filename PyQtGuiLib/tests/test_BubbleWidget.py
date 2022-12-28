@@ -27,6 +27,7 @@ class Test(QWidget):
         self.btn.resize(130,100)
         self.btn.move(200,200)
 
+        # 气泡控件
         self.bu = BubbleWidget(self)
         self.bu.resize(150,100)
         self.bu.setDirection(BubbleWidget.Top)
