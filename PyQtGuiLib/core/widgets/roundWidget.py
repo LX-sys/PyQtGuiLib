@@ -24,7 +24,6 @@ class RoundWidget(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,600)
-
         # 背景透明,去掉窗口边框,去掉边框
         self.setAttribute(Qt.WA_TranslucentBackground, True)
         self.setWindowFlags(Qt.FramelessWindowHint)
