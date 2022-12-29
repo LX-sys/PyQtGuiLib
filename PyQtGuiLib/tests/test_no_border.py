@@ -11,7 +11,9 @@ from PyQtGuiLib.header import (
     QThread,
     Signal,
     QColor,
-    QThread
+    QThread,
+    QPushButton,
+    Qt
 )
 
 from PyQtGuiLib.core.widgets import (
@@ -39,6 +41,23 @@ border-radius:30px;
         ''')
         self.setOpacity(0.7)
 
+        self.flag = False
+
+        self.btn = QPushButton("固定",self)
+        self.btn.move(100,100)
+        self.btn.clicked.connect(self.test)
+
+    def test(self):
+        if self.flag is False:
+            self.btn.setText("解放")
+            self.windowHandle().setFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+            self.flag= True
+        else:
+            self.btn.setText("固定")
+            self.windowHandle().setFlags(self.windowFlags() | Qt.Widget)
+            self.flag = False
+        self.show()
+        self.update()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

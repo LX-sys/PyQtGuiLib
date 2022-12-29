@@ -12,7 +12,8 @@ from PyQtGuiLib.header import (
     Signal,
     QColor,
     QThread,
-    Qt
+    Qt,
+    QPushButton
 )
 
 from PyQtGuiLib.core.comboBox import ComboBox
@@ -29,6 +30,9 @@ class TestComboBox(QMainWindow):
         self.combox = ComboBox(self)
         self.combox.resize(300,40)
         self.combox.move(100,100)
+
+        self.btn = QPushButton("test",self)
+        self.btn.move(100,250)
 
 
 
