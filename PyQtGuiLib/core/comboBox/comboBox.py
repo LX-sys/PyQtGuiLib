@@ -142,6 +142,7 @@ class ComboBox(QWidget):
         super().__init__(*args,**kwargs)
         self.w,self.h = 400,40
         self.resize(self.w,self.h)
+        self.raise_()
 
         # 展开区域,大小,位置
         self.EA_w = self.w
@@ -201,7 +202,8 @@ class ComboBox(QWidget):
 
     # 创建展开区域
     def createExpandArea(self):
-        self.EA_widget = ScrollArea(self)
+        self.EA_widget = ScrollArea()
+        self.EA_widget.show()
         # self.EA_widget.setStyleSheet("border:1px solid blue;")
         self.EA_widget.move(self.EA_x,self.EA_y)
         self.EA_widget.resize(self.EA_w,self.EA_h+self.EA_up_margin)
@@ -273,7 +275,6 @@ class ComboBox(QWidget):
     # def inputMethodEvent(self, e: QInputMethodEvent) -> None:
     #     print(e)
     #     super(ComboBox, self).inputMethodEvent(e)
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
