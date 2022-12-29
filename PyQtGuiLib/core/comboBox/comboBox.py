@@ -110,7 +110,14 @@ class ScrollArea(QScrollArea):
         # 风格模式
         self.style_mode = ScrollArea.Style_Card
 
-        self.__vlay = QVBoxLayout(self)
+        self.setWidgetResizable(True)
+        self.core_widget = QWidget()
+        self.setWidget(self.core_widget)
+
+        # 所有对象
+        self.obj = []
+
+        self.__vlay = QVBoxLayout(self.core_widget)
         self.__vlay.setContentsMargins(0,0,0,0)
         self.__vlay.setSpacing(3)
 
@@ -127,14 +134,36 @@ border-radius:5px;
 
     def addWidget(self,widget:QWidget):
         if isinstance(widget,str):
-            widget = QLabel(widget)
-            print(widget)
-            widget.setFixedHeight(30)
-            widget.setAlignment(Qt.AlignCenter)
+            # text = widget
+            widget_ = QLabel(widget)
+            setattr(QLabel,"itemClicked",Signal())
+            print(getattr(QLabel,"itemClicked"))
+            # print(QLabel.__dict__)
+            # print(widget_.itemClicked.emit(1))
+
+            # widget.c = 10
+            # widget.itemClicked = Signal()
+            # print(widget.__dict__)
+
+            # widget.mousePressEvent = widget.itemClicked.emit()
+
+            widget_.setMinimumHeight(30)
+            # widget.setAlignment(Qt.AlignCenter)
             if self.style_mode == ScrollArea.Style_Card:
-                widget.setStyleSheet(self.styleCrad())
-        self.__vlay.addWidget(widget)
-        self.adjustSize()
+                widget_.setStyleSheet(self.styleCrad())
+        self.__vlay.addWidget(widget_)
+        self.obj.append(widget_)
+
+    # def mousePress(self,*args):
+    #     e = args[0]  # type:QMouseEvent
+    #     # print(args)
+
+
+    def itemChildWidget(self)->list:
+        return self.obj
+
+    def itemCount(self)->int:
+        return len(self.obj)
 
 
 class ComboBox(QWidget):
@@ -149,11 +178,14 @@ class ComboBox(QWidget):
         self.EA_h = 200
         self.EA_x = 0
         self.EA_y = self.h
-        self.EA_area_height = 300 # 展开区域默认高度
+        self.EA_area_max_height = 200 # 展开区域默认的最大高度
         self.old_h = self.h  # 保存旧的高度
         self.EA_state = False # 状态,展开,隐藏
 
         self.EA_up_margin = 0  # 下拉框与选择区域的距离
+
+        # 单个子项高度
+        self.item_height = 40
 
         # 展开区域的伸缩动画持续时间
         self.EA_stretch_ani_duration_time = 400
@@ -169,9 +201,8 @@ class ComboBox(QWidget):
 
     def test(self):
         self.setEAUpMargin(0)
-        self.addText("12345")
-        self.addText("sad")
-        self.addText("12czxc345")
+        for i in range(1):
+            self.addText(str(i))
 
     def resize(self, *args) -> None:
         if len(args) == 1 and isinstance(args[0],QSize):
@@ -196,15 +227,16 @@ class ComboBox(QWidget):
     def setEAUpMargin(self,margin:int):
         self.EA_up_margin = margin
 
+    def setItemHeight(self,h:int):
+        self.item_height = h
+
     # 设置展开区域的伸缩动画持续时间
     def setEAStretchAniDuration(self,msecs:int):
         self.EA_stretch_ani_duration_time = msecs
 
     # 创建展开区域
     def createExpandArea(self):
-        self.EA_widget = ScrollArea()
-        self.EA_widget.show()
-        # self.EA_widget.setStyleSheet("border:1px solid blue;")
+        self.EA_widget = ScrollArea(self)
         self.EA_widget.move(self.EA_x,self.EA_y)
         self.EA_widget.resize(self.EA_w,self.EA_h+self.EA_up_margin)
 
@@ -227,7 +259,11 @@ class ComboBox(QWidget):
         ani_expand.setStartValue(self.size())
 
         if self.EA_state is False:
-            ani_expand.setEndValue(QSize(self.width(),self.height()+self.EA_area_height))
+            # item个数 * 单个大小 = 总高度
+            area_height = self.EA_widget.itemCount() * self.item_height
+            if area_height > self.EA_area_max_height:
+                area_height = self.EA_area_max_height
+            ani_expand.setEndValue(QSize(self.width(),self.height()+area_height))
         else:
             ani_expand.setEndValue(QSize(self.__choose_area.width(),self.__choose_area.height()))
 
@@ -249,32 +285,6 @@ class ComboBox(QWidget):
         self.EA_widget.move(self.EA_x, self.old_h+self.EA_up_margin)
         self.EA_widget.resize(self.EA_w,self.h-self.old_h-self.EA_up_margin)
         super().resizeEvent(e)
-    
-    # def keyPressEvent(self, e: QKeyEvent) -> None:
-    #     print(e.key())
-    #     if e.key() == 16777219:
-    #         self.text = self.text[:-1]
-    #     else:
-    #         self.text += e.text()
-    #     self.update()
-    #     super().keyPressEvent(e)
-
-    # def paintEvent(self, e: QPaintEvent) -> None:
-    #     painter = QPainter(self)
-    #
-    #     font = QFont()
-    #     font.setPointSize(15)
-    #     painter.setFont(font)
-    #
-    #     painter.drawLine(8,0,8,40)
-    #     painter.drawRect(0,0,self.w,50)
-    #
-    #     painter.drawText(10,25,self.text)
-    #
-    #     painter.end()
-    # def inputMethodEvent(self, e: QInputMethodEvent) -> None:
-    #     print(e)
-    #     super(ComboBox, self).inputMethodEvent(e)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

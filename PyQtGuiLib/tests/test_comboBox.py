@@ -23,22 +23,31 @@ from PyQtGuiLib.core.comboBox import ComboBox
 '''
 
 class TestComboBox(QMainWindow):
+    sed = Signal()
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
 
         self.combox = ComboBox(self)
+        # self.combox.setFocus()
         self.combox.resize(300,40)
         self.combox.move(100,100)
 
         self.btn = QPushButton("test",self)
-        self.btn.move(100,250)
-
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = TestComboBox()
+
+    c = Signal(int)
+
+    # print(c.signatures)
+    # c.__get__(win,object())
+    setattr(TestComboBox,"ked",c)
+    print(TestComboBox.__dict__)
+    # TestComboBox.ked.signatures = TestComboBox.property(lambda win: object(), lambda win, v: None, lambda win: None)
+    # print(TestComboBox.sed.signatures)
+    # print(TestComboBox.ked.signatures)
     win.show()
 
     if PYQT_VERSIONS == "PyQt6":

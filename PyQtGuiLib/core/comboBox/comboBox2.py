@@ -30,12 +30,11 @@ from PyQtGuiLib.header import (
     QPropertyAnimation,
     QPoint,
     QSize,
-    QMoveEvent
+    QMoveEvent,
+    QComboBox
 )
 
-
 class ScrollArea(QScrollArea):
-
     # 风格
     Style_Card = "card"  # 卡片
 
