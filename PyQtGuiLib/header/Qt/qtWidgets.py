@@ -25,7 +25,11 @@ if PYQT_VERSIONS == "PyQt5":
         QMainWindow,
         QDesktopWidget,
         QGraphicsDropShadowEffect,
-        QSlider
+        QSlider,
+        QListWidget,
+        QListWidgetItem,
+        QListView,
+        QAction
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -54,7 +58,11 @@ if PYQT_VERSIONS == "PyQt6":
         QMainWindow,
         QDesktopWidget,
         QGraphicsDropShadowEffect,
-        QSlider
+        QSlider,
+        QListWidget,
+        QListWidgetItem,
+        QListView,
+        QAction
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -83,7 +91,11 @@ if PYQT_VERSIONS == "PySide2":
         QMainWindow,
         QDesktopWidget,
         QGraphicsDropShadowEffect,
-        QSlider
+        QSlider,
+        QListWidget,
+        QListWidgetItem,
+        QListView,
+        QAction
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -112,5 +124,9 @@ if PYQT_VERSIONS == "PySide6":
         QMainWindow,
         QDesktopWidget,
         QGraphicsDropShadowEffect,
-        QSlider
+        QSlider,
+        QListWidget,
+        QListWidgetItem,
+        QListView,
+        QAction
     )

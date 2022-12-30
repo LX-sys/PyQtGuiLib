@@ -22,6 +22,12 @@ from PyQtGuiLib.core.comboBox import ComboBox
     下拉框 测试用例
 '''
 
+class TPushButton(QPushButton):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint| Qt.WindowTransparentForInput)
+
+
 class TestComboBox(QMainWindow):
     sed = Signal()
     def __init__(self,*args,**kwargs):
@@ -32,8 +38,18 @@ class TestComboBox(QMainWindow):
         # self.combox.setFocus()
         self.combox.resize(300,40)
         self.combox.move(100,100)
+        print(self.combox.pos())
 
-        self.btn = QPushButton("test",self)
+
+        self.btn1 = QPushButton("test2",self)
+        self.btn = TPushButton("test", self)
+        self.btn.move(200,0)
+        self.btn.clicked.connect(lambda :print("111"))
+
+        self.btn1.clicked.connect(self.test)
+
+    def test(self,e):
+        print(e)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -45,6 +45,10 @@ class LineEdit(QLineEdit):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
+        self.setStyleSheet('''
+border:none;
+        ''')
+
         # 图标大小
         self.icon_w, self.icon_h = 12, 12
         # 图标位置靠右的位置,距离边的距离
@@ -107,6 +111,10 @@ class ScrollArea(QScrollArea):
 
         self.resize(500,500)
 
+        self.setStyleSheet('''
+        border:none;
+                ''')
+
         # 风格模式
         self.style_mode = ScrollArea.Style_Card
 
@@ -114,21 +122,26 @@ class ScrollArea(QScrollArea):
         self.core_widget = QWidget()
         self.setWidget(self.core_widget)
 
+        # 隐藏滚动条
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+
         # 所有对象
         self.obj = []
 
         self.__vlay = QVBoxLayout(self.core_widget)
-        self.__vlay.setContentsMargins(0,0,0,0)
+        self.__vlay.setContentsMargins(3,5,3,5)
         self.__vlay.setSpacing(3)
 
-        self.item_fixed_size = (self.width(),30)
+        self.item_fixed_height = 40
 
     # 卡片风格颜色
     def styleCrad(self)->str:
         style ='''
-background-color: rgb(176, 255, 225);
-border:1px solid gray;
+background-color: #237eff;
+border:1px solid #237eff;
 border-radius:5px;
+color:#ffffff;
         '''
         return style
 
@@ -136,8 +149,8 @@ border-radius:5px;
         if isinstance(widget,str):
             # text = widget
             widget_ = QLabel(widget)
-            setattr(QLabel,"itemClicked",Signal())
-            print(getattr(QLabel,"itemClicked"))
+            # setattr(QLabel,"itemClicked",Signal())
+            # print(getattr(QLabel,"itemClicked"))
             # print(QLabel.__dict__)
             # print(widget_.itemClicked.emit(1))
 
@@ -147,7 +160,7 @@ border-radius:5px;
 
             # widget.mousePressEvent = widget.itemClicked.emit()
 
-            widget_.setMinimumHeight(30)
+            widget_.setMinimumHeight(self.item_fixed_height)
             # widget.setAlignment(Qt.AlignCenter)
             if self.style_mode == ScrollArea.Style_Card:
                 widget_.setStyleSheet(self.styleCrad())
@@ -172,6 +185,8 @@ class ComboBox(QWidget):
         self.w,self.h = 400,40
         self.resize(self.w,self.h)
         self.raise_()
+
+        self.setStyleSheet('font: 11pt "华文细黑";')
 
         # 展开区域,大小,位置
         self.EA_w = self.w
@@ -201,8 +216,8 @@ class ComboBox(QWidget):
 
     def test(self):
         self.setEAUpMargin(0)
-        for i in range(1):
-            self.addText(str(i))
+        for i in range(10):
+            self.addText("选项{}".format(str(i)))
 
     def resize(self, *args) -> None:
         if len(args) == 1 and isinstance(args[0],QSize):
