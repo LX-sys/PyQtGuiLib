@@ -3,3 +3,4 @@
 # @author:LX
 # @file:__init__.py.py
 # @software:PyCharm
+from PyQtGuiLib.animation.lmlmAni import LmLmAnimation
