@@ -149,16 +149,7 @@ color:#ffffff;
         if isinstance(widget,str):
             # text = widget
             widget_ = QLabel(widget)
-            # setattr(QLabel,"itemClicked",Signal())
-            # print(getattr(QLabel,"itemClicked"))
-            # print(QLabel.__dict__)
-            # print(widget_.itemClicked.emit(1))
 
-            # widget.c = 10
-            # widget.itemClicked = Signal()
-            # print(widget.__dict__)
-
-            # widget.mousePressEvent = widget.itemClicked.emit()
 
             widget_.setMinimumHeight(self.item_fixed_height)
             # widget.setAlignment(Qt.AlignCenter)
@@ -166,11 +157,6 @@ color:#ffffff;
                 widget_.setStyleSheet(self.styleCrad())
         self.__vlay.addWidget(widget_)
         self.obj.append(widget_)
-
-    # def mousePress(self,*args):
-    #     e = args[0]  # type:QMouseEvent
-    #     # print(args)
-
 
     def itemChildWidget(self)->list:
         return self.obj
