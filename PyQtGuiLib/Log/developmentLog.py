@@ -39,6 +39,8 @@
 2022.12.26  0.0.7.0版本
     --- 新增线性渐变进度条,到目前为止,这是唯一个不提供文字显示的进度条
     --- 更新的所有进度条的抗锯齿写法 painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
-2022.12.26  0.0.7.1版本
+2023.1.4  0.0.8.0版本
     --- 线性渐变进度条 增加一个修改背景底色的方法 setBackGroundColor()
+    --- 感谢[PyQt5学习爱好群-(讨厌自己)提供的BUG修复思路] 修复Borderless右下角拉伸BUG
+    --- 新增 标题栏 TitleBar 类(测试发布中)
 '''
