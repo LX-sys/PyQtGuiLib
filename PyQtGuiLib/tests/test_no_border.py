@@ -28,7 +28,7 @@ from PyQtGuiLib.core.widgets import (
     继承窗口
 '''
 
-class TestNoBorder(RoundWidget):
+class TestNoBorder(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
@@ -39,7 +39,7 @@ background-color:#d4d4d4;
 border-radius:30px;
 }
         ''')
-        self.setOpacity(0.7)
+        # self.setOpacity(0.7)
 
         self.flag = False
 
