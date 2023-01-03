@@ -43,4 +43,9 @@
     --- 线性渐变进度条 增加一个修改背景底色的方法 setBackGroundColor()
     --- 感谢[PyQt5学习爱好群-(讨厌自己)提供的BUG修复思路] 修复Borderless右下角拉伸BUG
     --- 新增 标题栏 TitleBar 类(测试发布中)
+2023.1.4 0.0.8.1版本
+    --- 修复 TitleBar 标题栏 在多个屏幕下的BUG
+    --- TitleBar 在点击关闭按钮,新增隐退效果
+    --- TitleBar 放大按钮动画增强
+    --- TitleBar 增加缩小动画
 '''
