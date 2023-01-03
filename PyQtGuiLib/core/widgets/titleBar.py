@@ -14,9 +14,14 @@ from PyQtGuiLib.header import (
     QColor,
     QPushButton,
     QPropertyAnimation,
+    QParallelAnimationGroup,
     QBrush,
-    Qt
+    Qt,
+    QSize,
+    QPoint,
 )
+
+from PyQtGuiLib.animation import LmLmAnimation
 
 '''
     窗口的标题栏
@@ -180,6 +185,9 @@ class TitleBar(QFrame):
         self.title_color = QColor(0,0,0)
         self.title_size = 20
 
+        # 保存窗口在放大之前的位置大小,已经窗口大小状态
+        self.old_screen_geometry = QRect(0,0,0,0) # type:QRect
+        self.screen_state = False
 
         if self.__parent is not None:
             self.move(0,0)
@@ -271,19 +279,82 @@ class TitleBar(QFrame):
     # 缩小,放大,关闭 动画
     def ani(self,action:str):
         animation = QPropertyAnimation(self.__parent)
-        animation.setPropertyName(b"size")
         animation.setTargetObject(self.__parent)
         animation.setDuration(300)
 
         if action == "zoom":
-            self.__parent.showMinimized()
-        elif action == "arge":
-            self.__parent.move(0,0)
+            def _t(parent,size):
+                parent.showMinimized()
+                parent.setGeometry(size)
+
+            old_geometry = self.__parent.geometry()
+            animation.setPropertyName(b"size")
             animation.setStartValue(self.__parent.size())
-            animation.setEndValue(QApplication.desktop().size())
-            animation.start()
+            animation.setEndValue(QSize(10,10))
+            # animation.start()
+            animation.finished.connect(lambda :_t(self.__parent,old_geometry))
+
+            # 获取窗口位置的中心点
+            center_point = QPoint(self.__parent.x()+self.__parent.width()//2,
+                                  self.__parent.y()+self.__parent.height()//2)
+
+            # 移动动画
+            animation_move = QPropertyAnimation(self.__parent)
+            animation_move.setPropertyName(b"pos")
+            animation_move.setTargetObject(self.__parent)
+            animation_move.setDuration(300)
+
+            animation_move.setStartValue(self.pos())
+            animation_move.setEndValue(center_point)
+
+            # 动画组
+            ani_group = QParallelAnimationGroup(self.__parent)
+            ani_group.addAnimation(animation_move)
+            ani_group.addAnimation(animation)
+            ani_group.start()
+
+        elif action == "arge":
+            animation.setPropertyName(b"size")
+
+            # 移动动画
+            animation_move = QPropertyAnimation(self.__parent)
+            animation_move.setPropertyName(b"pos")
+            animation_move.setTargetObject(self.__parent)
+            animation_move.setDuration(300)
+
+            animation.setStartValue(self.__parent.size())
+            animation_move.setStartValue(self.__parent.pos())
+
+            if self.screen_state is False:
+                # 保存旧属性和状态
+                self.old_screen_geometry = self.__parent.geometry()  # type:QRect
+
+                # 获取的单个屏幕的大小
+                single_screen_width = QApplication.desktop().size().width() // QApplication.desktop().screenCount()
+                single_screen_height = QApplication.desktop().size().height()
+                animation.setEndValue(QSize(single_screen_width,single_screen_height))
+                #
+                animation_move.setEndValue(QPoint(0,0))
+
+                self.screen_state = True
+            else:
+                animation.setEndValue(self.old_screen_geometry.size())
+                #
+                animation_move.setEndValue(QPoint(self.old_screen_geometry.x(),self.old_screen_geometry.y()))
+                self.screen_state = False
+            # 动画组
+            ani_group = QParallelAnimationGroup(self.__parent)
+            ani_group.addAnimation(animation_move)
+            ani_group.addAnimation(animation)
+            ani_group.start()
+
         elif action == "close":
-            self.__parent.close()
+            animation.setPropertyName(b"windowOpacity")
+            animation.setStartValue(1)
+            animation.setEndValue(0)
+            animation.start()
+            animation.finished.connect(self.__parent.close)
+            # self.__parent.close()
 
     # 更新标题栏大小
     def updateTitleSize(self) -> None:
