@@ -33,6 +33,13 @@ PyQtGuiLib
 |- tests         # 组件测试文件
 ```
 
+### 其他贡献者
+
+```python
+PyQt5学习爱好群-(讨厌自己)  -- PyQtGuiLib 0.0.8.0版本
+   ---> 修复了Borderless右下角拉伸BUG
+```
+
 ## 组件说明
 
 ### 气泡窗口(BubbleWidget)
