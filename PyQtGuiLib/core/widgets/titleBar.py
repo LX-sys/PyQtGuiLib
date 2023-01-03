@@ -53,10 +53,10 @@ class ButtonIcon(QPushButton):
     def setBtnStyle(self,style:str = "WinStyle"):
         self.btnStyle = style
     
-    def isWinStyle(self)->bool:
+    def isWinStyle(self) -> bool:
         return True if self.btnStyle == ButtonIcon.WinStyle else False
 
-    def isMacStyle(self)->bool:
+    def isMacStyle(self) -> bool:
         return True if self.btnStyle == ButtonIcon.MacStyle else False
 
     # 绘制图标,所有子类都必须实现都方法
@@ -87,11 +87,15 @@ class ZoomButton(ButtonIcon):
             painter.drawRoundedRect(rect,self.radius,self.radius)
             painter.drawLine(5,self.height()//2,self.width()-5,self.height()//2)
         elif self.isMacStyle():
+            op.setColor(QColor(255, 199, 124))
+            painter.setPen(op)
             brush = QBrush(QColor(255, 199, 124))
             painter.setBrush(brush)
 
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
             painter.drawRoundedRect(rect, self.w//2,self.h//2)
+            op.setColor(QColor(50, 100, 100))
+            painter.setPen(op)
             painter.drawLine(5, self.height() // 2, self.width() - 5, self.height() // 2)
             painter.setBrush(Qt.NoBrush)
 
@@ -113,6 +117,8 @@ class LargeButton(ButtonIcon):
             painter.drawRoundedRect(rect1, self.radius,self.radius)
             painter.drawRoundedRect(rect2, self.radius,self.radius)
         elif self.isMacStyle():
+            op.setColor(QColor(40, 194, 50))
+            painter.setPen(op)
             brush = QBrush(QColor(40, 194, 50))
             painter.setBrush(brush)
 
@@ -121,7 +127,8 @@ class LargeButton(ButtonIcon):
 
             brush = QBrush(QColor(0,0,0))
             painter.setBrush(brush)
-
+            op.setColor(QColor(50, 100, 100))
+            painter.setPen(op)
             painter.drawEllipse(self.width()//2-5,self.height()//2-5,5,5)
             painter.drawEllipse(self.width()//2+1,self.height()//2+1,5,5)
 
@@ -144,11 +151,18 @@ class CloseButton(ButtonIcon):
             painter.drawLine(5,5,self.width()-5,self.height()-5)
             painter.drawLine(self.width()-5,5,5,self.height()-5)
         elif self.isMacStyle():
+            op.setColor(QColor(252, 70, 70))
+            painter.setPen(op)
             brush = QBrush(QColor(252, 70, 70))
             painter.setBrush(brush)
 
+
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
             painter.drawRoundedRect(rect, self.w//2,self.h//2)
+
+            op.setColor(QColor(50, 100, 100))
+            painter.setPen(op)
+
             painter.drawLine(5, 5, self.width() - 5, self.height() - 5)
             painter.drawLine(self.width() - 5, 5, 5, self.height() - 5)
 
