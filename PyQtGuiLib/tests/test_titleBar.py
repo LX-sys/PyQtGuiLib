@@ -36,7 +36,7 @@ border-radius:30px;
 }
         ''')
         self.tbar = TitleBar(self)
-        self.tbar.setBtnStyle(TitleBar.WinStyle)
+        self.tbar.setBtnStyle(TitleBar.MacStyle)
         self.tbar.setStyleSheet("background - color: rgb(232, 232, 232);")
 
     def resizeEvent(self, event:QResizeEvent) -> None:
