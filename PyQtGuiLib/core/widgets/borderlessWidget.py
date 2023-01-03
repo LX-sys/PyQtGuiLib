@@ -91,10 +91,10 @@ class Borderless:
         x,y = parent.pos().x(),parent.pos().y()
         for direction in self.pressDirection:
             if direction == Borderless.Right:
-                distance = pos - self.pressPos
-                distance_ = parent.width() + distance.x()
-                parent.resize(distance_, parent.height())
                 if Borderless.Down not in self.pressDirection:
+                    distance = pos - self.pressPos
+                    distance_ = parent.width() + distance.x()
+                    parent.resize(distance_, parent.height())
                     self.pressPos = QPoint(distance_, 0)
             if direction == Borderless.Down:
                 distance = pos - self.pressPos
