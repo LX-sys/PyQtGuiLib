@@ -29,7 +29,9 @@ if PYQT_VERSIONS == "PyQt5":
         QListWidget,
         QListWidgetItem,
         QListView,
-        QAction
+        QAction,
+        QAbstractScrollArea,
+        QRadioButton
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -62,7 +64,9 @@ if PYQT_VERSIONS == "PyQt6":
         QListWidget,
         QListWidgetItem,
         QListView,
-        QAction
+        QAction,
+        QAbstractScrollArea,
+        QRadioButton
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -95,7 +99,9 @@ if PYQT_VERSIONS == "PySide2":
         QListWidget,
         QListWidgetItem,
         QListView,
-        QAction
+        QAction,
+        QAbstractScrollArea,
+        QRadioButton
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -128,5 +134,7 @@ if PYQT_VERSIONS == "PySide6":
         QListWidget,
         QListWidgetItem,
         QListView,
-        QAction
+        QAction,
+        QAbstractScrollArea,
+        QRadioButton
     )
