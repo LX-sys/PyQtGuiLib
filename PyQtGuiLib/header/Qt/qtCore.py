@@ -15,7 +15,8 @@ if PYQT_VERSIONS == "PyQt5":
         QThread,
         QEasingCurve,
         QByteArray,
-        QSequentialAnimationGroup
+        QSequentialAnimationGroup,
+        QParallelAnimationGroup
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -33,7 +34,8 @@ if PYQT_VERSIONS == "PyQt6":
         QThread,
         QEasingCurve,
         QByteArray,
-        QSequentialAnimationGroup
+        QSequentialAnimationGroup,
+        QParallelAnimationGroup
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -51,7 +53,8 @@ if PYQT_VERSIONS == "PySide2":
         QThread,
         QEasingCurve,
         QByteArray,
-        QSequentialAnimationGroup
+        QSequentialAnimationGroup,
+        QParallelAnimationGroup
     )
 if PYQT_VERSIONS == "PySide6":
     from PySide6.QtCore import (
@@ -68,5 +71,6 @@ if PYQT_VERSIONS == "PySide6":
         QThread,
         QEasingCurve,
         QByteArray,
-        QSequentialAnimationGroup
+        QSequentialAnimationGroup,
+        QParallelAnimationGroup
     )
