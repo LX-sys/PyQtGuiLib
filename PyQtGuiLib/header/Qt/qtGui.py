@@ -22,7 +22,9 @@ if PYQT_VERSIONS == "PyQt5":
         QFontMetricsF,
         QCloseEvent,
         QBrush,
-        QPalette
+        QPalette,
+        QPixmap,
+        QIcon
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -47,7 +49,9 @@ if PYQT_VERSIONS == "PyQt6":
         QFontMetricsF,
         QCloseEvent,
         QBrush,
-        QPalette
+        QPalette,
+        QPixmap,
+        QIcon
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -72,7 +76,9 @@ if PYQT_VERSIONS == "PySide2":
         QFontMetricsF,
         QCloseEvent,
         QBrush,
-        QPalette
+        QPalette,
+        QPixmap,
+        QIcon
     )
 
 
@@ -98,5 +104,7 @@ if PYQT_VERSIONS == "PySide6":
         QFontMetricsF,
         QCloseEvent,
         QBrush,
-        QPalette
+        QPalette,
+        QPixmap,
+        QIcon
     )
