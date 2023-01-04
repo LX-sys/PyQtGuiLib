@@ -51,5 +51,6 @@
 2023.1.4 0.0.8.2版本
     --- TitleBar 更新Mac风格的放大,缩小,关闭按钮风格
     --- TitleBar 新增 setAniDuration() 方法 设置动画的时长
+    --- TitleBar 新增 setTitleIcon(),setSyncWindowIcon() 与设置图标相关的方法
     --- 优化了TitleBar部分代码
 '''
