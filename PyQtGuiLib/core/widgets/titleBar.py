@@ -49,6 +49,14 @@ class ButtonIcon(QPushButton):
         self.open_width = 1
         self.radius = 3
 
+    def resize(self, *args) -> None:
+        if len(args) == 1 and isinstance(args[0],QSize):
+            self.w = args[0].width(),args[0].height()
+        else:
+            self.w,self.h = args[0],args[1]
+
+        super().resize(self.w,self.h)
+
     # 设置 缩小,放大,关闭 的风格
     def setBtnStyle(self,style:str = "WinStyle"):
         self.btnStyle = style
@@ -203,6 +211,9 @@ class TitleBar(QFrame):
         self.old_screen_geometry = QRect(0,0,0,0) # type:QRect
         self.screen_state = False
 
+        # 动画时长
+        self.ani_msec = 300  # 毫秒
+
         if self.__parent is not None:
             self.move(0,0)
             self.resize(self.__parent.width(),self.h)
@@ -270,11 +281,10 @@ class TitleBar(QFrame):
         fw = int(fs.width(self.title_text))
         fh = int(fs.height())
         if self.title_pos == TitleBar.Title_Center:
-            painter.drawText(self.width() // 2 - fw // 2, self.height() // 2 + fh // 4, self.title_text)
+            painter.drawText(self.width() // 2 - fw // 2, self.height() // 2 + fh // 2, self.title_text)
 
         if self.title_pos == TitleBar.Title_Left:
-            painter.drawText(10, self.height() // 2 + fh // 4, self.title_text)
-
+            painter.drawText(10, self.height() // 2 + fh // 2, self.title_text)
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
@@ -290,11 +300,15 @@ class TitleBar(QFrame):
         self.lm.clicked.connect(lambda :self.ani("arge"))
         self.cm.clicked.connect(lambda :self.ani("close"))
 
+    # 设置动画的时长
+    def setAniDuration(self,msec:int):
+        self.ani_msec = msec
+
     # 缩小,放大,关闭 动画
     def ani(self,action:str):
         animation = QPropertyAnimation(self.__parent)
         animation.setTargetObject(self.__parent)
-        animation.setDuration(300)
+        animation.setDuration(self.ani_msec)
 
         if action == "zoom":
             def _t(parent,size):
@@ -316,7 +330,7 @@ class TitleBar(QFrame):
             animation_move = QPropertyAnimation(self.__parent)
             animation_move.setPropertyName(b"pos")
             animation_move.setTargetObject(self.__parent)
-            animation_move.setDuration(300)
+            animation_move.setDuration(self.ani_msec)
 
             animation_move.setStartValue(self.pos())
             animation_move.setEndValue(center_point)
@@ -326,7 +340,6 @@ class TitleBar(QFrame):
             ani_group.addAnimation(animation_move)
             ani_group.addAnimation(animation)
             ani_group.start()
-
         elif action == "arge":
             animation.setPropertyName(b"size")
 
@@ -334,7 +347,7 @@ class TitleBar(QFrame):
             animation_move = QPropertyAnimation(self.__parent)
             animation_move.setPropertyName(b"pos")
             animation_move.setTargetObject(self.__parent)
-            animation_move.setDuration(300)
+            animation_move.setDuration(self.ani_msec)
 
             animation.setStartValue(self.__parent.size())
             animation_move.setStartValue(self.__parent.pos())
@@ -361,14 +374,12 @@ class TitleBar(QFrame):
             ani_group.addAnimation(animation_move)
             ani_group.addAnimation(animation)
             ani_group.start()
-
         elif action == "close":
             animation.setPropertyName(b"windowOpacity")
             animation.setStartValue(1)
             animation.setEndValue(0)
             animation.start()
             animation.finished.connect(self.__parent.close)
-            # self.__parent.close()
 
     # 更新标题栏大小
     def updateTitleSize(self) -> None:
@@ -380,11 +391,14 @@ class TitleBar(QFrame):
         # 按钮占据的总宽度
         btn_occupied_width = self.zm.width()+self.lm.width()+self.cm.width()+btn_w_interval*3
         occ_w = self.width()-btn_occupied_width
-        self.zm.move(occ_w,5)
+        zm_h = self.height()//2 - self.zm.height()//2
+        lm_h = self.height()//2 - self.lm.height()//2
+        cm_h = self.height()//2 - self.cm.height()//2
+        self.zm.move(occ_w,zm_h)
         occ_w = occ_w+self.zm.width()+btn_w_interval
-        self.lm.move(occ_w,5)
+        self.lm.move(occ_w,lm_h)
         occ_w  = occ_w+self.lm.width()+btn_w_interval
-        self.cm.move(occ_w,5)
+        self.cm.move(occ_w,cm_h)
 
 
 if __name__ == '__main__':
