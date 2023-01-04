@@ -31,7 +31,8 @@ if PYQT_VERSIONS == "PyQt5":
         QListView,
         QAction,
         QAbstractScrollArea,
-        QRadioButton
+        QRadioButton,
+        QSpacerItem
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -66,7 +67,8 @@ if PYQT_VERSIONS == "PyQt6":
         QListView,
         QAction,
         QAbstractScrollArea,
-        QRadioButton
+        QRadioButton,
+        QSpacerItem
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -101,7 +103,8 @@ if PYQT_VERSIONS == "PySide2":
         QListView,
         QAction,
         QAbstractScrollArea,
-        QRadioButton
+        QRadioButton,
+        QSpacerItem
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -136,5 +139,6 @@ if PYQT_VERSIONS == "PySide6":
         QListView,
         QAction,
         QAbstractScrollArea,
-        QRadioButton
+        QRadioButton,
+        QSpacerItem
     )
