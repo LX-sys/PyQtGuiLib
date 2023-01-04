@@ -36,7 +36,8 @@ border-radius:30px;
 }
         ''')
         self.tbar = TitleBar(self)
-        self.tbar.setTitlePos(TitleBar.Title_Left)
+        self.tbar.setTitleIcon(r"D:\code\PyQtGuiLib\PyQtGuiLib\tests\temp_image\11.jpg")
+        self.tbar.setTitlePos(TitleBar.Title_Center)
         self.tbar.setBtnStyle(TitleBar.WinStyle)
         self.tbar.setStyleSheet("background - color: rgb(232, 232, 232);")
 
