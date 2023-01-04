@@ -13,3 +13,4 @@ from PyQtGuiLib.core.widgets.borderlessWidget import (
 from PyQtGuiLib.core.widgets.roundWidget import RoundWidget
 from PyQtGuiLib.core.widgets.buttonWidget import ButtonWidget
 from PyQtGuiLib.core.widgets.titleBar import TitleBar
+from PyQtGuiLib.core.widgets.statusBar import StatusBar
