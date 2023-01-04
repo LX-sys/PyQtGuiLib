@@ -19,6 +19,8 @@ from PyQtGuiLib.header import (
     Qt,
     QSize,
     QPoint,
+    QPixmap,
+    QIcon
 )
 
 from PyQtGuiLib.animation import LmLmAnimation
@@ -203,9 +205,14 @@ class TitleBar(QFrame):
         # 标题高度
         self.h = 35
         # 标题文本
-        self.title_text="Title"
+        self.title_text= "Title"
         self.title_color = QColor(0,0,0)
         self.title_size = 20
+
+        # 图标大小,图标路径
+        self.image_size = 30,30
+        self.title_icon_path = r""
+        self.is_sync_icon = True # 是否同步桌面任务栏的图标
 
         # 保存窗口在放大之前的位置大小,已经窗口大小状态
         self.old_screen_geometry = QRect(0,0,0,0) # type:QRect
@@ -276,6 +283,11 @@ class TitleBar(QFrame):
         op.setColor(self.title_color)
         painter.setPen(op)
 
+        icon_distance = 0
+
+        if self.title_icon_path:
+            icon_distance = 30
+
         # 文字
         fs = QFontMetricsF(f)
         fw = int(fs.width(self.title_text))
@@ -284,12 +296,28 @@ class TitleBar(QFrame):
             painter.drawText(self.width() // 2 - fw // 2, self.height() // 2 + fh // 2, self.title_text)
 
         if self.title_pos == TitleBar.Title_Left:
-            painter.drawText(10, self.height() // 2 + fh // 2, self.title_text)
+            painter.drawText(10+icon_distance, self.height() // 2 + fh // 2, self.title_text)
+
+    # 绘制tub
+    def drawTitleIcon(self,painter: QPainter):
+        f = QFont()
+        f.setPointSize(self.title_size)
+        fs = QFontMetricsF(f)
+        fw = int(fs.width(self.title_text))
+
+        pix = QPixmap(self.title_icon_path)
+        if self.title_pos == TitleBar.Title_Center:
+            painter.drawPixmap(self.width() // 2-fw, self.height()//2-self.image_size[1]//2, *self.image_size, pix)
+        if self.title_pos == TitleBar.Title_Left:
+            painter.drawPixmap(5, self.height()//2-self.image_size[1]//2, *self.image_size, pix)
+        if self.is_sync_icon:
+            self.__parent.setWindowIcon(QIcon(self.title_icon_path))
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
         painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
 
+        self.drawTitleIcon(painter)
         self.drawTitleText(painter)
 
         painter.end()
@@ -303,6 +331,21 @@ class TitleBar(QFrame):
     # 设置动画的时长
     def setAniDuration(self,msec:int):
         self.ani_msec = msec
+
+    # 设置图标
+    def setTitleIcon(self,path:str,isWindowIcon:bool=True):
+        '''
+
+        :param path: 图片路径
+        :param isWindowIcon: 是否同步桌面任务栏的图标
+        :return:
+        '''
+        self.title_icon_path = path
+        self.is_sync_icon = isWindowIcon
+
+    # 设置是否同步桌面任务栏的图标
+    def setSyncWindowIcon(self,b:bool):
+        self.is_sync_icon = b
 
     # 缩小,放大,关闭 动画
     def ani(self,action:str):
