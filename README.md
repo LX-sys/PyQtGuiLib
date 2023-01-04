@@ -263,6 +263,12 @@ updateTitleSize() # 更新标题栏大小
 # ---- 
 注意: 标题大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
 事件中调用 updateTitleSize() 来跟随变化
+
+# -------
+注意: 图标同步任务栏的效果只在win下才有效果
+在Mac设置图标方法,下面这个设置路径是写在运行程序那里的
+app = QApplication()
+app.setWindowIcon(QIcon(路径))
 ```
 
 
