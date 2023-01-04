@@ -7,16 +7,11 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    QWidget,
     QResizeEvent
 )
 
 from PyQtGuiLib.core.widgets import (
-    RoundWidget,   # 圆角QWidget窗口
-    BorderlessMainWindow, # 无边框矩形主窗口
-    BorderlessFrame,      # 无边框矩形QFrame窗口
     BorderlessWidget,     # 无边框矩形QWidget窗口
-    BorderlessStackedWidget  # 无边框矩形StackedWidget窗口
     )
 
 from PyQtGuiLib.core.widgets import StatusBar,TitleBar
@@ -30,7 +25,6 @@ class TestStatusBar(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
-
         self.setStyleSheet('''
 #widget{
 background-color:#d4d4d4;
@@ -45,8 +39,8 @@ border-radius:30px;
         # 状态栏
         self.status = StatusBar(self)
         self.status.setStyleSheet("background-color: rgb(232, 232, 232);")
-        self.status.addText("我是标签")
-        self.status.addButton("我是按钮")
+        self.status.addText("我是标签",duration=3)
+        self.status.addButton("我是按钮","border:1px solid red;")
         self.g = GradientBar()
         self.g.setValue(80)
         self.g.setFixedSize(100,10)
