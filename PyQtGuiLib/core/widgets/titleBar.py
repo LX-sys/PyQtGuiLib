@@ -1,7 +1,5 @@
 
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    sys,
     QApplication,
     QWidget,
     QFrame,
@@ -23,8 +21,6 @@ from PyQtGuiLib.header import (
     QIcon
 )
 
-from PyQtGuiLib.animation import LmLmAnimation
-
 '''
     窗口的标题栏
 '''
@@ -40,7 +36,7 @@ class ButtonIcon(QPushButton):
     '''
     WinStyle = "WinStyle"
     MacStyle = "MacStyle"
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.w,self.h = 20,20
@@ -307,7 +303,8 @@ class TitleBar(QFrame):
 
         pix = QPixmap(self.title_icon_path)
         if self.title_pos == TitleBar.Title_Center:
-            painter.drawPixmap(self.width() // 2-fw, self.height()//2-self.image_size[1]//2, *self.image_size, pix)
+            painter.drawPixmap(self.width() // 2 - fw // 2-self.image_size[0], self.height() // 2 - self.image_size[1] // 2, *self.image_size,
+                               pix)
         if self.title_pos == TitleBar.Title_Left:
             painter.drawPixmap(5, self.height()//2-self.image_size[1]//2, *self.image_size, pix)
         if self.is_sync_icon:
@@ -442,14 +439,3 @@ class TitleBar(QFrame):
         self.lm.move(occ_w,lm_h)
         occ_w  = occ_w+self.lm.width()+btn_w_interval
         self.cm.move(occ_w,cm_h)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = ZoomButton()
-    win.show()
-
-    if PYQT_VERSIONS == "PyQt6":
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
