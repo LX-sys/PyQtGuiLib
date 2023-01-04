@@ -235,7 +235,7 @@ getColors()  # 返回所有的颜色和比重
 ### 标题栏(TitleBar)
 
 ```python
-标题栏  ----> 70%  测试使用中
+标题栏  ----> 99%  测试使用中
 导入方式 from PyQtGuiLib.core.widgets import TitleBar
 
 标题栏 -- TitleBar API介绍
@@ -255,6 +255,9 @@ setTitleSize()  # 设置标题字体大小
 setAllTitle() # 同时设置,标题,颜色,字体大小
 setTitlePos() # 设置标题的位置(例如居中: TitleBar.Title_Center)
 setBtnStyle() # 设置 缩小,放大,关闭 按钮的风格(默认: TitleBar.WinStyle)
+setAniDuration() # 设置动画的时长(默认300毫秒)
+setTitleIcon() # 设置图标(默认会同步任务栏的图标)
+setSyncWindowIcon() # 设置是否同步桌面任务栏的图标
 updateTitleSize() # 更新标题栏大小
 
 # ---- 
