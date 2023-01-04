@@ -53,4 +53,7 @@
     --- TitleBar 新增 setAniDuration() 方法 设置动画的时长
     --- TitleBar 新增 setTitleIcon(),setSyncWindowIcon() 与设置图标相关的方法
     --- 优化了TitleBar部分代码
+2023.1.4 0.0.8.3版本
+    --- 修复 TitleBar 类在mac下图标显示位置的问题
+    --- utility.py 新增 系统判断
 '''
