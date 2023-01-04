@@ -235,7 +235,7 @@ getColors()  # 返回所有的颜色和比重
 ### 标题栏(TitleBar)
 
 ```python
-标题栏  ----> 99%  测试使用中
+标题栏  ----> 99%
 导入方式 from PyQtGuiLib.core.widgets import TitleBar
 
 标题栏 -- TitleBar API介绍
@@ -269,6 +269,28 @@ updateTitleSize() # 更新标题栏大小
 在Mac设置图标方法,下面这个设置路径是写在运行程序那里的
 app = QApplication()
 app.setWindowIcon(QIcon(路径))
+```
+
+### 状态栏(StatusBar)
+
+```python
+状态栏  ----> 80%  测试使用中
+导入方式 from PyQtGuiLib.core.widgets import StatusBar
+
+状态栏 -- StatusBar API介绍
+
+# --- Api
+
+addText() # 添加文本,可以设置持续多长时间后消失
+addButton() # 添加按钮,可以设置一个点击事件
+addWidget() # 添加一个窗口
+addTime() # 添加时间
+setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
+
+这里所有添加的功能都可以通过 style 参数来设置样式
+# ---- 
+注意: 标题大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
+事件中调用 updateStatusSize() 来跟随变化
 ```
 
 
