@@ -39,7 +39,7 @@ border-radius:30px;
         self.tbar.setTitleIcon(r"D:\code\PyQtGuiLib\PyQtGuiLib\tests\temp_image\11.jpg")
         self.tbar.setTitlePos(TitleBar.Title_Center)
         self.tbar.setBtnStyle(TitleBar.WinStyle)
-        self.tbar.setStyleSheet("background - color: rgb(232, 232, 232);")
+        self.tbar.setStyleSheet("background-color: rgb(232, 232, 232);")
 
     def resizeEvent(self, event:QResizeEvent) -> None:
         super().resizeEvent(event)
