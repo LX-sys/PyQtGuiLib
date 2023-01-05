@@ -44,6 +44,10 @@ class CountDownThread(QThread):
 
 
 class StatusBar(QFrame):
+
+    PosBottom = "PosBottom"
+    PosTop = "PosTop"
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
@@ -58,6 +62,9 @@ class StatusBar(QFrame):
         self.format = "%Y-%m-%d %H:%M:%S"
         self.local_time = time.strftime(self.format, time.localtime())
         self.l_time = QLabel(self.local_time)
+
+        # 状态栏位置
+        self.status_pos = StatusBar.PosBottom
 
         # 创建倒计时类
         self.cd = CountDownThread()
@@ -86,6 +93,10 @@ class StatusBar(QFrame):
         if self.__parent is not None:
             self.move(0,self.__parent.height()-self.h)
             self.resize(self.__parent.width(),self.h)
+
+    # 设置状态栏位置
+    def setStatusPos(self,mode:str):
+        self.status_pos = mode
 
     def __addSpacer(self):
         self.__hlay.addItem(self.hSpacer)
@@ -141,8 +152,13 @@ class StatusBar(QFrame):
         self.__addSpacer()
 
     def updateStatusSize(self):
-        self.move(0, self.__parent.height() - self.h)
-        self.resize(self.__parent.width(), self.h)
+
+        if self.status_pos == StatusBar.PosTop:
+            self.move(0, 0)
+            self.resize(self.__parent.width(), self.h)
+        elif self.status_pos == StatusBar.PosBottom:
+            self.move(0, self.__parent.height() - self.h)
+            self.resize(self.__parent.width(), self.h)
 
     def timerEvent(self,e) -> None:
         self.local_time = time.strftime(self.format, time.localtime())
