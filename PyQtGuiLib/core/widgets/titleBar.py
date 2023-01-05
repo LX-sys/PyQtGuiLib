@@ -18,7 +18,9 @@ from PyQtGuiLib.header import (
     QSize,
     QPoint,
     QPixmap,
-    QIcon
+    QIcon,
+    QStyle,
+    QStyleOption
 )
 
 '''
@@ -173,7 +175,7 @@ class CloseButton(ButtonIcon):
             painter.drawLine(self.width() - 5, 5, 5, self.height() - 5)
 
 
-class TitleBar(QFrame):
+class TitleBar(QWidget):
 
     # 标题的位置
     Title_Left = "TextLeft"
@@ -439,3 +441,11 @@ class TitleBar(QFrame):
         self.lm.move(occ_w,lm_h)
         occ_w  = occ_w+self.lm.width()+btn_w_interval
         self.cm.move(occ_w,cm_h)
+
+    def paintEvent(self, e: QPaintEvent) -> None:
+        opt = QStyleOption()
+        opt.initFrom(self)
+
+        painter = QPainter(self)
+
+        self.style().drawPrimitive(QStyle.PE_Widget,opt,painter,self)

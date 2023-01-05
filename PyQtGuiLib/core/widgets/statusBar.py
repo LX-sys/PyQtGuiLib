@@ -17,6 +17,10 @@ from PyQtGuiLib.header import (
     QPushButton,
     QSpacerItem,
     QSizePolicy,
+    QPainter,
+    QPaintEvent,
+    QStyleOption,
+    QStyle
 )
 '''
     状态栏
@@ -43,7 +47,7 @@ class CountDownThread(QThread):
         self.timeOuted.emit()
 
 
-class StatusBar(QFrame):
+class StatusBar(QWidget):
 
     PosBottom = "PosBottom"
     PosTop = "PosTop"
@@ -145,7 +149,7 @@ class StatusBar(QFrame):
         self.__addSpacer()
 
     # 添加时间
-    def addTime(self,style:str=None):
+    def addTime(self,style:str="background-color:transparent"):
         if style:
             self.l_time.setStyleSheet(style)
         self.__hlay.addWidget(self.l_time)
@@ -163,3 +167,11 @@ class StatusBar(QFrame):
     def timerEvent(self,e) -> None:
         self.local_time = time.strftime(self.format, time.localtime())
         self.l_time.setText(self.local_time)
+
+    def paintEvent(self, e: QPaintEvent) -> None:
+        opt = QStyleOption()
+        opt.initFrom(self)
+
+        painter = QPainter(self)
+
+        self.style().drawPrimitive(QStyle.PE_Widget,opt,painter,self)
