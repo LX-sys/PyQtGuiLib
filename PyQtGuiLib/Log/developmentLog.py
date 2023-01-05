@@ -57,4 +57,5 @@
     --- 修复 TitleBar 类在mac下图标显示位置的问题
     --- utility.py 新增 系统判断
     --- 新增状态栏
+    --- 状态栏 新增 setStatusPos() 方法
 '''
