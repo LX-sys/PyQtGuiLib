@@ -7,7 +7,8 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    QResizeEvent
+    QResizeEvent,
+    QWidget
 )
 
 from PyQtGuiLib.core.widgets import (
@@ -32,14 +33,15 @@ border-radius:30px;
 }
         ''')
         # 标题栏
-        self.title = TitleBar(self)
-        self.title.setTitleText("测试状态栏")
-        self.title.setBtnStyle(TitleBar.WinStyle)
+        # self.title = TitleBar(self)
+        # self.title.setTitleText("测试状态栏")
+        # self.title.setBtnStyle(TitleBar.WinStyle)
 
         # 状态栏
         self.status = StatusBar(self)
+        self.status.setStatusPos(StatusBar.PosTop)
         self.status.setStyleSheet("background-color: rgb(232, 232, 232);")
-        self.status.addText("我是标签",duration=3)
+        self.status.addText("我是标签",duration=20)
         self.status.addButton("我是按钮","border:1px solid red;")
         self.g = GradientBar()
         self.g.setValue(80)
@@ -49,7 +51,7 @@ border-radius:30px;
 
     def resizeEvent(self, event:QResizeEvent) -> None:
         super().resizeEvent(event)
-        self.title.updateTitleSize()
+        # self.title.updateTitleSize()
         self.status.updateStatusSize()
 
 if __name__ == '__main__':
