@@ -39,8 +39,8 @@ border-radius:30px;
 
         # 状态栏
         self.status = StatusBar(self)
-        self.status.setStatusPos(StatusBar.PosTop)
-        self.status.setStyleSheet("background-color: rgb(232, 232, 232);")
+        self.status.setStatusPos(StatusBar.PosBottom)
+        self.status.setStyleSheet("background-color: rgb(232, 100, 232);")
         self.status.addText("我是标签",duration=20)
         self.status.addButton("我是按钮","border:1px solid red;")
         self.g = GradientBar()
