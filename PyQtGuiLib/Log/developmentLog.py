@@ -60,4 +60,7 @@
     --- 状态栏 新增 setStatusPos() 方法
 2023.1.5 0.0.8.3版本
     --- 优化 TitleBar,StatusBar 代码,并修复了样式表设置无效的BUG
+2023.1.5 1.0.8.3版本
+    --- 新增 styles 皮肤包项目 
+    --- 全面兼容 PyQt5,PyQt6,PySide2,PySide6, PySide6 在使用无边框的还有小问题
 '''
