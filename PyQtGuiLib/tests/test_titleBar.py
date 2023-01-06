@@ -51,7 +51,7 @@ if __name__ == '__main__':
     win = TestTitleBar()
     win.show()
 
-    if PYQT_VERSIONS == "PyQt6":
+    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
         sys.exit(app.exec())
     else:
         sys.exit(app.exec_())

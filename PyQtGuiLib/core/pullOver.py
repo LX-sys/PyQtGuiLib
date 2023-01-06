@@ -8,7 +8,8 @@ from PyQtGuiLib.header import (
     QPropertyAnimation,
     QEasingCurve,
     desktopCenter,
-    desktopSize
+    desktopSize,
+    Qt
 )
 
 
@@ -91,12 +92,11 @@ class PullOver:
         # s_count = QApplication.desktop().screenCount()
         desktop_w = desktopSize().width()
         desktop_h = desktopSize().height()
-
         def _t(parent, self):
             parent.hide()
             btn_obj.move(small_btn_pos)
             btn_obj.show()
-            self.move_ani.disconnect()
+            self.move_ani.finished.disconnect()
 
         # Window current position
         pos_ = self.parent.pos()
@@ -142,7 +142,7 @@ class PullOver:
         self.move_ani.start()
         def _t(self):
             self.monitoth.setStop(False)
-            self.move_ani.disconnect()
+            self.move_ani.finished.disconnect()
         self.move_ani.finished.connect(lambda :_t(self))
 
     def center(self):

@@ -7,7 +7,7 @@ from PyQtGuiLib.header.versions import PYQT_VERSIONS
 from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy
 
 
-if PYQT_VERSIONS == "PyQt5":
+if PYQT_VERSIONS == "PyQt5"  :
     FramelessWindowHint = Qt.FramelessWindowHint
     ArrowCursor = Qt.ArrowCursor
     SizeFDiagCursor = Qt.SizeFDiagCursor
@@ -39,7 +39,7 @@ if PYQT_VERSIONS == "PyQt5":
     PolicyExpanding = QSizePolicy.Expanding
     PolicyMinimum = QSizePolicy.Minimum
 
-if PYQT_VERSIONS == "PyQt6":
+if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
     ArrowCursor = Qt.CursorShape.ArrowCursor
     SizeFDiagCursor = Qt.CursorShape.SizeFDiagCursor

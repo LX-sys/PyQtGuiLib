@@ -17,7 +17,7 @@ def desktopSize() -> QSize:
         size = QApplication.desktop().size()
         count = QApplication.desktop().screenCount()
         return QSize(size.width()//count,size.height())
-    elif PYQT_VERSIONS == "PyQt6":
+    elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
         return DesktopWidget.primaryScreen().availableGeometry().size()
     else:
         return QSize(0,0)
@@ -27,7 +27,7 @@ def desktopSize() -> QSize:
 def desktopCenter() -> QPoint:
     if PYQT_VERSIONS == "PyQt5":
         return DesktopWidget().availableGeometry().center()
-    elif PYQT_VERSIONS == "PyQt6":
+    elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
         return DesktopWidget.primaryScreen().availableGeometry().center()
     else:
         return QPoint(0,0)
@@ -38,7 +38,7 @@ def textSize(font:QFont,text:str)->QSize:
     fs = QFontMetricsF(font)
     if PYQT_VERSIONS == "PyQt5":
         return QSize(int(fs.width(text)),int(fs.height()))
-    elif PYQT_VERSIONS == "PyQt6":
+    elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
         return QSize(int(fs.horizontalAdvance(text)), int(fs.height()))
     else:
         return QSize(0,0)

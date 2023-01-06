@@ -133,7 +133,7 @@ class Borderless:
         elif e.button() == LeftButton:  # 处理窗口移动
             self.movePressState = True
 
-            if PYQT_VERSIONS == "PyQt5":
+            if PYQT_VERSIONS in ["PyQt5","PySide2","PySide6"]:
                 old_pos = e.globalPos()
             if PYQT_VERSIONS == "PyQt6":
                 old_pos = e.pos()
@@ -150,7 +150,7 @@ class Borderless:
 
     def moveEvent(self,parent:QWidget, e:QMouseEvent) -> None:
         if self.movePressState:
-            if PYQT_VERSIONS == "PyQt5":
+            if PYQT_VERSIONS in ["PyQt5","PySide2","PySide6"]:
                 old_pos = e.globalPos()
             if PYQT_VERSIONS == "PyQt6":
                 old_pos = e.pos()

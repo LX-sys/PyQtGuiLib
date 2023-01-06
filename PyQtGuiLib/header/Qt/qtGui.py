@@ -80,7 +80,8 @@ if PYQT_VERSIONS == "PySide2":
         QBrush,
         QPalette,
         QPixmap,
-        QIcon
+        QIcon,
+        QGuiApplication as DesktopWidget,
     )
 
 
@@ -108,5 +109,7 @@ if PYQT_VERSIONS == "PySide6":
         QBrush,
         QPalette,
         QPixmap,
-        QIcon
+        QIcon,
+        QAction,
+        QGuiApplication as DesktopWidget,
     )
