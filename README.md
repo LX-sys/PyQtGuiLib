@@ -28,6 +28,7 @@ PyQtGuiLib
 |- abandonCase   # 存放已经放弃的的案例
 |- animation     # 动画功能文件
 |- core          # 组件的核心实现文件
+|- styles        # 基础组件皮肤包
 |- header        # 公共模块,函数文件
 |- Log           # 更新日志
 |- tests         # 组件测试文件
@@ -38,6 +39,20 @@ PyQtGuiLib
 ```python
 PyQt5学习爱好群-(讨厌自己)  -- PyQtGuiLib 0.0.8.0版本
    ---> 修复了Borderless右下角拉伸BUG
+```
+
+### 皮肤包
+
+```python
+导入方式 
+from PyQtGuiLib.styles import xxx
+
+按钮皮肤包
+from PyQtGuiLib.styles import ButtonStyle
+
+# --- Api
+ButtonStyle.style()
+ButtonStyle.randomStyle()  # 常用
 ```
 
 ## 组件说明
@@ -261,7 +276,7 @@ setSyncWindowIcon() # 设置是否同步桌面任务栏的图标
 updateTitleSize() # 更新标题栏大小
 
 # ---- 
-注意: 标题大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
+注意: 标题栏大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
 事件中调用 updateTitleSize() 来跟随变化
 
 # -------
@@ -289,7 +304,7 @@ setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
 
 这里所有添加的功能都可以通过 style 参数来设置样式
 # ---- 
-注意: 标题大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
+注意: 状态栏大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
 事件中调用 updateStatusSize() 来跟随变化
 ```
 
