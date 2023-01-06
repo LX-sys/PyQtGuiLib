@@ -4,7 +4,7 @@
 # @file:qt.py
 # @software:PyCharm
 from PyQtGuiLib.header.versions import PYQT_VERSIONS
-from PyQtGuiLib.header import Qt,QPainter,QStyle
+from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy
 
 
 if PYQT_VERSIONS == "PyQt5":
@@ -34,6 +34,10 @@ if PYQT_VERSIONS == "PyQt5":
     DashDotLine = Qt.DashDotLine
     DashDotDotLine = Qt.DashDotDotLine
     CustomDashLine = Qt.CustomDashLine
+    WindowStaysOnTopHint = Qt.WindowStaysOnTopHint
+    Widget = Qt.Widget
+    PolicyExpanding = QSizePolicy.Expanding
+    PolicyMinimum = QSizePolicy.Minimum
 
 if PYQT_VERSIONS == "PyQt6":
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
@@ -62,3 +66,7 @@ if PYQT_VERSIONS == "PyQt6":
     DashDotLine = Qt.PenStyle.DashDotLine
     DashDotDotLine = Qt.PenStyle.DashDotDotLine
     CustomDashLine = Qt.PenStyle.CustomDashLine
+    WindowStaysOnTopHint = Qt.WindowType.WindowStaysOnTopHint
+    Widget = Qt.WindowType.Widget
+    PolicyExpanding = QSizePolicy.Policy.Expanding
+    PolicyMinimum = QSizePolicy.Policy.Minimum

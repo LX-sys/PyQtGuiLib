@@ -13,7 +13,7 @@ from PyQtGuiLib.header import (
     QColor,
     QThread,
     QPushButton,
-    Qt
+    qt
 )
 
 from PyQtGuiLib.core.widgets import (
@@ -50,11 +50,11 @@ border-radius:30px;
     def test(self):
         if self.flag is False:
             self.btn.setText("解放")
-            self.windowHandle().setFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+            self.windowHandle().setFlags(self.windowFlags() | qt.WindowStaysOnTopHint)
             self.flag= True
         else:
             self.btn.setText("固定")
-            self.windowHandle().setFlags(self.windowFlags() | Qt.Widget)
+            self.windowHandle().setFlags(self.windowFlags() | qt.Widget)
             self.flag = False
         self.show()
         self.update()

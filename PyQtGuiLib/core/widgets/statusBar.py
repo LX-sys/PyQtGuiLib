@@ -20,7 +20,8 @@ from PyQtGuiLib.header import (
     QPainter,
     QPaintEvent,
     QStyleOption,
-    QStyle
+    QStyle,
+    qt
 )
 '''
     状态栏
@@ -80,7 +81,8 @@ class StatusBar(QWidget):
         if is_mac_sys:
             self.__hlay.setSpacing(6*3)
 
-        self.hSpacer = QSpacerItem(704, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        QSizePolicy.Policy.Expanding
+        self.hSpacer = QSpacerItem(704, 20, qt.PolicyExpanding, qt.PolicyMinimum)
 
         self.updateStatusSize()
 
@@ -174,4 +176,4 @@ class StatusBar(QWidget):
 
         painter = QPainter(self)
 
-        self.style().drawPrimitive(QStyle.PE_Widget,opt,painter,self)
+        self.style().drawPrimitive(qt.PE_Widget,opt,painter,self)
