@@ -24,7 +24,7 @@ if PYQT_VERSIONS == "PyQt5":
         QBrush,
         QPalette,
         QPixmap,
-        QIcon
+        QIcon,
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -51,7 +51,9 @@ if PYQT_VERSIONS == "PyQt6":
         QBrush,
         QPalette,
         QPixmap,
-        QIcon
+        QIcon,
+        QAction,
+        QGuiApplication as DesktopWidget,
     )
 
 if PYQT_VERSIONS == "PySide2":

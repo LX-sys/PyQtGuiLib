@@ -17,7 +17,9 @@ from PyQtGuiLib.header import (
     QResizeEvent,
     QPropertyAnimation,
     QPoint,
-    QThread
+    QThread,
+    qt,
+    textSize
 )
 
 '''
@@ -183,15 +185,15 @@ class WaterBar(QWidget):
             painter.setFont(f)
             painter.setPen(self.text_color)
             # 文字
-            fs = QFontMetricsF(f)
-            fw = int(fs.width(self.text))
-            fh = int(fs.height())
+            fs = textSize(f,self.text)
+            fw = fs.width()
+            fh = fs.height()
             painter.drawText(self.w // 2 - fw // 2, self.h // 2 + fh // 4, self.text)
 
     def paintEvent(self, e: QPaintEvent) -> None:
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         # 画水位
         self.drawWaterLevel(painter)

@@ -8,7 +8,7 @@ from PyQtGuiLib.header import (
     sys,
     QApplication,
     QResizeEvent,
-    QWidget
+    QWidget,
 )
 
 from PyQtGuiLib.core.widgets import (

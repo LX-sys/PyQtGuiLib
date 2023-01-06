@@ -10,7 +10,6 @@ from PyQtGuiLib.header import (
     QApplication,
     QWidget,
     Signal,
-    Qt,
     QFont,
     QColor,
     QPen,
@@ -21,7 +20,8 @@ from PyQtGuiLib.header import (
     QResizeEvent,
     QLinearGradient,
     QBrush,
-    Signal
+    Signal,
+    qt
 )
 '''
     线性渐变进度条
@@ -132,18 +132,16 @@ class GradientBar(QWidget):
         # 进度条底色
         bg = QBrush(self.bg_color)
 
-        painter.setPen(Qt.NoPen)  # 设置无画笔
+        painter.setPen(qt.NoPen)  # 设置无画笔
         painter.setBrush(bg)
-        # painter.drawRect(0, 0, self.w, self.h)
         painter.drawRoundedRect(0, 0, self.w, self.h,self.radius,self.radius)
         painter.setBrush(gradient)
-        # painter.drawRect(0, 0, self.bw, self.h)
         painter.drawRoundedRect(0, 0, self.bw, self.h, self.radius,self.radius)
 
     def paintEvent(self, e:QPaintEvent) -> None:
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         # 渐变进度条
         self.gradientBar(painter)

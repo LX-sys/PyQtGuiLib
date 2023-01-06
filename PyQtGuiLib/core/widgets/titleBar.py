@@ -1,5 +1,5 @@
-
 from PyQtGuiLib.header import (
+    PYQT_VERSIONS,
     QApplication,
     QWidget,
     QFrame,
@@ -14,13 +14,15 @@ from PyQtGuiLib.header import (
     QPropertyAnimation,
     QParallelAnimationGroup,
     QBrush,
-    Qt,
+    qt,
     QSize,
     QPoint,
     QPixmap,
     QIcon,
     QStyle,
-    QStyleOption
+    QStyleOption,
+    desktopCenter,
+    desktopSize
 )
 
 '''
@@ -73,7 +75,8 @@ class ButtonIcon(QPushButton):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
-        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+
 
         self.drawIcon(painter)
 
@@ -105,7 +108,7 @@ class ZoomButton(ButtonIcon):
             op.setColor(QColor(50, 100, 100))
             painter.setPen(op)
             painter.drawLine(5, self.height() // 2, self.width() - 5, self.height() // 2)
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(qt.NoBrush)
 
 
 # 放大按钮
@@ -140,7 +143,7 @@ class LargeButton(ButtonIcon):
             painter.drawEllipse(self.width()//2-5,self.height()//2-5,5,5)
             painter.drawEllipse(self.width()//2+1,self.height()//2+1,5,5)
 
-            painter.setBrush(Qt.NoBrush)
+            painter.setBrush(qt.NoBrush)
 
 
 # 关闭按钮
@@ -399,9 +402,9 @@ class TitleBar(QWidget):
                 self.old_screen_geometry = self.__parent.geometry()  # type:QRect
 
                 # 获取的单个屏幕的大小
-                single_screen_width = QApplication.desktop().size().width() // QApplication.desktop().screenCount()
-                single_screen_height = QApplication.desktop().size().height()
-                animation.setEndValue(QSize(single_screen_width,single_screen_height))
+                # single_screen_width = QApplication.desktop().size().width() // QApplication.desktop().screenCount()
+                # single_screen_height = QApplication.desktop().size().height()
+                animation.setEndValue(desktopSize())
                 #
                 animation_move.setEndValue(QPoint(0,0))
 
@@ -447,5 +450,4 @@ class TitleBar(QWidget):
         opt.initFrom(self)
 
         painter = QPainter(self)
-
-        self.style().drawPrimitive(QStyle.PE_Widget,opt,painter,self)
+        self.style().drawPrimitive(qt.PE_Widget,opt,painter,self)

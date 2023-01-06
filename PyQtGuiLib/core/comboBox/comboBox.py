@@ -29,7 +29,8 @@ from PyQtGuiLib.header import (
     Qt,
     QPropertyAnimation,
     QPoint,
-    QSize
+    QSize,
+    qt
 )
 
 
@@ -93,7 +94,7 @@ border:none;
     def paintEvent(self, e: QPaintEvent) -> None:
         super().paintEvent(e)
         painter = QPainter(self)
-        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         # 绘制图标
         self.drawIcon(painter)
@@ -123,8 +124,8 @@ class ScrollArea(QScrollArea):
         self.setWidget(self.core_widget)
 
         # 隐藏滚动条
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(qt.ScrollBarAlwaysOff)
 
         # 所有对象
         self.obj = []

@@ -8,14 +8,14 @@ from PyQtGuiLib.header import (
     sys,
     QApplication,
     QWidget,
-    Qt,
     QMouseEvent,
     QPoint,
+    QPointF,
     QMainWindow,
     QFrame,
-    QStackedWidget
+    QStackedWidget,
+    qt
 )
-
 '''
     无边框窗口
         可自由拉伸八个方位
@@ -27,6 +27,15 @@ from PyQtGuiLib.header import (
     QStackedWidget
 '''
 
+
+FramelessWindowHint = qt.FramelessWindowHint
+ArrowCursor = qt.ArrowCursor
+SizeFDiagCursor = qt.SizeFDiagCursor
+SizeBDiagCursor = qt.SizeBDiagCursor
+SizeHorCursor = qt.SizeHorCursor
+SizeVerCursor = qt.SizeVerCursor
+LeftButton = qt.LeftButton
+OpenHandCursor = qt.OpenHandCursor
 
 # 无边框窗口移动的提示实现类
 class Borderless:
@@ -68,17 +77,17 @@ class Borderless:
         '''
         if (x <= self.scope and x >= 0) and (y >= 0 and y <= self.scope) \
                 or (w - x <= self.scope) and (h - y <= self.scope):
-            parent.setCursor(Qt.SizeFDiagCursor)
+            parent.setCursor(SizeFDiagCursor)
         elif (w - x <= self.scope) and (y >= 0 and y <= self.scope) \
                 or (x <= self.scope and x >= 0) and (h - y <= self.scope):
-            parent.setCursor(Qt.SizeBDiagCursor)
+            parent.setCursor(SizeBDiagCursor)
         elif (x <= self.scope and x >= 0) or (w - x <= self.scope):
-            parent.setCursor(Qt.SizeHorCursor)
+            parent.setCursor(SizeHorCursor)
         elif (y >= 0 and y <= self.scope) or (h - y <= self.scope):
-            parent.setCursor(Qt.SizeVerCursor)
+            parent.setCursor(SizeVerCursor)
 
         else:
-            parent.setCursor(Qt.ArrowCursor)
+            parent.setCursor(ArrowCursor)
 
         if self.pressDirection:
             return True
@@ -121,10 +130,17 @@ class Borderless:
         if self.isEdge(parent,e.pos()):
             self.pressState = True
             self.pressPos = e.pos()
-        elif e.button() == Qt.LeftButton:  # 处理窗口移动
+        elif e.button() == LeftButton:  # 处理窗口移动
             self.movePressState = True
-            self.pressPos = e.globalPos()-parent.pos()
-            parent.setCursor(Qt.OpenHandCursor)
+
+            if PYQT_VERSIONS == "PyQt5":
+                old_pos = e.globalPos()
+            if PYQT_VERSIONS == "PyQt6":
+                old_pos = e.pos()
+
+            self.pressPos = old_pos - parent.pos()
+
+            parent.setCursor(OpenHandCursor)
 
     def releaseEvent(self) -> None:
         self.pressDirection.clear()
@@ -134,7 +150,11 @@ class Borderless:
 
     def moveEvent(self,parent:QWidget, e:QMouseEvent) -> None:
         if self.movePressState:
-            parent.move(e.globalPos()-self.pressPos)
+            if PYQT_VERSIONS == "PyQt5":
+                old_pos = e.globalPos()
+            if PYQT_VERSIONS == "PyQt6":
+                old_pos = e.pos()
+            parent.move(old_pos-self.pressPos)
         self.updateCursor(parent,e.pos())
         self.expandEdge(parent,e.pos())
 
@@ -171,8 +191,7 @@ class BorderlessWidget(QWidget):
         self.resize(800, 500)
 
         self.borderless = Borderless()
-
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(FramelessWindowHint)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
 
@@ -197,7 +216,7 @@ class BorderlessFrame(QFrame):
 
         self.borderless = Borderless()
 
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(FramelessWindowHint)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
 
@@ -222,7 +241,7 @@ class BorderlessStackedWidget(QStackedWidget):
 
         self.borderless = Borderless()
 
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(FramelessWindowHint)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
 

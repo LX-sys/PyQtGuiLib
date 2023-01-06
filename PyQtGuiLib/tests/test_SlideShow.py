@@ -9,13 +9,15 @@ from PyQtGuiLib.header import (
     sys,
     QWidget,
     QLabel,
-    Qt,
+    qt,
     QHBoxLayout,
 )
 
 from PyQtGuiLib.core import SlideShow
 
-
+'''
+    窗口轮播功能
+'''
 class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -26,7 +28,7 @@ class Test(QWidget):
         # 窗口轮播功能
         self.ss = SlideShow(self)
         # self.ss.setAinDirectionMode((SlideShow.Ani_Up,SlideShow.Ani_Down))
-        self.ss.setAutoSlideShow(True,direction=SlideShow.Ani_Down,is_not_show_btn=False)
+        # self.ss.setAutoSlideShow(True,direction=SlideShow.Ani_Down,is_not_show_btn=False)
         # self.ss.setHideButtons(True)
         self.ss.move(50,50)
         self.ss.resize(600,200)
@@ -43,21 +45,21 @@ class Test(QWidget):
     def test(self):
         t = QWidget()
         tl = QLabel("1")
-        tl.setAlignment(Qt.AlignCenter)
+        tl.setAlignment(qt.AlignCenter)
         lh = QHBoxLayout(t)
         lh.addWidget(tl)
         tl.setStyleSheet('font: 60pt "微软雅黑";')
         t.setStyleSheet("background-color:#00aa7f;")
         t2 = QWidget()
         tl2 = QLabel("2")
-        tl2.setAlignment(Qt.AlignCenter)
+        tl2.setAlignment(qt.AlignCenter)
         lh2 = QHBoxLayout(t2)
         lh2.addWidget(tl2)
         tl2.setStyleSheet('font: 60pt "微软雅黑";')
         t2.setStyleSheet("background-color:#aaaaff;")
         t3 = QWidget()
         tl3 = QLabel("3", t3)
-        tl3.setAlignment(Qt.AlignCenter)
+        tl3.setAlignment(qt.AlignCenter)
         lh3 = QHBoxLayout(t3)
         lh3.addWidget(tl3)
         tl3.setStyleSheet('font: 60pt "微软雅黑";')

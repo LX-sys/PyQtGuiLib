@@ -36,8 +36,8 @@ border-radius:30px;
 }
         ''')
         self.tbar = TitleBar(self)
-        # self.tbar.setTitleText("测试标题栏")
-        self.tbar.setTitleIcon(r"/Applications/Python 3.8/save/PyQtGuiLib/PyQtGuiLib/tests/image/1.png")
+        self.tbar.setTitleText("测试标题栏")
+        # self.tbar.setTitleIcon(r"/Applications/Python 3.8/save/PyQtGuiLib/PyQtGuiLib/tests/image/1.png")
         self.tbar.setTitlePos(TitleBar.Title_Center)
         self.tbar.setBtnStyle(TitleBar.MacStyle)
         self.tbar.setStyleSheet("background-color: rgb(232, 232, 232);")

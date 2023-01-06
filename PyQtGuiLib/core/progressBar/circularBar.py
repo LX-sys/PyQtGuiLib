@@ -7,9 +7,10 @@ from PyQtGuiLib.header import (
     QPen,
     QPainter,
     QPaintEvent,
-    QFontMetricsF,
     QSize,
-    QResizeEvent
+    QResizeEvent,
+    textSize,
+    qt
 )
 
 
@@ -27,12 +28,12 @@ class CircularBar(QWidget):
     Double = "Double"
 
     # 圈的风格
-    SolidLine = Qt.SolidLine
-    DashLine = Qt.DashLine
-    DotLine = Qt.DotLine
-    DashDotLine = Qt.DashDotLine
-    DashDotDotLine = Qt.DashDotDotLine
-    CustomDashLine = Qt.CustomDashLine
+    SolidLine = qt.SolidLine
+    DashLine = qt.DashLine
+    DotLine = qt.DotLine
+    DashDotLine = qt.DashDotLine
+    DashDotDotLine = qt.DashDotDotLine
+    CustomDashLine = qt.CustomDashLine
 
 
     def __init__(self,*args,**kwargs):
@@ -171,15 +172,15 @@ class CircularBar(QWidget):
         painter.setFont(f)
         painter.setPen(self.text_color)
         # 文字
-        fs = QFontMetricsF(f)
-        fw = int(fs.width(self.text))
-        fh = int(fs.height())
+        fs = textSize(f,self.text)
+        fw = fs.width()
+        fh = fs.height()
         painter.drawText(inner_x+inner_w//2-fw//2,y+self.h//2+fh//4,self.text)
 
     def paintEvent(self, event:QPaintEvent) -> None:
         painter = QPainter()
         painter.begin(self)
-        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         self.drawLoopBar(painter,6,6)
 

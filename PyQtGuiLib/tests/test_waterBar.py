@@ -12,7 +12,6 @@ from PyQtGuiLib.header import (
     Signal,
     QColor,
     QSlider,
-    Qt
 )
 
 from PyQtGuiLib.core.progressBar import WaterBar

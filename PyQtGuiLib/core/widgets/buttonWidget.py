@@ -2,7 +2,7 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    Qt,
+    qt,
     QMouseEvent,
     Signal
 )
@@ -23,7 +23,7 @@ class ButtonWidget(RoundWidget):
         super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e:QMouseEvent) -> None:
-        if e.button() == Qt.LeftButton:
+        if e.button() == qt.LeftButton:
             self.clicked.emit()
         super().mouseReleaseEvent(e)
 

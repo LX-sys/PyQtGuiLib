@@ -1,0 +1,64 @@
+# -*- coding:utf-8 -*-
+# @time:2023/1/68:49
+# @author:LX
+# @file:qt.py
+# @software:PyCharm
+from PyQtGuiLib.header.versions import PYQT_VERSIONS
+from PyQtGuiLib.header import Qt,QPainter,QStyle
+
+
+if PYQT_VERSIONS == "PyQt5":
+    FramelessWindowHint = Qt.FramelessWindowHint
+    ArrowCursor = Qt.ArrowCursor
+    SizeFDiagCursor = Qt.SizeFDiagCursor
+    SizeBDiagCursor = Qt.SizeBDiagCursor
+    SizeHorCursor = Qt.SizeHorCursor
+    SizeVerCursor = Qt.SizeVerCursor
+    LeftButton = Qt.LeftButton
+    OpenHandCursor = Qt.OpenHandCursor
+    WA_TranslucentBackground = Qt.WA_TranslucentBackground
+    WA_DeleteOnClose = Qt.WA_DeleteOnClose
+    NoBrush = Qt.NoBrush
+    NoPen = Qt.NoPen
+    Antialiasing = QPainter.Antialiasing
+    SmoothPixmapTransform = QPainter.SmoothPixmapTransform
+    TextAntialiasing = QPainter.TextAntialiasing
+    PE_Widget = QStyle.PE_Widget
+    AlignCenter = Qt.AlignCenter
+    ScrollBarAlwaysOn = Qt.ScrollBarAlwaysOn
+    ScrollBarAlwaysOff = Qt.ScrollBarAlwaysOff
+    ScrollBarAsNeeded = Qt.ScrollBarAsNeeded
+    SolidLine = Qt.SolidLine
+    DashLine = Qt.DashLine
+    DotLine = Qt.DotLine
+    DashDotLine = Qt.DashDotLine
+    DashDotDotLine = Qt.DashDotDotLine
+    CustomDashLine = Qt.CustomDashLine
+
+if PYQT_VERSIONS == "PyQt6":
+    FramelessWindowHint = Qt.WindowType.FramelessWindowHint
+    ArrowCursor = Qt.CursorShape.ArrowCursor
+    SizeFDiagCursor = Qt.CursorShape.SizeFDiagCursor
+    SizeBDiagCursor = Qt.CursorShape.SizeBDiagCursor
+    SizeHorCursor = Qt.CursorShape.SizeHorCursor
+    SizeVerCursor = Qt.CursorShape.SizeVerCursor
+    LeftButton = Qt.MouseButton.LeftButton
+    OpenHandCursor = Qt.CursorShape.OpenHandCursor
+    WA_TranslucentBackground = Qt.WidgetAttribute.WA_TranslucentBackground
+    WA_DeleteOnClose = Qt.WidgetAttribute.WA_DeleteOnClose
+    NoBrush = Qt.BrushStyle.NoBrush
+    NoPen = Qt.PenStyle.NoPen
+    Antialiasing = QPainter.RenderHint.Antialiasing
+    SmoothPixmapTransform = QPainter.RenderHint.SmoothPixmapTransform
+    TextAntialiasing = QPainter.RenderHint.TextAntialiasing
+    PE_Widget = QStyle.PrimitiveElement.PE_Widget
+    AlignCenter = Qt.AlignmentFlag.AlignCenter
+    ScrollBarAlwaysOn = Qt.ScrollBarPolicy.ScrollBarAlwaysOn
+    ScrollBarAlwaysOff = Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+    ScrollBarAsNeeded = Qt.ScrollBarPolicy.ScrollBarAsNeeded
+    SolidLine = Qt.PenStyle.SolidLine
+    DashLine = Qt.PenStyle.DashLine
+    DotLine = Qt.PenStyle.DotLine
+    DashDotLine = Qt.PenStyle.DashDotLine
+    DashDotDotLine = Qt.PenStyle.DashDotDotLine
+    CustomDashLine = Qt.PenStyle.CustomDashLine

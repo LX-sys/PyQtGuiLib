@@ -31,7 +31,8 @@ from PyQtGuiLib.header import (
     QPoint,
     QSize,
     QMoveEvent,
-    QComboBox
+    QComboBox,
+    qt
 )
 
 class ScrollArea(QScrollArea):
@@ -43,9 +44,9 @@ class ScrollArea(QScrollArea):
 
         self.resize(500,500)
 
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(qt.WA_TranslucentBackground, True)
+        self.setWindowFlags(qt.FramelessWindowHint)
+        self.setAttribute(qt.WA_DeleteOnClose)
 
         # 风格模式
         self.style_mode = ScrollArea.Style_Card
@@ -70,7 +71,7 @@ border-radius:5px;
             widget = QLabel(widget)
             print(widget)
             widget.setFixedHeight(30)
-            widget.setAlignment(Qt.AlignCenter)
+            widget.setAlignment(qt.AlignCenter)
             if self.style_mode == ScrollArea.Style_Card:
                 widget.setStyleSheet(self.styleCrad())
         self.__vlay.addWidget(widget)
@@ -135,7 +136,7 @@ class LineEdit(QLineEdit):
     def paintEvent(self, e: QPaintEvent) -> None:
         super().paintEvent(e)
         painter = QPainter(self)
-        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         # 绘制图标
         self.drawIcon(painter)

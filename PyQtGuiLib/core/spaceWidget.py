@@ -19,7 +19,7 @@ from PyQtGuiLib.header import (
     QColor,
     QPushButton,
     QScrollArea,
-    Qt,
+    qt,
     Signal
 )
 
@@ -121,8 +121,8 @@ class SpaceWidget(QScrollArea):
         self.core = CoreWidget()
         self.setWidget(self.core)
 
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(qt.ScrollBarAlwaysOn)
+        self.setVerticalScrollBarPolicy(qt.ScrollBarAlwaysOff)
 
         self.horizontalScrollBar().setValue(50)
 

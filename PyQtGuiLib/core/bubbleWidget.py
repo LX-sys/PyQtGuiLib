@@ -16,7 +16,8 @@ from PyQtGuiLib.header import (
     Signal,
     QThread,
     QSize,
-    QFontMetricsF
+    QFontMetricsF,
+    textSize
 )
 
 from PyQtGuiLib.animation.lmlmAni import LmLmAnimation
@@ -247,10 +248,11 @@ class BubbleWidget(QWidget):
         f.setPointSize(self.text_size)
         painter.setFont(f)
         painter.setPen(self.text_color)
-        # 文字
-        fs = QFontMetricsF(f)
-        fw = int(fs.width(self.text))
-        fh = int(fs.height())
+        # 文字大小
+        fs = textSize(f,self.text)
+        fw = fs.width()
+        fh = fs.height()
+
         if self.direction == BubbleWidget.Top:
             x = (self.w - fw) // 2
             y = self.h // 2+self.triangle_diameter

@@ -1,7 +1,7 @@
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
-    Qt,
+    qt,
     QApplication,
     QWidget,
     QHBoxLayout,
@@ -25,9 +25,10 @@ class RoundWidget(BorderlessWidget):
         super().__init__(*args,**kwargs)
         self.resize(800,600)
         # 背景透明,去掉窗口边框,去掉边框
-        self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_DeleteOnClose)
+        self.setAttribute(qt.WA_TranslucentBackground, True)
+        self.setWindowFlags(qt.FramelessWindowHint)
+        self.setAttribute(qt.WA_DeleteOnClose)
+
 
         self.builtin_widget = '''
 #widget{

@@ -58,4 +58,6 @@
     --- utility.py 新增 系统判断
     --- 新增状态栏
     --- 状态栏 新增 setStatusPos() 方法
+2023.1.5 0.0.8.3版本
+    --- 优化 TitleBar,StatusBar 代码,并修复了样式表设置无效的BUG
 '''

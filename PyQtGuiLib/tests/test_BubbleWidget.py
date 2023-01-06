@@ -23,7 +23,7 @@ class Test(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
 
-        self.setWindowOpacity(0.5)
+        # self.setWindowOpacity(0.5)
 
 
         self.btn = QPushButton("一号玩家",self)

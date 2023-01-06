@@ -35,7 +35,7 @@ if PYQT_VERSIONS == "PyQt6":
         QEasingCurve,
         QByteArray,
         QSequentialAnimationGroup,
-        QParallelAnimationGroup
+        QParallelAnimationGroup,
     )
 
 if PYQT_VERSIONS == "PySide2":

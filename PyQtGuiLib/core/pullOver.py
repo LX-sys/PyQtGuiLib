@@ -1,4 +1,5 @@
 from PyQtGuiLib.header import (
+    PYQT_VERSIONS,
     QApplication,
     QWidget,
     QThread,
@@ -6,7 +7,8 @@ from PyQtGuiLib.header import (
     QPoint,
     QPropertyAnimation,
     QEasingCurve,
-    QDesktopWidget,
+    desktopCenter,
+    desktopSize
 )
 
 
@@ -40,8 +42,12 @@ class MonitoThread(QThread):
 
 # 窗口靠边
 class PullOver:
+
     # 弹力
-    OutBounce = QEasingCurve.OutBounce
+    if PYQT_VERSIONS == "PyQt5":
+        OutBounce = QEasingCurve.OutBounce
+    else:
+        OutBounce = None
 
     def __init__(self,parent:QWidget,*args,**kwargs):
         self.parent = parent
@@ -57,7 +63,8 @@ class PullOver:
 
     # 设置动效
     def setEasingCurve(self,easing):
-        self.move_ani.setEasingCurve(easing)
+        if easing:
+            self.move_ani.setEasingCurve(easing)
 
     # 核心方法
     def pullover(self,btn_obj:QWidget,pos:QPoint=None,small_btn_pos:QPoint=None):
@@ -81,9 +88,9 @@ class PullOver:
     # 靠边隐藏
     def winHide_event(self,btn_obj:QWidget,pos:QPoint,small_btn_pos:QPoint=None):
         x,y = pos.x(),pos.y()
-        s_count = QApplication.desktop().screenCount()
-        desktop_w = QApplication.desktop().width()//s_count
-        desktop_h = QApplication.desktop().height()
+        # s_count = QApplication.desktop().screenCount()
+        desktop_w = desktopSize().width()
+        desktop_h = desktopSize().height()
 
         def _t(parent, self):
             parent.hide()
@@ -140,8 +147,7 @@ class PullOver:
 
     def center(self):
         f = self.parent.frameGeometry()
-        c = QDesktopWidget().availableGeometry().center()
-        f.moveCenter(c)
+        f.moveCenter(desktopCenter())
         return f.topLeft()
 
     '''

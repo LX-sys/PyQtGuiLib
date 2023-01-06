@@ -1,10 +1,11 @@
 from PyQtGuiLib.header.Qt.qtWidgets import *
 from PyQtGuiLib.header.Qt.qtGui import *
 from PyQtGuiLib.header.Qt.qtCore import *
+from PyQtGuiLib.header.Qt import qt
 from PyQtGuiLib.header.py.common import *
 
 from PyQtGuiLib.header.versions import PYQT_VERSIONS
-from PyQtGuiLib.header.utility import is_win_sys, is_mac_sys
+from PyQtGuiLib.header.utility import is_win_sys, is_mac_sys,desktopCenter,desktopSize,textSize
 
 
 # 处理mac下无法运行的情况

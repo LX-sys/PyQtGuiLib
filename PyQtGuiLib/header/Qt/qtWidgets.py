@@ -23,7 +23,7 @@ if PYQT_VERSIONS == "PyQt5":
         QSplitter,
         QGraphicsOpacityEffect,
         QMainWindow,
-        QDesktopWidget,
+        QDesktopWidget as DesktopWidget,
         QGraphicsDropShadowEffect,
         QSlider,
         QListWidget,
@@ -37,7 +37,6 @@ if PYQT_VERSIONS == "PyQt5":
         QStyle,
         QStyleOption
     )
-
 if PYQT_VERSIONS == "PyQt6":
     from PyQt6.QtWidgets import (
         QApplication,
@@ -62,13 +61,11 @@ if PYQT_VERSIONS == "PyQt6":
         QSplitter,
         QGraphicsOpacityEffect,
         QMainWindow,
-        QDesktopWidget,
         QGraphicsDropShadowEffect,
         QSlider,
         QListWidget,
         QListWidgetItem,
         QListView,
-        QAction,
         QAbstractScrollArea,
         QRadioButton,
         QSpacerItem,
