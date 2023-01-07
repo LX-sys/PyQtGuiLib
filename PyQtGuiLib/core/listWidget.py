@@ -6,11 +6,11 @@ from PyQtGuiLib.header import (
     QListWidgetItem,
     QWidget,
     QSize,
-    QStyledItemDelegate
+    QStyledItemDelegate,
+    QStyleOptionViewItem,
+    QModelIndex
 )
 
-from PyQt5.QtWidgets import QStyleOptionViewItem
-from PyQt5.QtCore import QModelIndex
 '''
 
     QListWidget 增强版本
@@ -43,14 +43,3 @@ class ListWidget(QListWidget):
         # self.setItemDelegate(ItemDelegate())
         self.addItem(item)
         self.setItemWidget(item, widget)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = ListWidget()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())

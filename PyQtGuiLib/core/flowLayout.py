@@ -8,10 +8,11 @@ from PyQtGuiLib.header import (
     QRect,
     QPoint,
     qt,
-    QMargins
+    QMargins,
+    QLayout,
+    QLayoutItem
 )
 
-from PyQt5.QtWidgets import QLayout,QLayoutItem
 '''
     流式布局
 '''
