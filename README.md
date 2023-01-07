@@ -312,7 +312,7 @@ setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
 流式布局  ----> 99%  测试使用中
 导入方式 from PyQtGuiLib.core import FlowLayout
 
-流式布局 -- StatusBar API介绍
+流式布局 -- FlowLayout API介绍
 
 # --- Api
 流式布局的和其他布局基本没有什么区别
