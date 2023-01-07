@@ -27,7 +27,7 @@ class Test(QWidget):
         for i in range(50):
             btn = QPushButton("test_{}".format(i))
             btn.setFixedSize(130,randint(40,60))
-            btn.setStyleSheet(ButtonStyle.randomStyle()) # 使用 皮肤包
+            btn.setStyleSheet(ButtonStyle.randomStyle())  # 使用 皮肤包
             self.items.append(btn)
             self.flow.addWidget(btn)
 
