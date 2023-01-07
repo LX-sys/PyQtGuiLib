@@ -35,7 +35,8 @@ if PYQT_VERSIONS == "PyQt5":
         QSpacerItem,
         QSizePolicy,
         QStyle,
-        QStyleOption
+        QStyleOption,
+        QStyledItemDelegate
     )
 if PYQT_VERSIONS == "PyQt6":
     from PyQt6.QtWidgets import (
@@ -71,7 +72,8 @@ if PYQT_VERSIONS == "PyQt6":
         QSpacerItem,
         QSizePolicy,
         QStyle,
-        QStyleOption
+        QStyleOption,
+        QStyledItemDelegate
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -110,7 +112,8 @@ if PYQT_VERSIONS == "PySide2":
         QSpacerItem,
         QSizePolicy,
         QStyle,
-        QStyleOption
+        QStyleOption,
+        QStyledItemDelegate
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -147,5 +150,6 @@ if PYQT_VERSIONS == "PySide6":
         QSpacerItem,
         QSizePolicy,
         QStyle,
-        QStyleOption
+        QStyleOption,
+        QStyledItemDelegate
     )
