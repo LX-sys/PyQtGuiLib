@@ -18,6 +18,7 @@ if PYQT_VERSIONS == "PyQt5"  :
     OpenHandCursor = Qt.OpenHandCursor
     WA_TranslucentBackground = Qt.WA_TranslucentBackground
     WA_DeleteOnClose = Qt.WA_DeleteOnClose
+    WA_StyledBackground = Qt.WA_StyledBackground
     NoBrush = Qt.NoBrush
     NoPen = Qt.NoPen
     Antialiasing = QPainter.Antialiasing
@@ -55,6 +56,7 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     OpenHandCursor = Qt.CursorShape.OpenHandCursor
     WA_TranslucentBackground = Qt.WidgetAttribute.WA_TranslucentBackground
     WA_DeleteOnClose = Qt.WidgetAttribute.WA_DeleteOnClose
+    WA_StyledBackground = Qt.WidgetAttribute.WA_StyledBackground
     NoBrush = Qt.BrushStyle.NoBrush
     NoPen = Qt.PenStyle.NoPen
     Antialiasing = QPainter.RenderHint.Antialiasing
@@ -75,3 +77,7 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     Widget = Qt.WindowType.Widget
     PolicyExpanding = QSizePolicy.Policy.Expanding
     PolicyMinimum = QSizePolicy.Policy.Minimum
+    Horizontal = Qt.Orientation.Horizontal
+    Vertical = Qt.Orientation.Vertical
+    PM_LayoutHorizontalSpacing = QStyle.PixelMetric.PM_LayoutHorizontalSpacing
+    PM_LayoutVerticalSpacing = QStyle.PixelMetric.PM_LayoutVerticalSpacing
