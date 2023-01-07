@@ -18,10 +18,12 @@ class TestFlowLayout(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
-        self.setWindowTitle("流式布局 测试用例")
+        # self.setWindowTitle("流式布局 测试用例")
 
         self.tit = TitleBar(self)
-        self.tit.setTitleText("流式布局 测试用例")
+        self.tit.setTitleText("")
+
+        self.setStyleSheet('''background-color:rgb(240, 237, 255);''')
 
 
         self.items = []
@@ -32,7 +34,7 @@ class TestFlowLayout(BorderlessWidget):
         # 创建 50 个 按钮
         for i in range(50):
             btn = QPushButton("test_{}".format(i))
-            btn.setFixedSize(130,randint(40,60))
+            btn.setFixedSize(130,60)
             btn.setStyleSheet(ButtonStyle.randomStyle())  # 使用 皮肤包
             self.items.append(btn)
             self.flow.addWidget(btn)

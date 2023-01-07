@@ -25,6 +25,7 @@ class FlowLayout(QLayout):
         self.vSpacing = -1
 
         self.items = []
+        self.setSpacing(6)
 
     def addItem(self, item: QLayoutItem) -> None:
         self.items.append(item)
@@ -106,9 +107,9 @@ class FlowLayout(QLayout):
         parent = self.parent()
         if not parent:
             return -1
-        elif parent.isWidgetType():
-            pw = QWidget()
-            return pw.style().pixelMetric(pm,None,pw)
+        # elif parent.isWidgetType():
+        #     pw = QWidget()
+        #     return pw.style().pixelMetric(pm,None,pw)
         else:
             return self.spacing()
 
