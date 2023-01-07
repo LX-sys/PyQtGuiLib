@@ -22,7 +22,8 @@ from PyQtGuiLib.header import (
     QStyle,
     QStyleOption,
     desktopCenter,
-    desktopSize
+    desktopSize,
+    textSize
 )
 
 '''
@@ -76,7 +77,6 @@ class ButtonIcon(QPushButton):
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-
 
         self.drawIcon(painter)
 
@@ -167,7 +167,6 @@ class CloseButton(ButtonIcon):
             brush = QBrush(QColor(252, 70, 70))
             painter.setBrush(brush)
 
-
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
             painter.drawRoundedRect(rect, self.w//2,self.h//2)
 
@@ -195,6 +194,9 @@ class TitleBar(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
+        # 样式表生效
+        self.setAttribute(qt.WA_StyledBackground,True)
+
         self.__parent = None #  type:QWidget
 
         if args:
@@ -204,11 +206,11 @@ class TitleBar(QWidget):
         self.title_pos = TitleBar.Title_Left
 
         # 标题高度
-        self.h = 35
+        self.h = 30
         # 标题文本
         self.title_text= "Title"
         self.title_color = QColor(0,0,0)
-        self.title_size = 20
+        self.title_size = 15
 
         # 图标大小,图标路径
         self.image_size = 30,30
@@ -290,21 +292,24 @@ class TitleBar(QWidget):
             icon_distance = 30
 
         # 文字
-        fs = QFontMetricsF(f)
-        fw = int(fs.width(self.title_text))
-        fh = int(fs.height())
+        fs = textSize(f,self.title_text)
+        fw = fs.width()
+        fh = fs.height()
         if self.title_pos == TitleBar.Title_Center:
             painter.drawText(self.width() // 2 - fw // 2, self.height() // 2 + fh // 2, self.title_text)
 
         if self.title_pos == TitleBar.Title_Left:
-            painter.drawText(10+icon_distance, self.height() // 2 + fh // 2, self.title_text)
+            if PYQT_VERSIONS in ["PyQt6","PySide6"]: # 这两个版本的文字高度计算是精准的需要-5个像素
+                painter.drawText(10+icon_distance, self.height() // 2 + fh // 2-5, self.title_text)
+            else:
+                painter.drawText(10+icon_distance, self.height() // 2 + fh // 2, self.title_text)
 
     # 绘制tub
     def drawTitleIcon(self,painter: QPainter):
         f = QFont()
         f.setPointSize(self.title_size)
-        fs = QFontMetricsF(f)
-        fw = int(fs.width(self.title_text))
+        fs = textSize(f,self.title_text)
+        fw = fs.width()
 
         pix = QPixmap(self.title_icon_path)
         if self.title_pos == TitleBar.Title_Center:
@@ -317,11 +322,8 @@ class TitleBar(QWidget):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
-        opt = QStyleOption()
-        opt.initFrom(self)
-        self.style().drawPrimitive(qt.PE_Widget, opt, painter, self)
 
-        painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         self.drawTitleIcon(painter)
         self.drawTitleText(painter)
@@ -406,8 +408,6 @@ class TitleBar(QWidget):
                 self.old_screen_geometry = self.__parent.geometry()  # type:QRect
 
                 # 获取的单个屏幕的大小
-                # single_screen_width = QApplication.desktop().size().width() // QApplication.desktop().screenCount()
-                # single_screen_height = QApplication.desktop().size().height()
                 animation.setEndValue(desktopSize())
                 #
                 animation_move.setEndValue(QPoint(0,0))
