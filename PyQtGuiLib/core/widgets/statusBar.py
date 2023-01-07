@@ -56,6 +56,8 @@ class StatusBar(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
+        self.setAttribute(qt.WA_StyledBackground,True)
+
         self.h = 30
 
         self.__parent = None #  type:QWidget
@@ -170,10 +172,10 @@ class StatusBar(QWidget):
         self.local_time = time.strftime(self.format, time.localtime())
         self.l_time.setText(self.local_time)
 
-    def paintEvent(self, e: QPaintEvent) -> None:
-        opt = QStyleOption()
-        opt.initFrom(self)
-        painter = QPainter(self)
-        self.style().drawPrimitive(qt.PE_Widget, opt, painter, self)
-
-        painter.end()
+    # def paintEvent(self, e: QPaintEvent) -> None:
+    #     opt = QStyleOption()
+    #     opt.initFrom(self)
+    #     painter = QPainter(self)
+    #     self.style().drawPrimitive(qt.PE_Widget, opt, painter, self)
+    #
+    #     painter.end()
