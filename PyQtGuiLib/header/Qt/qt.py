@@ -38,6 +38,11 @@ if PYQT_VERSIONS == "PyQt5"  :
     Widget = Qt.Widget
     PolicyExpanding = QSizePolicy.Expanding
     PolicyMinimum = QSizePolicy.Minimum
+    PolicyPushButton = QSizePolicy.PushButton
+    Horizontal = Qt.Horizontal
+    Vertical = Qt.Vertical
+    PM_LayoutHorizontalSpacing = QStyle.PM_LayoutHorizontalSpacing
+    PM_LayoutVerticalSpacing = QStyle.PM_LayoutVerticalSpacing
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
