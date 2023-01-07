@@ -3,7 +3,7 @@ import importlib
 # 当前python qt使用的版本
 PYQT_VERSIONS = None
 
-VERSIONS = ["PyQt5","PyQt6","PySide2","PySide6"]
+VERSIONS = ["PyQt5","PySide2","PySide6","PyQt6"]
 
 for module in VERSIONS:
     try:
