@@ -39,7 +39,12 @@ if PYQT_VERSIONS == "PyQt5":
         QStyledItemDelegate,
         QLayout,
         QLayoutItem,
-        QStyleOptionViewItem
+        QStyleOptionViewItem,
+        QTreeWidget,
+        QTreeWidgetItem,
+        QTreeWidgetItemIterator,
+        QTextBrowser,
+        QTextEdit
     )
 if PYQT_VERSIONS == "PyQt6":
     from PyQt6.QtWidgets import (
@@ -79,8 +84,12 @@ if PYQT_VERSIONS == "PyQt6":
         QStyledItemDelegate,
         QLayout,
         QLayoutItem,
-        QStyleOptionViewItem
-
+        QStyleOptionViewItem,
+        QTreeWidget,
+        QTreeWidgetItem,
+        QTreeWidgetItemIterator,
+        QTextBrowser,
+        QTextEdit
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -123,7 +132,12 @@ if PYQT_VERSIONS == "PySide2":
         QStyledItemDelegate,
         QLayout,
         QLayoutItem,
-        QStyleOptionViewItem
+        QStyleOptionViewItem,
+        QTreeWidget,
+        QTreeWidgetItem,
+        QTreeWidgetItemIterator,
+        QTextBrowser,
+        QTextEdit
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -164,5 +178,10 @@ if PYQT_VERSIONS == "PySide6":
         QStyledItemDelegate,
         QLayout,
         QLayoutItem,
-        QStyleOptionViewItem
+        QStyleOptionViewItem,
+        QTreeWidget,
+        QTreeWidgetItem,
+        QTreeWidgetItemIterator,
+        QTextBrowser,
+        QTextEdit
     )
