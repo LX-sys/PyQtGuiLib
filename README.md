@@ -307,7 +307,21 @@ setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
 注意: 状态栏大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
 事件中调用 updateStatusSize() 来跟随变化
 ```
+### 流式布局(FlowLayout)
+```python
+流式布局  ----> 99%  测试使用中
+导入方式 from PyQtGuiLib.core import FlowLayout
 
+流式布局 -- StatusBar API介绍
+
+# --- Api
+流式布局的和其他布局基本没有什么区别
+addWidget()
+removeWidget() 
+
+# ----------
+注意: 在使用 removeWidget() 移除控件的时候,控件会被删除掉
+```
 
 
 
