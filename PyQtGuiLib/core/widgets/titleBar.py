@@ -317,6 +317,10 @@ class TitleBar(QWidget):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
+        opt = QStyleOption()
+        opt.initFrom(self)
+        self.style().drawPrimitive(qt.PE_Widget, opt, painter, self)
+
         painter.setRenderHints(painter.Antialiasing | painter.SmoothPixmapTransform | painter.TextAntialiasing)
 
         self.drawTitleIcon(painter)
@@ -444,10 +448,3 @@ class TitleBar(QWidget):
         self.lm.move(occ_w,lm_h)
         occ_w  = occ_w+self.lm.width()+btn_w_interval
         self.cm.move(occ_w,cm_h)
-
-    def paintEvent(self, e: QPaintEvent) -> None:
-        opt = QStyleOption()
-        opt.initFrom(self)
-
-        painter = QPainter(self)
-        self.style().drawPrimitive(qt.PE_Widget,opt,painter,self)

@@ -173,7 +173,7 @@ class StatusBar(QWidget):
     def paintEvent(self, e: QPaintEvent) -> None:
         opt = QStyleOption()
         opt.initFrom(self)
-
         painter = QPainter(self)
+        self.style().drawPrimitive(qt.PE_Widget, opt, painter, self)
 
-        self.style().drawPrimitive(qt.PE_Widget,opt,painter,self)
+        painter.end()
