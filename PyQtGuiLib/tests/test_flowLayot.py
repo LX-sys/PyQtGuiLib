@@ -19,10 +19,8 @@ class TestFlowLayout(BorderlessWidget):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
         # self.setWindowTitle("流式布局 测试用例")
-
         self.tit = TitleBar(self)
-        self.tit.setTitleText("")
-
+        self.tit.setTitleText("流式布局 测试用例")
         self.setStyleSheet('''background-color:rgb(240, 237, 255);''')
 
 
@@ -30,6 +28,7 @@ class TestFlowLayout(BorderlessWidget):
 
         # 流式布局
         self.flow = FlowLayout(self)
+        self.flow.setContentsMargins(20,20+self.tit.height(),20,20)
 
         # 创建 50 个 按钮
         for i in range(50):
