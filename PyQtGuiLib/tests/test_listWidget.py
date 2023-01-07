@@ -22,10 +22,11 @@ class TestListWidget(QWidget):
         self.listw = ListWidget(self)
         self.listw.resize(200,300)
         self.listw.move(100,100)
+        # self.listw.itemDoubleClicked.connect(lambda :print("asd"))
 
         for i in range(5):
             widget = QWidget()
-            widget.setFixedHeight(50)
+            widget.setFixedHeight(30)
             widget.setStyleSheet(ButtonStyle.randomStyle())
             self.listw.addWidget(widget)
 
