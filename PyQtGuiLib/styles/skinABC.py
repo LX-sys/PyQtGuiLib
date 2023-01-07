@@ -1,8 +1,49 @@
 from random import randint,choice
+import re
 '''
 
     皮肤 抽象类
 '''
+
+# 将各种颜色转换成RGB
+def colorToRGB(color:str) -> tuple:
+    '''
+    :param color: 参数支持三种颜色样式
+    rgb(xxx,xxx,xxx)   完全支持
+    #xxxxxx   完全支持
+    ....
+    :return: (xxx,xxx,xxx)
+    '''
+    # 只返回真值
+    def isTrue(value):
+        if value:
+            return value
+
+    if type(color) == tuple or "rgb" in color or "RGB" in color:  # 类型(xxx,xxx,xxx)
+        if "rgb" in color:
+            # 将 "rgb(xxx,xxx,xxx);"  转化为==> (xxx,xxx,xxx)
+            number = re.findall(r"[0-9]*", color)
+            number_list = list(filter(isTrue, number))
+            color = int(number_list[0]), int(number_list[1]), int(number_list[2])
+        for color_value in color:
+            if color_value < 0 or color_value > 255:
+                raise ValueError("No such color, please pass in another format")
+        return color
+
+    r_, g_, b_ = [0], [0], [0]
+    if "#" == color[0]:  # 类型 #xxxxxx
+        if (v := len(color)) != 7:
+            difference = 7 - v  # 差值
+            if difference > 0:
+                color += "0" * difference
+            else:
+                # 如果超过7位,则截断
+                color = color[:difference]
+    # 去除#
+    color = color[1:]
+    exec("r_[0],g_[0],b_[0]=(0x{},0x{},0x{})".format(color[:2], color[2:4], color[4:6]))
+    # 返回RGB
+    return int(r_[0]), int(g_[0]), int(b_[0])
 
 class SkinABC:
 
@@ -162,19 +203,91 @@ class SkinABC:
             "font-style": font_style if font_style else choice(SkinABC.getAllFontStyle()),
             "font-family": font_family
         }
+        return SkinABC.style(objectName,**style_dict)
 
-        if kwargs:
-            style_dict.update(kwargs)
+    # 互补色样式
+    @staticmethod
+    def contrastStyle(objectName:str=None,
+              backgroundColor:str=None,
+              color:str=None,
+              radius:str=None,
+              border_width:str=None,
+              border_style:str=None,
+              border_color:str=None,
+              font_size:str="18px",
+              font_style:str=None,
+              font_family:str="Heiti SC",**kwargs):
 
-        style_list = []
-        for k, v in style_dict.items():
-            style_list.append("{}:{};".format(k, v))
-
-        if objectName is None:
-            return "\n".join(style_list)
+        if backgroundColor and color:
+            bgcolor_format = backgroundColor
+            color_format = color
+        elif backgroundColor:
+            r,g,b = colorToRGB(backgroundColor)
+            bgcolor_format = "rgba({},{},{},{})".format(r,g,b, 255)
+            color_format = "rgba({},{},{},{})".format(255 - r, 255 - g, 255 - b, 255)
+        elif color:
+            r, g, b = colorToRGB(color)
+            bgcolor_format = "rgba({},{},{},{})".format(r,g,b,255)
+            color_format = "rgba({},{},{},{})".format(255-r,255-g,255-b,255)
         else:
-            style_str = "#" + objectName + "{\n"
-            style_str += "\n".join(style_list)
-            style_str += "\n}"
-            return style_str
+            r,g,b = randint(0,256),randint(0,256),randint(0,256)
+            bgcolor_format = "rgba({},{},{},255)".format(r,g,b)
+            color_format = "rgba({},{},{},255)".format(255-r,255-g,255-b)
 
+        style_dict = {
+            "background-color": bgcolor_format,
+            "color": color_format,
+            "border-radius": radius if radius else "{}%".format(randint(1,31)),
+            "border-width": border_width if border_width else "0px",
+            "border-style": border_style if border_style else "none",
+            "border-color": border_color if border_color else "transparent",
+            "font-size": font_size,
+            "font-style": font_style if font_style else choice(SkinABC.getAllFontStyle()),
+            "font-family": font_family
+        }
+        return SkinABC.style(objectName, **style_dict)
+
+    # 同色调样式
+    @staticmethod
+    def homologyStyle(objectName:str=None,
+              backgroundColor:str=None,
+              color:str=None,
+              radius:str=None,
+              border_width:str=None,
+              border_style:str=None,
+              border_color:str=None,
+              font_size:str="18px",
+              font_style:str=None,
+              font_family:str="Heiti SC",**kwargs):
+
+        if backgroundColor and color:
+            bgcolor_format = backgroundColor
+            color_format = color
+        elif backgroundColor:
+            r,g,b = colorToRGB(backgroundColor)
+            a = randint(0,256)
+            bgcolor_format = "rgba({},{},{},{})".format(r,g,b, a)
+            color_format = "rgba({},{},{},{})".format(r,g,b, 255-a)
+        elif color:
+            r, g, b = colorToRGB(color)
+            a = randint(0, 256)
+            bgcolor_format = "rgba({},{},{},{})".format(r,g,b,a)
+            color_format = "rgba({},{},{},{})".format(255-r,255-g,255-b,255-a)
+        else:
+            r,g,b,a = randint(0,256),randint(0,256),randint(0,256),randint(0,256)
+            bgcolor_format = "rgba({},{},{},{})".format(r,g,b,a)
+            color_format = "rgba({},{},{},{})".format(r,g,b,255-a)
+
+        style_dict = {
+            "background-color": bgcolor_format,
+            "color": color_format,
+            "border-radius": radius if radius else "{}%".format(randint(1, 31)),
+            "border-width": border_width if border_width else "0px",
+            "border-style": border_style if border_style else "none",
+            "border-color": border_color if border_color else "transparent",
+            "font-size": font_size,
+            "font-style": font_style if font_style else choice(SkinABC.getAllFontStyle()),
+            "font-family": font_family
+        }
+
+        return SkinABC.style(objectName, **style_dict)

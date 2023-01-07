@@ -18,7 +18,7 @@ class TestStyle(QWidget):
             btn = QPushButton("test_{}".format(str(i)), self)
             btn.setGeometry(x, 100, 130, 60)
             x+=150
-            btn.setStyleSheet(ButtonStyle.randomStyle())
+            btn.setStyleSheet(ButtonStyle.contrastStyle())
 
         # self.btn = QPushButton("test",self)
         # self.btn.setGeometry(100,100,130,60)
