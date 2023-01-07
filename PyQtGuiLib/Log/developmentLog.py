@@ -64,6 +64,7 @@
     --- 新增 styles 皮肤包项目 
     --- 全面兼容 PyQt5,PyQt6,PySide2,PySide6, PySide6 在使用无边框的还有小问题
 2023.1.7 1.0.9.3版本
-    --- 新增流失布局
+    --- 新增流式布局
     --- 互补色样式(contrastStyle())，同色调样式(homologyStyle())
+    --- 修复 标题栏和状态栏 无法绘制文字的BUG
 '''
