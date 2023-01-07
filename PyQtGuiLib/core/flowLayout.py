@@ -5,22 +5,28 @@ from PyQtGuiLib.header import (
     QWidget,
     QPushButton,
     QSize,
-    QRect
+    QRect,
+    QPoint,
+    qt,
+    QMargins
 )
+
 from PyQt5.QtWidgets import QLayout,QLayoutItem
 '''
-    简单的流式布局
+    流式布局
 '''
 
 class FlowLayout(QLayout):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
+        # 边距
+        self.margin = -1
+        self.hSpacing = -1
+        self.vSpacing = -1
 
         self.items = []
 
-
     def addItem(self, item: QLayoutItem) -> None:
-        print("==>",item)
         self.items.append(item)
 
     def count(self) -> int:
@@ -29,71 +35,93 @@ class FlowLayout(QLayout):
     def itemAt(self, index: int) -> QLayoutItem:
         if index < self.count():
             return self.items[index]
+        return None
 
     def takeAt(self, index: int) -> QLayoutItem:
-        return index >= 0 and index < self.count() if self.takeAt(index) else 0
+        if (index >=0 and index < self.count()):
+            return self.takeAt(index)
+        return None
 
-    def spacing(self) -> int:
-        return 0
+    def setGeometry(self, rect: QRect) -> None:
+        super().setGeometry(rect)
+        self.doLayout(rect,False)
 
-    def setGeometry(self, r:QRect):
-        super().setGeometry(r)
-        if self.count() == 0:
-            return
-        w = r.width() - (self.count() - 1) * self.spacing()
-        h = r.height() - (self.count() - 1) * self.spacing()
-        i = 0
+    def sizeHint(self) -> QSize:
+        return self.minimumSize()
 
-        while i < self.count():
-            o = self.items[i]
-            geom = QRect(r.x() + i * self.spacing(), r.y() + i * self.spacing(), w, h)
-            o.setGeometry(geom)
-            i = i + 1
+    def minimumSize(self) -> QSize:
+        size = QSize(0,0)
+        for w in self.items:  # type:QWidget
+            size = size.expandedTo(w.minimumSize())
 
-    def sizeHint(self):
-        s = QSize(0, 0)
-        n = self.count()
-        if n > 0:
-            s = QSize(100, 70)  # start with a nice default size
-        i = 0
-        while i < n:
-            o = self.items[i]
-            s = s.expandedTo(o.sizeHint())
-            i = i + 1
-        return s + n * QSize(self.spacing(), self.spacing())
+        margins = self.contentsMargins()
+        size += QSize(margins.left()+margins.right(),margins.top()+margins.bottom())
+        return size
 
-    def minimumSize(self):
-        s = QSize(0, 0)
-        n = self.count()
-        i = 0
-        while i < n:
-            o = self.items[i]
-            s = s.expandedTo(o.minimumSize())
-            i = i + 1
-        return s + n * QSize(self.spacing(), self.spacing())
+    def heightForWidth(self, width: int) -> int:
+        height = self.doLayout(QRect(0,0,width,0),True)
+        return height
 
-class Test(QWidget):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.resize(600,600)
+    def doLayout(self,rect:QRect,tOnly:bool):
+        left, top, right, bottom = self.getContentsMargins()
+        offrect = rect.adjusted(left+1,top+1,right-1,bottom-1)
+        x,y = offrect.x(),offrect.y()
+        lineHeight = 0
 
-        self.flow = FlowLayout(self)
-        btn = QPushButton("asd")
-        btn.resize(130,60)
-        btn2 = QPushButton("112")
-        btn2.resize(130, 60)
-        self.flow.addWidget(btn)
-        self.flow.addWidget(btn2)
+        for w in self.items:  # type:QWidget
+            wid = w.widget()
+            spaceX = self.horizontalSpacing()
+            if spaceX == -1:
+                spaceX = wid.style().layoutSpacing(qt.PolicyPushButton,qt.PolicyPushButton,qt.Horizontal)
+            spaceY = self.verticalSpacing()
+            if spaceY == -1:
+                spaceX = wid.style().layoutSpacing(qt.PolicyPushButton,qt.PolicyPushButton,qt.Vertical)
+            nextX = x+w.sizeHint().width() + spaceX
+            if nextX - spaceX > offrect.right() and lineHeight >0:
+                x = offrect.x()
+                y = y + lineHeight + spaceY
+                nextX = x+w.sizeHint().width()+spaceX
+                lineHeight = 0
 
+            if not tOnly:
+                w.setGeometry(QRect(QPoint(x,y),w.sizeHint()))
 
+            x = nextX
+            lineHeight = max(lineHeight,w.sizeHint().height())
+        return y+lineHeight-rect.y()+bottom
 
+    def horizontalSpacing(self):
+        if self.hSpacing >= 0:
+            return self.hSpacing
+        else:
+            return self.smartSpacing(qt.PM_LayoutHorizontalSpacing)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = Test()
-    win.show()
+    def verticalSpacing(self):
+        if self.hSpacing >= 0:
+            return self.hSpacing
+        else:
+            return self.smartSpacing(qt.PM_LayoutVerticalSpacing)
 
-    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
+    def smartSpacing(self,pm) -> int:
+        parent = self.parent()
+        if not parent:
+            return -1
+        elif parent.isWidgetType():
+            pw = QWidget()
+            return pw.style().pixelMetric(pm,None,pw)
+        else:
+            return self.spacing()
+
+    def removeItem(self, e: QLayoutItem) -> None:
+        self.items.remove(e)
+
+    def removeWidget(self, w: QWidget) -> None:
+        for it in self.items:
+            if it.widget() == w:
+                self.items.remove(it)
+                w.deleteLater()
+                break
+
+    def __del__(self):
+        for w in self.items: # type:QWidget
+            del w
