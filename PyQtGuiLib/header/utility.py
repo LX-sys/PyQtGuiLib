@@ -39,6 +39,6 @@ def textSize(font:QFont,text:str)->QSize:
     if PYQT_VERSIONS == "PyQt5":
         return QSize(int(fs.width(text)),int(fs.height()))
     elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
-        return QSize(int(fs.horizontalAdvance(text)), int(fs.height()))
+        return QSize(int(fs.horizontalAdvance(text)+1), int(fs.height()+1)) # +1 是为了补偿丢失的像素
     else:
         return QSize(0,0)
