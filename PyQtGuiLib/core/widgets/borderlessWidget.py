@@ -136,7 +136,7 @@ class Borderless:
             if PYQT_VERSIONS in ["PyQt5","PySide2","PySide6"]:
                 old_pos = e.globalPos()
             if PYQT_VERSIONS == "PyQt6":
-                old_pos = e.pos()
+                old_pos = e.globalPosition().toPoint()
 
             self.pressPos = old_pos - parent.pos()
 
@@ -153,7 +153,8 @@ class Borderless:
             if PYQT_VERSIONS in ["PyQt5","PySide2","PySide6"]:
                 old_pos = e.globalPos()
             if PYQT_VERSIONS == "PyQt6":
-                old_pos = e.pos()
+                old_pos = e.globalPosition().toPoint()
+
             parent.move(old_pos-self.pressPos)
         self.updateCursor(parent,e.pos())
         self.expandEdge(parent,e.pos())
