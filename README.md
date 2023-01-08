@@ -64,7 +64,7 @@ ButtonStyle.homologyStyle() # 同色调样式()
 ```python
 BuiltStyleDesigner  ---> 30%
 
-工具位置 PyQtGuiLib -> styles -> builtStyleDesigner.py 直接运行这个文件即可
+工具位置 PyQtGuiLib -> styles -> BuiltStyleDesigner -> builtStyleDesigner.py 直接运行这个文件即可
 
 目前支持的 控件
 QPushButton  ---> 50%
