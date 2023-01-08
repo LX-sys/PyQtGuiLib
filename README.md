@@ -39,7 +39,7 @@ PyQtGuiLib
 ```python
 PyQt5学习爱好群-(讨厌自己)  -- PyQtGuiLib 0.0.8.0版本
    ---> 修复了Borderless右下角拉伸BUG
-PyQt5学习爱好群-(讨厌自己)  -- PyQtGuiLib 1.0.9.5版本
+PyQt5学习爱好群-(讨厌自己)  -- PyQtGuiLib 1.1.9.5版本
    ---> 修复 PyQt6 版本下 无边框类(Borderless)移动BUG
 ```
 
