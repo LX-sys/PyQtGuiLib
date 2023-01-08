@@ -7,28 +7,23 @@ from PyQtGuiLib.header import (
 )
 
 from PyQtGuiLib.styles import ButtonStyle
+from PyQtGuiLib.core import FlowLayout
 
 class TestStyle(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800, 500)
 
-        x = 50
-        for i in range(5):
-            btn = QPushButton("test_{}".format(str(i)), self)
-            btn.setGeometry(x, 100, 130, 60)
-            x+=150
-            btn.setStyleSheet(ButtonStyle.contrastStyle())
+        self.flow = FlowLayout(self)
 
-        # self.btn = QPushButton("test",self)
-        # self.btn.setGeometry(100,100,130,60)
-        #
-        # self.btn2 = QPushButton("test2",self)
-        # self.btn2.setGeometry(250,100,130,60)
-        #
-        # self.btn.setStyleSheet(ButtonStyle.flatStyle(None,radius="10%"))
-        # # self.btn2.setStyleSheet(ButtonStyle.outlineStyle(None,radius="10%"))
-        # self.btn2.setStyleSheet(ButtonStyle.randomStyle())
+
+        for i in range(50):
+            btn = QPushButton("test_{}".format(str(i)), self)
+            btn.setFixedSize(130,60)
+            # btn.setStyleSheet(ButtonStyle.contrastStyle())  # 互补色样式
+            # btn.setStyleSheet(ButtonStyle.randomStyle()) # 随机样式
+            btn.setStyleSheet(ButtonStyle.homologyStyle())  # 同色调样式
+            self.flow.addWidget(btn)
 
 
 if __name__ == '__main__':
