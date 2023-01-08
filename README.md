@@ -39,6 +39,8 @@ PyQtGuiLib
 ```python
 PyQt5学习爱好群-(讨厌自己)  -- PyQtGuiLib 0.0.8.0版本
    ---> 修复了Borderless右下角拉伸BUG
+PyQt5学习爱好群-(讨厌自己)  -- PyQtGuiLib 1.0.9.5版本
+   ---> 修复 PyQt6 版本下 无边框类(Borderless)移动BUG
 ```
 
 ### 皮肤包
@@ -52,7 +54,20 @@ from PyQtGuiLib.styles import ButtonStyle
 
 # --- Api
 ButtonStyle.style()
-ButtonStyle.randomStyle()  # 常用
+ButtonStyle.randomStyle()  # 随机样式
+ButtonStyle.contrastStyle() # 互补色样式
+ButtonStyle.homologyStyle() # 同色调样式()
+```
+
+### 内置工具 - 样式设计器
+
+```python
+BuiltStyleDesigner  ---> 30%
+
+工具位置 PyQtGuiLib -> styles -> builtStyleDesigner.py 直接运行这个文件即可
+
+目前支持的 控件
+QPushButton  ---> 50%
 ```
 
 ## 组件说明
