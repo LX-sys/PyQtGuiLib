@@ -30,7 +30,7 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
         super().__init__(*args, **kwargs)
         self.resize(1100, 850)
 
-        self.addTree({
+        self.createTree({
             "QPushButton":[("randomStyle","随机样式"),
                            ("contrastStyle","互补色样式"),
                            ("homologyStyle","同色调样式")]
@@ -41,22 +41,32 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
         self.controls = []
         self.control_number = 35
 
-        # 当前点击的控件名称,方法
+        # 当前点击的控件名称,方法,当前点击的控件对象
         self.cu_click_name = ""
         self.cu_fun = ""
+        self.cu_click_control_obj = None
+
+        # 控制qss区域事件多次触发
+        self.is_control_edit = False
 
         # ----------
         # 设置一个当前的控件数量
         self.c_number_spin.setValue(self.control_number)
+        self.c_number_spin.lineEdit().setReadOnly(True) # 只禁用编辑功能
 
+        # 事件
         self.myEvent()
+
+    # 当前点击的控件对象
+    def getClickObj(self)->QWidget:
+        return self.cu_click_control_obj
 
     # 添加控件
     def addControls(self,widget:QWidget,size:QSize=QSize(130,60)):
         widget.setFixedSize(size)
         self.flow.addWidget(widget)
 
-    def addTree(self,tree_dict:dict):
+    def createTree(self,tree_dict:dict):
         if not tree_dict:
             return None
 
@@ -69,7 +79,6 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
                 item_c = QTreeWidgetItem(item)
                 item_c.setText(0, ch)
                 item_c.setText(1, explain)
-                # tree.addTopLevelItem(item)
 
     def itemDoubleClick_event(self,item:QTreeWidgetItem,column:int):
         text = item.text(column)
@@ -88,7 +97,7 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
                         btn = QPushButton()
                         btn.setText("test_{}".format(i))
                         btn.setStyleSheet(ButtonStyle.randomStyle())
-                        btn.clicked.connect(partial(self.qss_event,btn.styleSheet()))
+                        btn.clicked.connect(partial(self.qss_event,btn.styleSheet(),btn))
                         self.controls.append(btn)
                         self.addControls(btn)
                 else:
@@ -142,9 +151,18 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
         self.control_number = n
 
     # qss代码事件
-    def qss_event(self,qss:str):
+    def qss_event(self,qss:str,conOBJ:QWidget):
+        '''
+            这里 self.cu_click_control_obj 的清空和赋值的顺序很重要,
+            如果先不清空,就赋值,会导致信号额外的触发
+        '''
+        self.cu_click_control_obj = None
+
         self.qssEditObj().clear()
         self.qssEditObj().setText(qss)
+
+        # 保存当前点击对象
+        self.cu_click_control_obj = conOBJ
 
     # 修改背景颜色事件
     def background_color_event(self):
@@ -153,12 +171,29 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
         self.back_c_btn.setStyleSheet("background-color:rgb({},{},{},{})".format(*rgb))
         self.showObj().setStyleSheet("background-color:rgb({},{},{},{})".format(*rgb))
 
+    # 反射样式
+    def reflect_qss_event(self):
+        if not self.getClickObj():
+            return
+
+        # 加 try 防止对象不存在报错
+        try:
+            self.getClickObj().setStyleSheet(self.qssEditObj().toPlainText())
+
+        except Exception as e:
+            print(e)
+
     def myEvent(self):
+        # 双击树事件
         self.treeObj().itemDoubleClicked.connect(self.itemDoubleClick_event)
 
+        # 控件改变事件
         self.c_number_spin.valueChanged.connect(self.number_event)
+
         self.back_c_btn.clicked.connect(self.background_color_event)
 
+        # qss代码区文本改变事件
+        self.qssEditObj().textChanged.connect(self.reflect_qss_event)
 
     def resizeEvent(self, e:QResizeEvent) -> None:
         self.updateSize()
