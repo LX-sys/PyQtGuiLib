@@ -44,7 +44,12 @@ if PYQT_VERSIONS == "PyQt5":
         QTreeWidgetItem,
         QTreeWidgetItemIterator,
         QTextBrowser,
-        QTextEdit
+        QTextEdit,
+        QTabWidget,
+        QSpinBox,
+        QDoubleSpinBox,
+        QFormLayout,
+        QColorDialog
     )
 if PYQT_VERSIONS == "PyQt6":
     from PyQt6.QtWidgets import (
@@ -89,7 +94,12 @@ if PYQT_VERSIONS == "PyQt6":
         QTreeWidgetItem,
         QTreeWidgetItemIterator,
         QTextBrowser,
-        QTextEdit
+        QTextEdit,
+        QTabWidget,
+        QSpinBox,
+        QDoubleSpinBox,
+        QFormLayout,
+        QColorDialog
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -137,7 +147,12 @@ if PYQT_VERSIONS == "PySide2":
         QTreeWidgetItem,
         QTreeWidgetItemIterator,
         QTextBrowser,
-        QTextEdit
+        QTextEdit,
+        QTabWidget,
+        QSpinBox,
+        QDoubleSpinBox,
+        QFormLayout,
+        QColorDialog
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -183,5 +198,10 @@ if PYQT_VERSIONS == "PySide6":
         QTreeWidgetItem,
         QTreeWidgetItemIterator,
         QTextBrowser,
-        QTextEdit
+        QTextEdit,
+        QTabWidget,
+        QSpinBox,
+        QDoubleSpinBox,
+        QFormLayout,
+        QColorDialog
     )
