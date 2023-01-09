@@ -3,11 +3,10 @@
 # @author:LX
 # @file:builtStyleDesigner.py
 # @software:PyCharm
-
-
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
+    json,
     QApplication,
     QVBoxLayout,
     QResizeEvent,
@@ -25,16 +24,20 @@ from PyQtGuiLib.styles import ButtonStyle
     内置-样式设计器
 '''
 
+# 加载配置文件
+def loadConfig()->dict:
+    with open("controlConfig.json", "r") as f:
+        data = json.load(f)
+    return data
+
+
 class BuiltStyleDesigner(BuiltStyleDesignerUI):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.resize(1100, 850)
 
-        self.createTree({
-            "QPushButton":[("randomStyle","随机样式"),
-                           ("contrastStyle","互补色样式"),
-                           ("homologyStyle","同色调样式")]
-                      })
+        # 从配置文件中读取
+        self.createTree(loadConfig())
 
         # 判断是否已经创建的控件,控件列表,控件数量
         self.is_Controls = False
