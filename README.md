@@ -290,10 +290,6 @@ setTitleIcon() # 设置图标(默认会同步任务栏的图标)
 setSyncWindowIcon() # 设置是否同步桌面任务栏的图标
 updateTitleSize() # 更新标题栏大小
 
-# ---- 
-注意: 标题栏大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
-事件中调用 updateTitleSize() 来跟随变化
-
 # -------
 注意: 图标同步任务栏的效果只在win下才有效果
 在Mac设置图标方法,下面这个设置路径是写在运行程序那里的
@@ -318,9 +314,6 @@ addTime() # 添加时间
 setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
 
 这里所有添加的功能都可以通过 style 参数来设置样式
-# ---- 
-注意: 状态栏大小是不会跟随窗口变化的,所有需要在窗口中 resizeEvent()
-事件中调用 updateStatusSize() 来跟随变化
 ```
 ### 流式布局(FlowLayout)
 ```python
