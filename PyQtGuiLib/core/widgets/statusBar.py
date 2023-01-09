@@ -172,10 +172,6 @@ class StatusBar(QWidget):
         self.local_time = time.strftime(self.format, time.localtime())
         self.l_time.setText(self.local_time)
 
-    # def paintEvent(self, e: QPaintEvent) -> None:
-    #     opt = QStyleOption()
-    #     opt.initFrom(self)
-    #     painter = QPainter(self)
-    #     self.style().drawPrimitive(qt.PE_Widget, opt, painter, self)
-    #
-    #     painter.end()
+    def paintEvent(self, e: QPaintEvent) -> None:
+        self.updateStatusSize()
+        super().paintEvent(e)

@@ -328,6 +328,9 @@ class TitleBar(QWidget):
         self.drawTitleIcon(painter)
         self.drawTitleText(painter)
 
+        # 自动调用
+        self.updateTitleSize()
+
         painter.end()
 
     # 创建缩小,放大,关闭事件
