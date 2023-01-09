@@ -69,7 +69,16 @@ BuiltStyleDesigner  ---> 30%
 目前支持的 控件
 QPushButton  ---> 50%
 ```
+### 解析器
+```python
+dumpStructure()  --> 100%
+导入方式 from PyQtGuiLib.core.resolver import dumpStructure
+dumpStructure(widget :QWidget ,spaceCount=0)  # 控件的组成分析函数
 
+# ===
+注意:在单独使用该函数之前,需要加 app = QApplication(sys.argv)
+如果你在一个窗口类里面使用则不需要加
+```
 ## 组件说明
 
 ### 气泡窗口(BubbleWidget)
