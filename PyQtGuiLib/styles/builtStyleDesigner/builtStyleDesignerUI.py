@@ -19,7 +19,8 @@ from PyQtGuiLib.header import (
     QSpinBox,
     QFormLayout,
     QLabel,
-    QPushButton
+    QPushButton,
+    QScrollArea
 )
 
 '''
@@ -78,10 +79,14 @@ font-size:16px;
         self.top_left_tree.setColumnCount(2)
         self.top_left_tree.setHeaderLabels(["组件","方法"])
         self.top_left_tree.setMaximumWidth(300)
-        self.top_rigth_show = QFrame()
-        self.flow = FlowLayout(self.top_rigth_show)
+
+        self.top_rigth_show = QScrollArea()
+        self.top_rigth_show_core = QFrame()
+        self.top_rigth_show.setWidget(self.top_rigth_show_core)
+        self.top_rigth_show.setWidgetResizable(True)
+        self.flow = FlowLayout(self.top_rigth_show_core)
         self.top_left_tree.setObjectName("top_left_tree")
-        self.top_rigth_show.setObjectName("top_rigth_show")
+        self.top_rigth_show_core.setObjectName("top_rigth_show")
 
         self.top_hlay.addWidget(self.top_left_tree)
         self.top_hlay.addWidget(self.top_rigth_show)
@@ -138,7 +143,7 @@ font-size:16px;
         return self.top_left_tree
 
     def showObj(self)->QFrame:
-        return self.top_rigth_show
+        return self.top_rigth_show_core
 
     def tabObj(self)->QTabWidget:
         return self.bottom_left_tab
@@ -148,3 +153,14 @@ font-size:16px;
 
     def flowObj(self)->FlowLayout:
         return self.flow
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = BuiltStyleDesignerUI()
+    win.show()
+
+    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
+        sys.exit(app.exec())
+    else:
+        sys.exit(app.exec_())

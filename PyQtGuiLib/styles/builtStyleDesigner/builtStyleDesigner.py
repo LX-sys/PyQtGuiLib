@@ -97,7 +97,8 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
                         btn = QPushButton()
                         btn.setText("test_{}".format(i))
                         btn.setStyleSheet(ButtonStyle.randomStyle())
-                        btn.clicked.connect(partial(self.qss_event,btn.styleSheet(),btn))
+                        # btn.clicked.connect(partial(self.qss_event,btn.styleSheet(),btn))
+                        btn.clicked.connect(partial(self.qss_event,None,btn))
                         self.controls.append(btn)
                         self.addControls(btn)
                 else:
@@ -142,7 +143,8 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
                 elif self.cu_fun == "homologyStyle":
                     btn.setStyleSheet(ButtonStyle.homologyStyle())
 
-                btn.clicked.connect(partial(self.qss_event, btn.styleSheet()))
+                # btn.clicked.connect(partial(self.qss_event,btn.styleSheet(),btn))
+                btn.clicked.connect(partial(self.qss_event,None,btn))
                 self.addControls(btn)
         else:
             pop = self.controls.pop(-1)
@@ -151,15 +153,19 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
         self.control_number = n
 
     # qss代码事件
-    def qss_event(self,qss:str,conOBJ:QWidget):
+    def qss_event(self,qss:str=None,conOBJ:QWidget=None):
         '''
             这里 self.cu_click_control_obj 的清空和赋值的顺序很重要,
             如果先不清空,就赋值,会导致信号额外的触发
         '''
         self.cu_click_control_obj = None
 
-        self.qssEditObj().clear()
-        self.qssEditObj().setText(qss)
+        # 加 try 防止对象不存在报错
+        try:
+            self.qssEditObj().clear()
+            self.qssEditObj().setText(conOBJ.styleSheet())
+        except Exception as e:
+            print("e:",e)
 
         # 保存当前点击对象
         self.cu_click_control_obj = conOBJ
@@ -179,7 +185,6 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
         # 加 try 防止对象不存在报错
         try:
             self.getClickObj().setStyleSheet(self.qssEditObj().toPlainText())
-
         except Exception as e:
             print(e)
 
