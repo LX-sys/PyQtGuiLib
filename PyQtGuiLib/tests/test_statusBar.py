@@ -33,9 +33,9 @@ border-radius:30px;
 }
         ''')
         # 标题栏
-        # self.title = TitleBar(self)
-        # self.title.setTitleText("测试状态栏")
-        # self.title.setBtnStyle(TitleBar.WinStyle)
+        self.title = TitleBar(self)
+        self.title.setTitleText("测试状态栏")
+        self.title.setBtnStyle(TitleBar.WinStyle)
 
         # 状态栏
         self.status = StatusBar(self)
@@ -48,11 +48,6 @@ border-radius:30px;
         self.g.setFixedSize(100,10)
         self.status.addWidget(self.g)
         self.status.addTime(style="color: rgb(0, 0, 127);")
-
-    def resizeEvent(self, event:QResizeEvent) -> None:
-        super().resizeEvent(event)
-        # self.title.updateTitleSize()
-        self.status.updateStatusSize()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

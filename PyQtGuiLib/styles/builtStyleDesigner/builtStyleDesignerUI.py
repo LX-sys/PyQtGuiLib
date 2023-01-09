@@ -135,7 +135,6 @@ font-size:16px;
         self.form_lay.addRow(self.back_c_l,self.back_c_btn)
 
     def updateSize(self):
-        self.titbar.updateTitleSize()
         self.sp_vlay.setGeometry(0, self.titbar.height(), self.size().width(), self.size().height())
         self.sp_hlay.setGeometry(0, 0, self.bottom_widget.width(), self.bottom_widget.height()-self.titbar.height())
 
