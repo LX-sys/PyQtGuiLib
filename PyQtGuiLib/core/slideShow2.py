@@ -71,8 +71,8 @@ class Idler:
             self.s_p,self.e_p = self.count() - 1,0
             self.is_rigth,self.is_left = False,False
 
-        self.s_p+=1
-        self.e_p+=1
+        self.s_p += 1
+        self.e_p += 1
         if self.s_p > self.count()-1:
             self.s_p = 0
         if self.e_p > self.count()-1:
@@ -85,7 +85,7 @@ class Idler:
         self.e_p -= 1
         if self.s_p < 0:
             self.s_p = self.count()-1
-        if self.e_p < 0 :
+        if self.e_p < 0:
             self.e_p = self.count()-1
 
 

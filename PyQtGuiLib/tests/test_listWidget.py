@@ -14,21 +14,22 @@ from PyQtGuiLib.core import ListWidget
 from PyQtGuiLib.styles import ButtonStyle
 
 
-class TestListWidget(QWidget):
+from PyQtGuiLib.tests.temp_tests.index_history_item import Ui_HistoryItem
+
+class TestListWidget(ListWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.resize(800,600)
+        self.resize(600,500)
 
-        self.listw = ListWidget(self)
-        self.listw.resize(200,300)
-        self.listw.move(100,100)
+        # self.listw = ListWidget(self)
+        # self.listw.resize(600,500)
+        # self.listw.move(100,100)
         # self.listw.itemDoubleClicked.connect(lambda :print("asd"))
 
         for i in range(5):
-            widget = QWidget()
-            widget.setFixedHeight(30)
+            widget = Ui_HistoryItem()
             widget.setStyleSheet(ButtonStyle.randomStyle())
-            self.listw.addWidget(widget)
+            self.addWidget(widget)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

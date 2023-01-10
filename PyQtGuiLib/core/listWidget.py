@@ -30,16 +30,25 @@ class ListWidgetItem(QListWidgetItem):
         super().__init__(*args,**kwargs)
 
 
-
-
 class ListWidget(QListWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
+        self.widgets = []
 
+        # item的最小高度
+        self.item_min_height = 150
+
+    def setItemMinHeight(self,int):
+        self.item_min_height = h
+
+    # 添加 QWidget
     def addWidget(self,widget:QWidget):
+        widget.setFixedHeight(self.item_min_height)
+
         item = ListWidgetItem()
-        item.setSizeHint(QSize(self.width(),widget.height()))
-        # self.setItemDelegate(ItemDelegate())
+        item.setSizeHint(QSize(self.width()-4,widget.height()))
         self.addItem(item)
         self.setItemWidget(item, widget)
+
+        self.widgets.append((item,widget))
