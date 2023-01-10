@@ -32,8 +32,9 @@ class RoundShadow(QWidget):
         pat.setRenderHint(pat.Antialiasing)
         pat.fillPath(path, QBrush(Qt.white))
 
-        # color = QColor(192, 192, 192, 50)
-        color = QColor(255, 0, 0, 255)
+        
+        color = QColor(192, 192, 192, 50)
+        # color = QColor(255, 0, 0, 255)
         for i in range(10):
             i_path = QPainterPath()
             i_path.setFillRule(Qt.WindingFill)
@@ -72,6 +73,5 @@ class TestWindow(RoundShadow):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     t = RoundShadow()
-    # t = RoundImage('./Asset/new_icons/close.png')
     t.show()
     app.exec_()
