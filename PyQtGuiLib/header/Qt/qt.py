@@ -4,7 +4,7 @@
 # @file:qt.py
 # @software:PyCharm
 from PyQtGuiLib.header.versions import PYQT_VERSIONS
-from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy
+from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy,QEasingCurve
 
 
 if PYQT_VERSIONS == "PyQt5"  :
@@ -48,6 +48,10 @@ if PYQT_VERSIONS == "PyQt5"  :
     TabFocus = Qt.TabFocus
     ClickFocus = Qt.ClickFocus
     StrongFocus = Qt.StrongFocus
+    OutBounce = QEasingCurve.OutBounce
+    CosineCurve = QEasingCurve.CosineCurve
+    SineCurve = QEasingCurve.SineCurve
+
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
@@ -89,3 +93,6 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     TabFocus = Qt.FocusPolicy.TabFocus
     ClickFocus = Qt.FocusPolicy.ClickFocus
     StrongFocus = Qt.FocusPolicy.StrongFocus
+    OutBounce = QEasingCurve.Type.OutBounce
+    CosineCurve = QEasingCurve.Type.CosineCurve
+    SineCurve = QEasingCurve.Type.SineCurve
