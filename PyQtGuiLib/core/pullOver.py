@@ -9,7 +9,7 @@ from PyQtGuiLib.header import (
     QEasingCurve,
     desktopCenter,
     desktopSize,
-    Qt
+    qt
 )
 
 
@@ -45,10 +45,8 @@ class MonitoThread(QThread):
 class PullOver:
 
     # 弹力
-    if PYQT_VERSIONS == "PyQt5":
-        OutBounce = QEasingCurve.OutBounce
-    else:
-        OutBounce = None
+    OutBounce = qt.OutBounce
+
 
     def __init__(self,parent:QWidget,*args,**kwargs):
         self.parent = parent
