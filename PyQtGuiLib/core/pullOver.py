@@ -1,12 +1,9 @@
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    QApplication,
     QWidget,
     QThread,
     Signal,
     QPoint,
     QPropertyAnimation,
-    QEasingCurve,
     desktopCenter,
     desktopSize,
     qt
