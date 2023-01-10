@@ -80,6 +80,8 @@
     --- 修复了 内置-样式设计器 不少BUG
 2023.1.9 1.2.10.5版本
     --- 新增 控件的组成分析函数 导入方式 from PyQtGuiLib.core.resolver import dumpStructure
+    --- 新增 QListWidget 增强版本 - ListWidget
+    --- 轮播组件重写中
 '''
 
 # ===============================================
