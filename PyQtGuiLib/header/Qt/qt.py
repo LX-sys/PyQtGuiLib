@@ -44,6 +44,10 @@ if PYQT_VERSIONS == "PyQt5"  :
     Vertical = Qt.Vertical
     PM_LayoutHorizontalSpacing = QStyle.PM_LayoutHorizontalSpacing
     PM_LayoutVerticalSpacing = QStyle.PM_LayoutVerticalSpacing
+    NoFocus = Qt.NoFocus
+    TabFocus = Qt.TabFocus
+    ClickFocus = Qt.ClickFocus
+    StrongFocus = Qt.StrongFocus
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
@@ -81,3 +85,7 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     Vertical = Qt.Orientation.Vertical
     PM_LayoutHorizontalSpacing = QStyle.PixelMetric.PM_LayoutHorizontalSpacing
     PM_LayoutVerticalSpacing = QStyle.PixelMetric.PM_LayoutVerticalSpacing
+    NoFocus = Qt.FocusPolicy.NoFocus
+    TabFocus = Qt.FocusPolicy.TabFocus
+    ClickFocus = Qt.FocusPolicy.ClickFocus
+    StrongFocus = Qt.FocusPolicy.StrongFocus
