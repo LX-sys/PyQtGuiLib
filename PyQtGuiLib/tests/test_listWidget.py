@@ -7,29 +7,36 @@ from PyQtGuiLib.header import (
     Signal,
     QColor,
     QSlider,
-    QListWidgetItem
+    QListWidgetItem,
+    QLabel,
+    qt
 )
 
 from PyQtGuiLib.core import ListWidget
 from PyQtGuiLib.styles import ButtonStyle
 
 
-from PyQtGuiLib.tests.temp_tests.index_history_item import Ui_HistoryItem
-
-class TestListWidget(ListWidget):
+class TestListWidget(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.resize(600,500)
+        self.resize(800,700)
 
-        # self.listw = ListWidget(self)
-        # self.listw.resize(600,500)
-        # self.listw.move(100,100)
-        # self.listw.itemDoubleClicked.connect(lambda :print("asd"))
+        self.listw = ListWidget(self)
+        self.listw.resize(600,500)
+        self.listw.move(100,100)
+        self.listw.itemDoubleClicked.connect(lambda :print("asd"))
 
-        for i in range(5):
-            widget = Ui_HistoryItem()
+        for i in range(30):
+            widget = QLabel(str(i))
+            widget.setAlignment(qt.AlignCenter)
             widget.setStyleSheet(ButtonStyle.randomStyle())
-            self.addWidget(widget)
+            self.listw.addWidget(widget)
+
+        wid = self.listw.getAllWidget()[1]
+        print(wid)
+        # self.listw.removeItemWidget(self.listw.widgets[0][0])
+        # self.listw.adjustSize()
+        self.listw.removeWidget(wid)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
