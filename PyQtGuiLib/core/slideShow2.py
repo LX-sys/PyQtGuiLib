@@ -30,7 +30,8 @@ from PyQtGuiLib.styles import ButtonStyle
 # 滚轮类
 class Idler:
     def __init__(self):
-        self.lists = [1,2,3,4,5]
+        # self.lists = [1,2,3,4,5]
+        self.lists = []
         # 双指针
         self.s_p = 0
         self.e_p = 1
