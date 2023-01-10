@@ -326,7 +326,7 @@ setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
 ```
 ### 流式布局(FlowLayout)
 ```python
-流式布局  ----> 99%  测试使用中
+流式布局  ----> 99%
 导入方式 from PyQtGuiLib.core import FlowLayout
 
 流式布局 -- FlowLayout API介绍
@@ -340,6 +340,26 @@ removeWidget()
 注意: 在使用 removeWidget() 移除控件的时候,控件会被删除掉
 ```
 
+## 控件增强
 
+### QListWidget 增强 - ListWidget
 
+```python
+ListWidget ---> 99% 
+导入方式 from PyQtGuiLib.core import ListWidget
+
+# 类变量 - 添加/移除窗口时的动画特效
+OutBounce
+CosineCurve
+SineCurve
+
+# ----- Api
+setAniEnabled() # 设置动画是否启用(默认开启)
+setAniDuration() # 设置持续时间(默认300)
+setAniSpecial() # 设置动画特效(参数就类变量,默认特效:OutBounce)
+setItemMinHeight() # 设置item的最小高度(默认:30)
+addWidget() # 添加 QWidget
+removeWidget() # 移除窗口
+getAllWidget() # 返回所有窗口
+```
 
