@@ -14,7 +14,8 @@ from PyQtGuiLib.header import (
     QMainWindow,
     QFrame,
     QStackedWidget,
-    qt
+    qt,
+    QGraphicsDropShadowEffect
 )
 '''
     无边框窗口
@@ -192,9 +193,16 @@ class BorderlessWidget(QWidget):
         self.resize(800, 500)
 
         self.borderless = Borderless()
-        self.setWindowFlags(FramelessWindowHint| qt.Window)
+        self.setWindowFlags(FramelessWindowHint|qt.Window)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
+
+        # self.ss = QGraphicsDropShadowEffect(self)
+        # self.ss.setOffset(0,0)
+        # self.ss.setBlurRadius(10)
+        # self.ss.setColor(qt.red)
+        # self.setGraphicsEffect(self.ss)
+
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
         self.borderless.pressEvent(self,e)
