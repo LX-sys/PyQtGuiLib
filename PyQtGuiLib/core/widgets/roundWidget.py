@@ -6,63 +6,112 @@ from PyQtGuiLib.header import (
     QWidget,
     QHBoxLayout,
     QGraphicsOpacityEffect,
-    QPushButton
+    QPushButton,
+    QPainter,
+    QPaintEvent,
+    qt,
+    QBrush,
+    QPen,
+    QColor,
+    QPainterPath,
+    QRectF,
+    QGraphicsDropShadowEffect,
+    QLinearGradient
 )
-from PyQtGuiLib.core.widgets import BorderlessWidget
-
-
+from PyQtGuiLib.core.widgets import BorderlessWidget,BorderlessFrame
 
 '''
-    该窗口一定要通过qss样式,设置背景
-    窗口的圆角也需要通过qss来实现,例如: border-radius:50px;
-    
-    注意使用这个窗口的时候,真正操作的是 widget()返回的窗口,
-    所以要添加控件,也是添加在widget()返回的窗口上
+    圆角窗口
 '''
-# 圆角窗口
-class RoundWidget(BorderlessWidget):
+
+class RoundWidget(BorderlessFrame):
+
+    # 渐变的方向
+    G_Hertical = "vertical"
+    G_Horizontal = "horizontal"
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,600)
-        # 背景透明,去掉窗口边框,去掉边框
-        self.setAttribute(qt.WA_TranslucentBackground, True)
-        self.setWindowFlags(qt.FramelessWindowHint)
-        self.setAttribute(qt.WA_DeleteOnClose)
 
+        self.setAttribute(qt.WA_TranslucentBackground)
 
-        self.builtin_widget = '''
-#widget{
-background-color:gray;
-border-radius:50px;
-}
-        '''
-        self.__builtin_style = ""
+        # 有问题这里
+        self.ss = QGraphicsDropShadowEffect(self)
+        self.ss.setOffset(0,0)
+        self.ss.setBlurRadius(10)
+        self.ss.setColor(qt.red)
+        self.setGraphicsEffect(self.ss)
 
-        self.__hlay = QHBoxLayout(self)
-        self.__hlay.setContentsMargins(0,0,0,0)
-        self.__hlay.setSpacing(0)
+        # 圆角半径,注意这个值不要高于 8 否则四个斜角将失去拉伸功能
+        self.r = 7
 
-        self.__widget = QWidget()
-        self.__hlay.addWidget(self.__widget)
-        self.setObjectName("widget")
-        self.setStyleSheet(self.builtin_widget)
+        # 颜色
+        self.w_color = QColor(240, 240, 240)
+        self.w_b_color = qt.gray
 
-        # 设置透明度
-        self.opacity_effect = QGraphicsOpacityEffect()
-        self.opacity_effect.setOpacity(1)
-        self.__widget.setGraphicsEffect(self.opacity_effect)
+        # 渐变色
+        self.is_e_gcolor = False # 是否启用渐变色
+        self.w_g_color = [(0.5,QColor(119, 177, 88)),(1,QColor(170, 255, 127))]
+        self.w_g_direction = "vertical"  # 渐变方向
 
-    def setOpacity(self,opacity:float):
-        self.opacity_effect.setOpacity(opacity)
+        self.border_width = 1
 
-    def widget(self) -> QWidget:
-        return self.__widget
+    # 设置圆角半径
+    def setRadius(self,r:int):
+        self.r = r
 
-    def setObjectName(self, name:str) -> None:
-        self.__widget.setObjectName(name)
+    # 窗体颜色
+    def setWindowColor(self,color:QColor):
+        self.w_color = color
 
-    def setStyleSheet(self, styleSheet:str) -> None:
-        self.__widget.setStyleSheet(styleSheet)
+    # 设置是否启用渐变色
+    def setEnableGColor(self,b:bool):
+        self.is_e_gcolor = b
+
+    # 窗体渐变色
+    def setWindowGColor(self,colos:list,direction="horizontal"):
+        self.self.w_g = colos
+        self.is_e_gcolor = True
+
+    # 窗边框颜色
+    def setWindowBorderColor(self,color:QColor):
+        self.w_b_color = color
+
+    def paintEvent(self, e: QPaintEvent) -> None:
+        painter = QPainter(self)
+
+        if self.w_g_direction == "horizontal":
+            gradient = QLinearGradient(0, self.height(), self.width(), self.height()) # 垂直线性渐变
+        elif self.w_g_direction == "vertical":
+            gradient = QLinearGradient(self.width(), 0, self.width(), self.height())  # 水平线性渐变
+        else:
+            gradient = QLinearGradient(0, self.height(), self.width(), self.height())  # 线性渐变
+
+        bru = QBrush(self.w_color)
+        op = QPen()
+        op.setColor(self.w_b_color)
+        op.setWidth(3)
+        op.setStyle(qt.SolidLine)
+
+        # ====
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)  # 抗锯齿
+        if self.is_e_gcolor:
+            for v,c in self.w_g_color:
+                gradient.setColorAt(v,c)
+            painter.setBrush(gradient)
+        else:
+            painter.setBrush(bru)
+        painter.setPen(op)
+
+        rect = self.rect()
+        rect.setLeft(5)
+        rect.setTop(self.border_width)
+        rect.setWidth(rect.width() - 5)
+        rect.setHeight(rect.height() - 5)
+        painter.drawRoundedRect(rect, self.r, self.r)
+
+        painter.end()
 
 
 if __name__ == '__main__':
