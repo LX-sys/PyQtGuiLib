@@ -251,12 +251,12 @@ class Public:
     def setRadius(self,r:int):
         self.borderless.r = r
 
-    # 窗体颜色
+    # 设置窗体颜色
     def setWindowColor(self,color:QColor):
         self.is_e_gcolor = False
         self.borderless.w_color = color
 
-    # 窗边框颜色
+    # 设置边框颜色
     def setWindowBorderColor(self,color:QColor):
         self.borderless.w_b_color = color
 
@@ -265,13 +265,13 @@ class Public:
         self.borderless.is_e_gcolor = b
         self.borderless.w_g_direction = direction
 
-    # 窗体渐变色
+    # 设置窗体渐变色
     def setWindowGColor(self,colos:list,direction="horizontal"):
         self.is_e_gcolor = True
         self.borderless.w_g_color = colos
         self.borderless.w_g_direction = direction
 
-    # 设置变了风格
+    # 设置变框风格
     def setBorderStyle(self,style):
         self.open_style = style
 

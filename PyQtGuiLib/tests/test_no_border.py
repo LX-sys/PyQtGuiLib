@@ -17,7 +17,6 @@ from PyQtGuiLib.header import (
 )
 
 from PyQtGuiLib.core.widgets import (
-    RoundWidget,   # 圆角QWidget窗口
     BorderlessMainWindow, # 无边框矩形主窗口
     BorderlessFrame,      # 无边框矩形QFrame窗口
     BorderlessWidget,     # 无边框矩形QWidget窗口
