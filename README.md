@@ -79,6 +79,33 @@ dumpStructure(widget :QWidget ,spaceCount=0)  # 控件的组成分析函数
 注意:在单独使用该函数之前,需要加 app = QApplication(sys.argv)
 如果你在一个窗口类里面使用则不需要加
 ```
+## 窗口系列
+```python
+导入方式 
+from PyQtGuiLib.core.widgets import (
+    BorderlessMainWindow, # 无边框矩形主窗口
+    BorderlessFrame,      # 无边框矩形QFrame窗口
+    BorderlessWidget,     # 无边框矩形QWidget窗口
+    BorderlessStackedWidget  # 无边框矩形StackedWidget窗口
+)
+
+特性
+无边框,可移动,可拉伸,窗口颜色风格变化多样
+
+窗口系列 类变量
+# 渐变的方向
+G_Vertical
+G_Horizontal
+
+窗口系列  ---- API介绍
+setRadius() # 设置圆角半径(不要超过8)
+setWindowColor() # 设置窗体颜色
+setWindowBorderColor() # 设置边框颜色
+setEnableGColor() # 设置是否启用渐变色
+setWindowGColor() # 设置窗体渐变色
+setBorderStyle() # 设置变框风格
+setBorderWidth() # 设置边的宽度
+```
 ## 组件说明
 
 ### 气泡窗口(BubbleWidget)
