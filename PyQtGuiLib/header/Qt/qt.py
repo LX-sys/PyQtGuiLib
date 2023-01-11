@@ -9,6 +9,8 @@ from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy,QEasingCurve
 
 if PYQT_VERSIONS == "PyQt5"  :
     FramelessWindowHint = Qt.FramelessWindowHint
+    Window = Qt.Window
+    WindowStaysOnTopHint = Qt.WindowStaysOnTopHint
     ArrowCursor = Qt.ArrowCursor
     SizeFDiagCursor = Qt.SizeFDiagCursor
     SizeBDiagCursor = Qt.SizeBDiagCursor
@@ -53,8 +55,11 @@ if PYQT_VERSIONS == "PyQt5"  :
     SineCurve = QEasingCurve.SineCurve
 
 
+
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
+    Window = Qt.WindowType.Window
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
+    WindowStaysOnTopHint =Qt.WindowType.WindowStaysOnTopHint
     ArrowCursor = Qt.CursorShape.ArrowCursor
     SizeFDiagCursor = Qt.CursorShape.SizeFDiagCursor
     SizeBDiagCursor = Qt.CursorShape.SizeBDiagCursor
