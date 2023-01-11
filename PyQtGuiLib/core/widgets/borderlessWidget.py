@@ -168,7 +168,7 @@ class BorderlessMainWindow(QMainWindow):
 
         self.borderless = Borderless()
 
-        self.setWindowFlags(Qt.FramelessWindowHint)
+        self.setWindowFlags(FramelessWindowHint| qt.Window)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
 
@@ -192,7 +192,7 @@ class BorderlessWidget(QWidget):
         self.resize(800, 500)
 
         self.borderless = Borderless()
-        self.setWindowFlags(FramelessWindowHint)
+        self.setWindowFlags(FramelessWindowHint| qt.Window)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
 
@@ -217,7 +217,7 @@ class BorderlessFrame(QFrame):
 
         self.borderless = Borderless()
 
-        self.setWindowFlags(FramelessWindowHint)
+        self.setWindowFlags(FramelessWindowHint| qt.Window)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
 
@@ -242,7 +242,7 @@ class BorderlessStackedWidget(QStackedWidget):
 
         self.borderless = Borderless()
 
-        self.setWindowFlags(FramelessWindowHint)
+        self.setWindowFlags(FramelessWindowHint| qt.Window)
         # 开启鼠标跟踪
         self.setMouseTracking(True)
 
