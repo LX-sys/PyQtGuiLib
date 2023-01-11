@@ -330,7 +330,6 @@ class TitleBar(QWidget):
 
         # 自动调用
         self.updateTitleSize()
-
         painter.end()
 
     # 创建缩小,放大,关闭事件
