@@ -3,9 +3,9 @@ from PyQtGuiLib.header import (
     sys,
     QApplication,
     QWidget,
-    QMainWindow
+    QMainWindow,
+    QPushButton
 )
-from PyQtGuiLib.core.widgets import ButtonWidget
 from PyQtGuiLib.core import PullOver
 
 
@@ -14,13 +14,13 @@ class TestPullOverWidget(QMainWindow):
         super().__init__(*args,**kwargs)
         self.resize(500,500)
 
-        self.show_btn = ButtonWidget()
+        self.show_btn = QPushButton("我是按钮")
         self.show_btn.resize(70, 70)
         self.show_btn.setObjectName("show_btn")
         self.show_btn.setStyleSheet('''
         #show_btn{
         background-color:green;
-        border-radius:35px;
+        color:white
         }
         ''')
 

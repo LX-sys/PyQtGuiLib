@@ -26,7 +26,7 @@ from PyQtGuiLib.styles import ButtonStyle
 
 # 加载配置文件
 def loadConfig()->dict:
-    with open("controlConfig.json", "r") as f:
+    with open("controlConfig.json", "r",encoding="utf8") as f:
         data = json.load(f)
     return data
 
