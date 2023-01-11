@@ -10,6 +10,7 @@ from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy,QEasingCurve
 if PYQT_VERSIONS == "PyQt5"  :
     FramelessWindowHint = Qt.FramelessWindowHint
     Window = Qt.Window
+    WindingFill = Qt.WindingFill
     WindowStaysOnTopHint = Qt.WindowStaysOnTopHint
     ArrowCursor = Qt.ArrowCursor
     SizeFDiagCursor = Qt.SizeFDiagCursor
@@ -23,6 +24,12 @@ if PYQT_VERSIONS == "PyQt5"  :
     WA_StyledBackground = Qt.WA_StyledBackground
     NoBrush = Qt.NoBrush
     NoPen = Qt.NoPen
+    red = Qt.red
+    blue = Qt.blue
+    white = Qt.white
+    black = Qt.black
+    gray = Qt.gray
+    transparent = Qt.transparent
     Antialiasing = QPainter.Antialiasing
     SmoothPixmapTransform = QPainter.SmoothPixmapTransform
     TextAntialiasing = QPainter.TextAntialiasing
@@ -58,6 +65,7 @@ if PYQT_VERSIONS == "PyQt5"  :
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     Window = Qt.WindowType.Window
+    WindingFill = Qt.WindowType.WindingFill
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
     WindowStaysOnTopHint =Qt.WindowType.WindowStaysOnTopHint
     ArrowCursor = Qt.CursorShape.ArrowCursor
@@ -72,6 +80,12 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     WA_StyledBackground = Qt.WidgetAttribute.WA_StyledBackground
     NoBrush = Qt.BrushStyle.NoBrush
     NoPen = Qt.PenStyle.NoPen
+    red = Qt.GlobalColor.red
+    blue = Qt.GlobalColor.blue
+    white = Qt.GlobalColor.white
+    black = Qt.GlobalColor.black
+    gray = Qt.GlobalColor.gray
+    transparent = Qt.GlobalColor.transparent
     Antialiasing = QPainter.RenderHint.Antialiasing
     SmoothPixmapTransform = QPainter.RenderHint.SmoothPixmapTransform
     TextAntialiasing = QPainter.RenderHint.TextAntialiasing
