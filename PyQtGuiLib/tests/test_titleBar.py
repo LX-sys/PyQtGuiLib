@@ -42,7 +42,7 @@ border-radius:30px;
         self.tbar.setTitleText("测试标题栏")
         self.tbar.setTitleColor(QColor(0,0,0,255))
         # self.tbar.setTitleIcon(r"/Applications/Python 3.8/save/PyQtGuiLib/PyQtGuiLib/tests/image/1.png")
-        self.tbar.setBtnStyle(TitleBar.WinStyle)
+        self.tbar.setBtnStyle(TitleBar.MacStyle)
         self.tbar.setStyleSheet("background-color: transparent;")
 
     def resizeEvent(self, event:QResizeEvent) -> None:
