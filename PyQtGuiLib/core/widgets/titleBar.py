@@ -177,6 +177,38 @@ class CloseButton(ButtonIcon):
             painter.drawLine(self.width() - 5, 5, 5, self.height() - 5)
 
 
+# 钉住窗口按钮
+class PegButton(ButtonIcon):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.is_flag = False
+
+    def drawIcon(self,painter:QPainter):
+        op = QPen()
+        op.setWidth(1)
+        painter.setPen(op)
+
+        if self.isWinStyle():
+            rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
+            rect_c = QRect(3, 3, self.width() - 6, self.height() - 6)
+            painter.drawRoundedRect(rect, self.radius,self.radius)
+            if self.is_flag:
+                bru = QBrush(QColor(84, 120, 186))
+                painter.setBrush(bru)
+            painter.drawRoundedRect(rect_c, self.radius, self.radius)
+        elif self.isMacStyle():
+            bru = QBrush(qt.black)
+            painter.setBrush(bru)
+
+            rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
+            rect_c = QRect(3, 3, self.width()  - 6, self.height() -6)
+            painter.drawRoundedRect(rect, self.w // 2, self.h // 2)
+            if self.is_flag:
+                bru = QBrush(QColor(171, 0, 0))
+                painter.setBrush(bru)
+            painter.drawRoundedRect(rect_c, self.w // 2, self.h // 2)
+
+
 class TitleBar(QWidget):
 
     # 标题的位置
@@ -228,10 +260,12 @@ class TitleBar(QWidget):
             self.move(0,0)
             self.resize(self.__parent.width(),self.h)
 
-        # 创建缩小,放大,关闭 按钮
+        # 创建缩小,放大,关闭,钉住 按钮
         self.zm = ZoomButton(self)
         self.lm = LargeButton(self)
         self.cm = CloseButton(self)
+        self.peg = PegButton(self)
+        self.is_pag = False # 是否钉住
         # 创建缩小,放大,关闭事件
         self.createEvent()
 
@@ -262,6 +296,7 @@ class TitleBar(QWidget):
         self.zm.setBtnStyle(style)
         self.lm.setBtnStyle(style)
         self.cm.setBtnStyle(style)
+        self.peg.setBtnStyle(style)
 
     # 设置标题栏高度
     def setTitleHeight(self,h:int):
@@ -337,6 +372,7 @@ class TitleBar(QWidget):
         self.zm.clicked.connect(lambda :self.ani("zoom"))
         self.lm.clicked.connect(lambda :self.ani("arge"))
         self.cm.clicked.connect(lambda :self.ani("close"))
+        self.peg.clicked.connect(lambda :self.ani("peg"))
 
     # 设置动画的时长
     def setAniDuration(self,msec:int):
@@ -431,6 +467,18 @@ class TitleBar(QWidget):
             animation.setEndValue(0)
             animation.start()
             animation.finished.connect(self.__parent.close)
+        elif action == "peg":
+            if not self.peg.is_flag:
+                self.peg.is_flag = True
+                self.__parent.windowHandle().setFlags(self.windowFlags() | qt.WindowStaysOnTopHint|
+                                                      qt.FramelessWindowHint | qt.Window)
+            else:
+                self.peg.is_flag = False
+                self.__parent.windowHandle().setFlags(self.windowFlags() | qt.Widget|qt.FramelessWindowHint|qt.Window)
+            self.__parent.show()
+            self.__parent.update()
+
+
 
     # 更新标题栏大小
     def updateTitleSize(self) -> None:
@@ -440,13 +488,18 @@ class TitleBar(QWidget):
         # 自动计算 缩小,放大,关闭 的位置
         btn_w_interval = 15 # 按钮直接的间隔
         # 按钮占据的总宽度
-        btn_occupied_width = self.zm.width()+self.lm.width()+self.cm.width()+btn_w_interval*3
+        btn_occupied_width = self.zm.width()+self.lm.width()+self.cm.width()+btn_w_interval*5
         occ_w = self.width()-btn_occupied_width
+
+        peg_h = self.height() // 2 - self.peg.height() // 2
         zm_h = self.height()//2 - self.zm.height()//2
         lm_h = self.height()//2 - self.lm.height()//2
         cm_h = self.height()//2 - self.cm.height()//2
+
+        self.peg.move(occ_w, peg_h)
+        occ_w = occ_w + self.peg.width() + btn_w_interval
         self.zm.move(occ_w,zm_h)
         occ_w = occ_w+self.zm.width()+btn_w_interval
         self.lm.move(occ_w,lm_h)
-        occ_w  = occ_w+self.lm.width()+btn_w_interval
+        occ_w = occ_w+self.lm.width()+btn_w_interval
         self.cm.move(occ_w,cm_h)
