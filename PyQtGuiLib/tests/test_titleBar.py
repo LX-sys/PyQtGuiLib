@@ -13,7 +13,6 @@ from PyQtGuiLib.header import (
 )
 
 from PyQtGuiLib.core.widgets import (
-    RoundWidget,   # 圆角QWidget窗口
     BorderlessMainWindow, # 无边框矩形主窗口
     BorderlessFrame,      # 无边框矩形QFrame窗口
     BorderlessWidget,     # 无边框矩形QWidget窗口
@@ -36,13 +35,15 @@ background-color:#d4d4d4;
 border-radius:30px;
 }
         ''')
+        # self.setEnableGColor(True)
+
         self.tbar = TitleBar(self)
-        self.tbar.setTitlePos(TitleBar.Title_Left)
+        self.tbar.setTitlePos(TitleBar.Title_Center)
         self.tbar.setTitleText("测试标题栏")
-        self.tbar.setTitleColor(QColor(100,200,78))
+        self.tbar.setTitleColor(QColor(0,0,0,255))
         # self.tbar.setTitleIcon(r"/Applications/Python 3.8/save/PyQtGuiLib/PyQtGuiLib/tests/image/1.png")
-        self.tbar.setBtnStyle(TitleBar.MacStyle)
-        self.tbar.setStyleSheet("background-color: rgb(232, 232, 232);")
+        self.tbar.setBtnStyle(TitleBar.WinStyle)
+        self.tbar.setStyleSheet("background-color: transparent;")
 
     def resizeEvent(self, event:QResizeEvent) -> None:
         super().resizeEvent(event)
