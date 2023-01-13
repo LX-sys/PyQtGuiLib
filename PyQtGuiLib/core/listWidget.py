@@ -18,6 +18,7 @@ class ListWidgetItem(QListWidgetItem):
 
 
 class ListWidget(QListWidget):
+    InCurve = qt.InCurve
     OutBounce = qt.OutBounce
     CosineCurve = qt.CosineCurve
     SineCurve = qt.SineCurve
