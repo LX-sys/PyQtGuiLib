@@ -82,10 +82,11 @@
     --- 新增 控件的组成分析函数 导入方式 from PyQtGuiLib.core.resolver import dumpStructure
     --- 新增 QListWidget 增强版本 - ListWidget
     --- 轮播组件重写中
-2023.1.12 - 2023-1.13 [1.2.11.5] 版本
-    --- 删除 文件buttonWdiget.py 和 roundWidget.py
+2023.1.12 - 2023-1.13 [1.2.12.5] 版本
+    --- 删除 文件buttonWidget.py 和 roundWidget.py
     --- 重构的 无边框的代码 增加了许多功能,请看文档
     --- 标题栏 新增了 窗口钉住功能, Win 和 Mac 各有一套风格
+    --- 新增功能 滚动栏(RollWidget)
 '''
 
 # ===============================================
