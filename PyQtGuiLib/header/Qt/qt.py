@@ -59,6 +59,7 @@ if PYQT_VERSIONS == "PyQt5"  :
     OutBounce = QEasingCurve.OutBounce
     CosineCurve = QEasingCurve.CosineCurve
     SineCurve = QEasingCurve.SineCurve
+    InCurve = QEasingCurve.InCurve
 
 
 
@@ -113,3 +114,4 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     OutBounce = QEasingCurve.Type.OutBounce
     CosineCurve = QEasingCurve.Type.CosineCurve
     SineCurve = QEasingCurve.Type.SineCurve
+    InCurve = QEasingCurve.Type.InCurve
