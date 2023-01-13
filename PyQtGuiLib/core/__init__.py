@@ -3,3 +3,4 @@ from PyQtGuiLib.core.pullOver import PullOver
 from PyQtGuiLib.core.slideShow import SlideShow
 from PyQtGuiLib.core.flowLayout import FlowLayout
 from PyQtGuiLib.core.listWidget import ListWidget
+from PyQtGuiLib.core.rollWidget import RollWidget
