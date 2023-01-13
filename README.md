@@ -368,7 +368,7 @@ removeWidget()
 注意: 流式布局 无法 配合 QScrollArea 使用
 ```
 
-### 状态栏(RollWidget)
+### 滚动栏(RollWidget)
 
 ```python
 滚动栏  ----> 90% 测试使用中
