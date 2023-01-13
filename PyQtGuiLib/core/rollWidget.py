@@ -97,6 +97,7 @@ class RollWidget(QWidget):
     # 滚动栏 改变信号
     changed = Signal(QWidget)
 
+    # 动画效果
     InCurve = qt.InCurve
     OutBounce = qt.OutBounce
     CosineCurve = qt.CosineCurve
@@ -109,15 +110,6 @@ class RollWidget(QWidget):
 
         # 样式表生效
         self.setAttribute(qt.WA_StyledBackground, True)
-
-        self.setStyleSheet('''
-#left_widget{
-background-color:red;
-}
-#right_widget{
-background-color:blue;
-}
-        ''')
 
         # 控件管理系统对象
         self.controls = ControlsSystem()
@@ -133,6 +125,7 @@ background-color:blue;
 
         # 控件默认大小
         self.default_size = QSize(70,50)
+        self.btn_size = QSize(30,30) # 按钮默认大小
 
         # 动画是否启用,持续时间,动画特效
         self.ani_enabled = True
@@ -141,6 +134,7 @@ background-color:blue;
 
         self.Init()
         self.myEvent()
+        self.defaultStyle()
 
     # 初始化
     def Init(self):
@@ -160,11 +154,44 @@ background-color:blue;
         self.hhlay = QHBoxLayout(self.right_widget)
         self.left_btn = QPushButton("<")
         self.right_btn = QPushButton(">")
+        self.left_btn.setObjectName("left_btn")
+        self.right_btn.setObjectName("right_btn")
+        self.left_btn.setFixedSize(self.btn_size)
+        self.right_btn.setFixedSize(self.btn_size)
 
         self.hlay.addWidget(self.left_widget)
         self.hlay.addWidget(self.right_widget)
         self.hhlay.addWidget(self.left_btn)
         self.hhlay.addWidget(self.right_btn)
+
+    # 默认样式
+    def defaultStyle(self):
+        self.setStyleSheet('''
+#left_widget{
+background-color:rgb(208, 208, 208);
+}
+#right_widget{
+background-color: rgb(63, 63, 63);
+}
+#left_btn{
+background-color:transparent;
+border:2px solid #73ffcc;
+color:#73ffcc;
+border-radius:5px;
+}
+#left_btn:hover{
+border:2px solid rgb(204, 204, 204);
+}
+#right_btn{
+background-color:transparent;
+border:2px solid #73ffcc;
+color:#73ffcc;
+border-radius:5px;
+}
+#right_btn:hover{
+border:2px solid rgb(204, 204, 204);
+}
+                ''')
 
     # 设置动画是否启用
     def setAniEnabled(self,b:bool):
