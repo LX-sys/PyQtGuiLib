@@ -365,6 +365,32 @@ removeWidget()
 
 # ----------
 注意: 在使用 removeWidget() 移除控件的时候,控件会被删除掉
+注意: 流式布局 无法 配合 QScrollArea 使用
+```
+
+### 状态栏(RollWidget)
+
+```python
+滚动栏  ----> 90% 测试使用中
+from PyQtGuiLib.core import RollWidget
+
+# -- 信号
+changed # 左右移动时触发信号,并返回当前子控件
+
+# -- 动画效果
+InCurve
+OutBounce
+CosineCurve
+SineCurve
+
+滚动栏 -- RollWidget API介绍
+
+# --- Api
+setAniEnabled() # 设置动画是否启用(默认开启)
+setAniDuration() # 设置持续时间(默认200)
+setAniSpecial() # 设置动画特效(参数就类变量,默认特效:InCurve)
+addWidget() # 添加控件
+buttons()  # 返回两个按钮对象
 ```
 
 ## 控件增强
