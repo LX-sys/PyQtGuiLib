@@ -66,7 +66,6 @@ class ControlsSystem:
     def all(self)->list:
         return self.controls
 
-
     def isEmpty(self)->bool:
         if len(self.controls) == 1:
             return True
