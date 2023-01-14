@@ -85,9 +85,14 @@ class StatusBar(QWidget):
 
         self.hSpacer = QSpacerItem(704, 20, qt.PolicyExpanding, qt.PolicyMinimum)
 
+        self.defaultStyle()
+
         self.updateStatusSize()
 
         self.startTimer(1000)
+
+    def defaultStyle(self):
+        self.setStyleSheet("background-color: rgb(193, 193, 193);")
 
     # 设置时间格式
     def setTimeFormat(self,format:str="%Y-%m-%d %H:%M:%S"):

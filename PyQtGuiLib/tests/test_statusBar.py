@@ -15,7 +15,7 @@ from PyQtGuiLib.core.widgets import (
     BorderlessWidget,     # 无边框矩形QWidget窗口
     )
 
-from PyQtGuiLib.core.widgets import StatusBar,TitleBar
+from PyQtGuiLib.core.widgets import StatusBar
 from PyQtGuiLib.core.progressBar import GradientBar
 
 '''
@@ -33,9 +33,9 @@ border-radius:30px;
 }
         ''')
         # 标题栏
-        self.title = TitleBar(self)
-        self.title.setTitleText("测试状态栏")
-        self.title.setBtnStyle(TitleBar.WinStyle)
+        # self.title = TitleBar(self)
+        # self.title.setTitleText("测试状态栏")
+        # self.title.setBtnStyle(TitleBar.WinStyle)
 
         # 状态栏
         self.status = StatusBar(self)

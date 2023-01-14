@@ -1,22 +1,23 @@
 # -*- coding:utf-8 -*-
-# @time:2022/12/1711:39
+# @time:2023/1/1322:40
 # @author:LX
-# @file:borderlessWidget.py
+# @file:borderlessStackedWidget.py
 # @software:PyCharm
+
 from PyQtGuiLib.core.widgets.borderlessWidgetABC import (
     PYQT_VERSIONS,
     QApplication,
     sys,
     Borderless,
     Public,
-    QWidget,
+    QStackedWidget,
     QMouseEvent,
     QPaintEvent,
 )
 
 
-# 无边框的QWidget
-class BorderlessWidget(QWidget,Public):
+# 无边框的QStackedWidget
+class BorderlessStackedWidget(QStackedWidget,Public):
     def __init__(self,*args,**kwargs):
         self.child_win = True if args else False
         super().__init__(parent_=self,*args,**kwargs)
@@ -44,7 +45,7 @@ class BorderlessWidget(QWidget,Public):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = BorderlessWidget()
+    win = BorderlessStackedWidget()
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
