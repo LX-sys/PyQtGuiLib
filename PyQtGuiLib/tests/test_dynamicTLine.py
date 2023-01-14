@@ -17,10 +17,12 @@ class Test_DynamicTLine(QWidget):
         self.resize(600,600)
 
         self.line = DynamicTLine(self)
+        self.line.setPlaceholderText("hello")
         self.line.move(100,100)
 
         self.line2 = DynamicTLine(self)
         self.line2.move(100,300)
+        self.line.setPlaceholderText("asdsa")
 
 
 if __name__ == '__main__':
