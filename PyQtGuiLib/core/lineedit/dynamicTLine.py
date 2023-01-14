@@ -120,8 +120,17 @@ background-color: transparent;
         self.title.hide()
         self.input.setGeometry(0,self.t_h-1,self.input_w,self.input_h)
 
+        self.setPlaceholderText(self.placeholderText)
+
+    # 设置提示文字
+    def setPlaceholderText(self,text):
+        self.placeholderText = text
         self.input.setPlaceholderText(self.placeholderText)
         self.title.setText(self.placeholderText)
+
+    # 获取文本
+    def text(self)->str:
+        return self.input.text()
 
     # 标题对象
     def label(self)->QLabel:
