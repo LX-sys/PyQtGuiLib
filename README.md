@@ -393,6 +393,19 @@ addWidget() # 添加控件
 buttons()  # 返回两个按钮对象
 ```
 
+### 动态标题输入框(DynamicTLine)
+
+```python
+DynamicTLine   ----> 90% 测试使用中
+from PyQtGuiLib.core.lineedit import DynamicTLine
+
+# --- Api
+setPlaceholderText() # 设置提示文字
+text() # 获取文本
+label() # 返回标题对象
+line()  # 返回输入框对象
+```
+
 ## 控件增强
 
 ### QListWidget 增强 - ListWidget
