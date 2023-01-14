@@ -26,6 +26,7 @@ from PyQtGuiLib.header import (
     textSize
 )
 
+from PyQtGuiLib.core.widgets import BorderlessWidget
 '''
     窗口的标题栏
 '''
@@ -209,7 +210,7 @@ class PegButton(ButtonIcon):
             painter.drawRoundedRect(rect_c, self.w // 2, self.h // 2)
 
 
-class TitleBar(QWidget):
+class TitleBar(BorderlessWidget):
 
     # 标题的位置
     Title_Left = "TextLeft"
@@ -228,11 +229,15 @@ class TitleBar(QWidget):
 
         # 样式表生效
         self.setAttribute(qt.WA_StyledBackground,True)
+        self.setBorderStyle(qt.NoPen)
 
         self.__parent = None #  type:QWidget
 
         if args:
             self.__parent = args[0]
+
+        # 默认半径
+        self.setRadius((self.radius()[0],0))
 
         # 标题位置
         self.title_pos = TitleBar.Title_Left
@@ -253,12 +258,15 @@ class TitleBar(QWidget):
         self.old_screen_geometry = QRect(0,0,0,0) # type:QRect
         self.screen_state = False
 
+        # 边距
+        self.padding = self.borderWidth()
+
         # 动画时长
         self.ani_msec = 300  # 毫秒
 
         if self.__parent is not None:
-            self.move(0,0)
-            self.resize(self.__parent.width(),self.h)
+            self.move(self.padd(),self.padd())
+            self.resize(self.__parent.width()-self.padd()*2,self.h)
 
         # 创建缩小,放大,关闭,钉住 按钮
         self.zm = ZoomButton(self)
@@ -272,6 +280,10 @@ class TitleBar(QWidget):
         # 设置标题设置
         self.setTitlePos(TitleBar.Title_Center)
         self.updateTitleSize()  # 更新标题栏位置
+
+    # 边距
+    def padd(self)->int:
+        return self.padding
 
     def setTitleText(self,text:str):
         self.title_text = text
@@ -356,6 +368,7 @@ class TitleBar(QWidget):
             self.__parent.setWindowIcon(QIcon(self.title_icon_path))
 
     def paintEvent(self, event: QPaintEvent) -> None:
+        super().paintEvent(event)
         painter = QPainter(self)
 
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
@@ -476,14 +489,13 @@ class TitleBar(QWidget):
                 self.peg.is_flag = False
                 self.__parent.windowHandle().setFlags(self.windowFlags() | qt.Widget|qt.FramelessWindowHint|qt.Window)
             self.__parent.show()
-            self.__parent.update()
-
-
+            self.__parent.repaint()
+            # self.__parent.update()
 
     # 更新标题栏大小
     def updateTitleSize(self) -> None:
-        self.move(0, 0)
-        self.resize(self.__parent.width(), self.h)
+        self.move(self.padd(), self.padd())
+        self.resize(self.__parent.width()-self.padd()*2, self.h+self.padd()*2)
 
         # 自动计算 缩小,放大,关闭 的位置
         btn_w_interval = 15 # 按钮直接的间隔
