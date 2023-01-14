@@ -31,7 +31,6 @@ class TestNoBorder(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
-
         self.setStyleSheet('''
 #widget{
 background-color:#d4d4d4;

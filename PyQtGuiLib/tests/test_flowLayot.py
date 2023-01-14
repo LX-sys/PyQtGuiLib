@@ -21,8 +21,7 @@ class TestFlowLayout(BorderlessWidget):
         # self.setWindowTitle("流式布局 测试用例")
         self.tit = TitleBar(self)
         self.tit.setTitleText("流式布局 测试用例")
-        self.setStyleSheet('''background-color:rgb(240, 237, 255);''')
-
+        # self.tit.setStyleSheet('''background-color:rgb(240, 237, 255);''')
 
         self.items = []
 

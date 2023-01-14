@@ -9,7 +9,8 @@ from PyQtGuiLib.header import (
     QApplication,
     QWidget,
     QColor,
-    QResizeEvent
+    QResizeEvent,
+    qt
 )
 
 from PyQtGuiLib.core.widgets import (
@@ -29,21 +30,29 @@ class TestTitleBar(BorderlessWidget):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
 
+        self.setRadius(9)
+
         self.setStyleSheet('''
 #widget{
 background-color:#d4d4d4;
 border-radius:30px;
 }
         ''')
-        # self.setEnableGColor(True)
+        self.setWindowColor(QColor(244, 161, 145))
 
         self.tbar = TitleBar(self)
         self.tbar.setTitlePos(TitleBar.Title_Center)
         self.tbar.setTitleText("测试标题栏")
-        self.tbar.setTitleColor(QColor(0,0,0,255))
-        # self.tbar.setTitleIcon(r"/Applications/Python 3.8/save/PyQtGuiLib/PyQtGuiLib/tests/image/1.png")
+        self.tbar.setEnableGColor(True)
+        self.tbar.setWindowGColor(
+            [
+            (0.3,QColor(12,45,123,30)),(0.9,QColor(12,45,123,30)),(0.4,QColor(255, 170, 127,100))
+             ])
+
+        # self.tbar.setTitleColor(QColor(0,0,0,255))
+        # self.tbar.setTitleIcon(r"D:\code\PyQtGuiLib\PyQtGuiLib\tests\temp_image\11.jpg")
         self.tbar.setBtnStyle(TitleBar.MacStyle)
-        self.tbar.setStyleSheet("background-color: transparent;")
+        # self.tbar.setWindowColor(QColor(123,44,44,30))
 
     def resizeEvent(self, event:QResizeEvent) -> None:
         super().resizeEvent(event)
