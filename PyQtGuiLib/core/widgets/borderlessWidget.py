@@ -23,7 +23,8 @@ from PyQtGuiLib.header import (
     QColor,
     QLinearGradient,
     QRect,
-    QSize
+    QSize,
+    Qt
 )
 '''
     无边框窗口
@@ -64,9 +65,10 @@ class Borderless:
         self.pressState = False  # 按下状态
         self.movePressState = False  # 记录移动时是否时按下的状态
 
-        # -------------
         # 圆角半径,注意这个值不要高于 8 否则四个斜角将失去拉伸功能
-        self.r = 7
+        self.r = (7, 7)
+
+        # -------------
 
         # 背景颜色,边框颜色,边的宽度,画笔风格
         self.w_color = QColor(240, 240, 240,255)
@@ -220,7 +222,7 @@ class Borderless:
         rect_.setWidth(rect_.width()-2)
         rect_.setHeight(rect_.height()-2)
 
-        painter.drawRoundedRect(rect_, self.r, self.r)
+        painter.drawRoundedRect(rect_, self.r[0],self.r[1])
 
         painter.end()
 
@@ -233,30 +235,36 @@ class Public:
 
     def __init__(self,parent_:QWidget,*args,**kwargs):
         self.parent = parent_
-
         # 处理父类 公用方法
         self.parent.setAttribute(qt.WA_TranslucentBackground)
-        self.parent.setWindowFlags(FramelessWindowHint | qt.Window)
+        self.parent.setWindowFlags(FramelessWindowHint | qt.Widget)
         self.parent.setMouseTracking(True)  # 开启鼠标跟踪
 
+        # 加上阴影后会出BUG
         # self.geffect = QGraphicsDropShadowEffect(self.parent)
         # self.geffect.setOffset(0, 0)
         # self.geffect.setBlurRadius(10)
-        # self.geffect.setColor(QColor(231, 0, 0,50))
+        # self.geffect.setColor(QColor(231, 0, 0,250))
         # self.parent.setGraphicsEffect(self.geffect)
 
         self.borderless = Borderless()
 
     # 设置圆角半径
-    def setRadius(self,r:int):
-        self.borderless.r = r
+    def setRadius(self,r):
+        if isinstance(r,int):
+            self.borderless.r = (r,r)
+        else:
+            self.borderless.r = r
 
-    def radius(self)->int:
+    def radius(self)->tuple:
         return self.borderless.r
+
+    def borderWidth(self)->int:
+        return self.borderless.border_width
 
     # 设置窗体颜色
     def setWindowColor(self,color:QColor):
-        self.is_e_gcolor = False
+        self.borderless.is_e_gcolor = False
         self.borderless.w_color = color
 
     # 设置边框颜色
@@ -270,13 +278,13 @@ class Public:
 
     # 设置窗体渐变色
     def setWindowGColor(self,colos:list,direction="horizontal"):
-        self.is_e_gcolor = True
+        self.borderless.is_e_gcolor = True
         self.borderless.w_g_color = colos
         self.borderless.w_g_direction = direction
 
     # 设置变框风格
     def setBorderStyle(self,style):
-        self.open_style = style
+        self.borderless.open_style = style
 
     # 设置边的宽度
     def setBorderWidth(self,w:int):
@@ -308,19 +316,23 @@ class BorderlessMainWindow(QMainWindow,Public):
 # 无边框的QWidget
 class BorderlessWidget(QWidget,Public):
     def __init__(self,*args,**kwargs):
+        self.child_win = True if args else False
         super().__init__(parent_=self,*args,**kwargs)
         self.resize(800, 500)
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
-        self.borderless.pressEvent(self,e)
+        if not self.child_win:
+            self.borderless.pressEvent(self,e)
         super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e:QMouseEvent) -> None:
-        self.borderless.releaseEvent()
+        if not self.child_win:
+            self.borderless.releaseEvent()
         super().mouseReleaseEvent(e)
 
     def mouseMoveEvent(self, e:QMouseEvent) -> None:
-        self.borderless.moveEvent(self,e)
+        if not self.child_win:
+            self.borderless.moveEvent(self,e)
         super().mouseMoveEvent(e)
 
     def paintEvent(self, e: QPaintEvent) -> None:
