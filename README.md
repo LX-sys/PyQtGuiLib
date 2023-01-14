@@ -404,6 +404,7 @@ setPlaceholderText() # 设置提示文字
 text() # 获取文本
 label() # 返回标题对象
 line()  # 返回输入框对象
+
 ```
 
 ## 控件增强
