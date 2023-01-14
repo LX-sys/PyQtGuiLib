@@ -16,7 +16,7 @@ from PyQtGuiLib.header import (
 '''
     流式布局
 '''
-
+from PyQt5.QtCore import Qt
 class FlowLayout(QLayout):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -79,7 +79,7 @@ class FlowLayout(QLayout):
             if spaceY == -1:
                 spaceX = wid.style().layoutSpacing(qt.PolicyPushButton,qt.PolicyPushButton,qt.Vertical)
             nextX = x+w.sizeHint().width() + spaceX
-            if nextX - spaceX > offrect.right() and lineHeight >0:
+            if (nextX - spaceX) > offrect.right() and lineHeight >0:
                 x = offrect.x()
                 y = y + lineHeight + spaceY
                 nextX = x+w.sizeHint().width()+spaceX
@@ -108,9 +108,9 @@ class FlowLayout(QLayout):
         parent = self.parent()
         if not parent:
             return -1
-        # elif parent.isWidgetType():
-        #     pw = QWidget()
-        #     return pw.style().pixelMetric(pm,None,pw)
+        elif parent.isWidgetType():
+            pw = QWidget()
+            return pw.style().pixelMetric(pm,None,pw)
         else:
             return self.spacing()
 
@@ -123,6 +123,10 @@ class FlowLayout(QLayout):
                 self.items.remove(it)
                 w.deleteLater()
                 break
+
+    # 这个方法如果返回 Flase 那么高度不在被限制
+    def hasHeightForWidth(self) -> bool:
+        return True
 
     def __del__(self):
         for w in self.items: # type:QWidget
