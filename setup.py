@@ -11,7 +11,7 @@ from setuptools import find_packages
 setup(
     name="PyQtGuiLib",
     packages =find_packages(),
-    version="1.2.12.5",
+    version="1.2.13.6",
     author="LX",
     author_email = "lx984608061@163.com",
     description = "Python version of the qt component library.",
