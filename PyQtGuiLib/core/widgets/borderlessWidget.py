@@ -251,6 +251,9 @@ class Public:
     def setRadius(self,r:int):
         self.borderless.r = r
 
+    def radius(self)->int:
+        return self.borderless.r
+
     # 设置窗体颜色
     def setWindowColor(self,color:QColor):
         self.is_e_gcolor = False
