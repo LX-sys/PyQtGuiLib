@@ -83,7 +83,6 @@ class StatusBar(QWidget):
         if is_mac_sys:
             self.__hlay.setSpacing(6*3)
 
-        QSizePolicy.Policy.Expanding
         self.hSpacer = QSpacerItem(704, 20, qt.PolicyExpanding, qt.PolicyMinimum)
 
         self.updateStatusSize()
@@ -160,7 +159,6 @@ class StatusBar(QWidget):
         self.__addSpacer()
 
     def updateStatusSize(self):
-
         if self.status_pos == StatusBar.PosTop:
             self.move(0, 0)
             self.resize(self.__parent.width(), self.h)
