@@ -17,6 +17,7 @@ from PyQtGuiLib.header import (
     QColorDialog
 )
 from functools import partial
+from PyQtGuiLib.styles.builtStyleDesigner.controlConfig import StyleConfig
 from PyQtGuiLib.styles.builtStyleDesigner.builtStyleDesignerUI import BuiltStyleDesignerUI
 from PyQtGuiLib.styles import ButtonStyle
 '''
@@ -24,11 +25,7 @@ from PyQtGuiLib.styles import ButtonStyle
     内置-样式设计器
 '''
 
-# 加载配置文件
-def loadConfig()->dict:
-    with open("controlConfig.json", "r",encoding="utf8") as f:
-        data = json.load(f)
-    return data
+
 
 
 class BuiltStyleDesigner(BuiltStyleDesignerUI):
@@ -37,7 +34,7 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
         self.resize(1100, 850)
 
         # 从配置文件中读取
-        self.createTree(loadConfig())
+        self.createTree(StyleConfig.getConfig())
 
         # 判断是否已经创建的控件,控件列表,控件数量
         self.is_Controls = False
