@@ -1,14 +1,8 @@
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    QApplication,
-    sys,
     QWidget,
-    QPen,
     QBrush,
     QPainter,
-    QSize,
     QRect,
-    QPoint,
     QColor,
     QPaintEvent,
     QMouseEvent,
@@ -19,8 +13,6 @@ from PyQtGuiLib.header import (
 '''
     开关按钮
 '''
-from random import randint
-
 class SwitchButton(QWidget):
     clicked = Signal(bool)
 
@@ -162,15 +154,3 @@ class SwitchButton(QWidget):
         elif self.is_switch and self.ellipse_x >= 2:
             self.ellipse_x -= (self.width()-self.height()-3)//20
             self.repaint()
-
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = SwitchButton()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
