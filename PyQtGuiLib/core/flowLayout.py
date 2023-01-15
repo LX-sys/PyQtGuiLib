@@ -16,7 +16,7 @@ from PyQtGuiLib.header import (
 '''
     流式布局
 '''
-from PyQt5.QtCore import Qt
+
 class FlowLayout(QLayout):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)

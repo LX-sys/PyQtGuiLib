@@ -397,7 +397,7 @@ buttons()  # 返回两个按钮对象
 
 ```python
 DynamicTLine   ----> 90% 测试使用中
-from PyQtGuiLib.core.lineedit import DynamicTLine
+导入方式 from PyQtGuiLib.core.lineedit import DynamicTLine
 
 # --- Api
 setPlaceholderText() # 设置提示文字
@@ -406,9 +406,27 @@ label() # 返回标题对象
 line()  # 返回输入框对象
 
 ```
+### 开关按钮
+```python
+SwitchButton  --> 95% 测试使用中
+导入方式 from PyQtGuiLib.core.switchButtons import SwitchButton
 
+# --- 信号
+clicked  # 点击时触发
+# --- 类变量
+Shape_Circle  # 圆形
+Shape_Square  # 方向
+
+# --- Api
+setDefaultState()  # 设置默认状态
+state()  # 返回当前的状态
+setShape() # 设置形状
+setBgColor() # 设置背景颜色 参数 格式 {"false":QColor,"true":QColor}
+setBallColor() # 设置运行球的颜色 格式 {"false":QColor,"true":QColor}
+
+# --------
+```
 ## 控件增强
-
 ### QListWidget 增强 - ListWidget
 
 ```python
