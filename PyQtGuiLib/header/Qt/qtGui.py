@@ -25,6 +25,7 @@ if PYQT_VERSIONS == "PyQt5":
         QPalette,
         QPixmap,
         QIcon,
+        QImage
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -54,6 +55,7 @@ if PYQT_VERSIONS == "PyQt6":
         QIcon,
         QAction,
         QGuiApplication as DesktopWidget,
+        QImage
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -82,6 +84,7 @@ if PYQT_VERSIONS == "PySide2":
         QPixmap,
         QIcon,
         QGuiApplication as DesktopWidget,
+        QImage
     )
 
 
@@ -112,4 +115,5 @@ if PYQT_VERSIONS == "PySide6":
         QIcon,
         QAction,
         QGuiApplication as DesktopWidget,
+        QImage
     )
