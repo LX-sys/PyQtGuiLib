@@ -426,6 +426,7 @@ setBallColor() # 设置运行球的颜色 格式 {"false":QColor,"true":QColor}
 
 # --------
 ```
+### 调色版
 ```python
 ColorPalette --> 99% 测试使用中
 导入方式 from PyQtGuiLib.core import ColorPalette
