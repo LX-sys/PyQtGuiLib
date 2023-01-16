@@ -38,6 +38,8 @@ class Test(QWidget):
         self.bu.setAnimationEnabled(True)
         self.bu.setTrack(self.btn)
         self.bu.setText("你好世界")
+
+
         # self.bu.setText("hello world")
 
         self.bu.finished.connect(lambda :print("111111111"))
