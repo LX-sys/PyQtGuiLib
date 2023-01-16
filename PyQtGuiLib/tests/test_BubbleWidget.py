@@ -32,17 +32,18 @@ class Test(QWidget):
 
         # 气泡控件
         self.bu = BubbleWidget(self)
-        self.bu.resize(200,60)
-        self.bu.setDirection(BubbleWidget.Down)
-        self.bu.setDurationTime(BubbleWidget.Be_Forever)
-        self.bu.setAnimationEnabled(True)
-        self.bu.setTrack(self.btn)
-        self.bu.setText("你好世界")
-
-
-        # self.bu.setText("hello world")
-
-        self.bu.finished.connect(lambda :print("111111111"))
+        self.bu.move(100,100)
+        self.bu.resize(200,80)
+        # self.bu.setDirection(BubbleWidget.Down)
+        # self.bu.setDurationTime(BubbleWidget.Be_Forever)
+        # self.bu.setAnimationEnabled(True)
+        # self.bu.setTrack(self.btn)
+        # self.bu.setText("你好世界")
+        #
+        #
+        # # self.bu.setText("hello world")
+        #
+        # self.bu.finished.connect(lambda :print("111111111"))
         # self.bu.move(80,100) # 如果不想手动设置位置可以用下面控件追踪功能
 
         # # --------
