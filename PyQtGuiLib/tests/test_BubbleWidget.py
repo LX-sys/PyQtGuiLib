@@ -27,13 +27,13 @@ class Test(QWidget):
 
 
         self.btn = QPushButton("一号玩家",self)
-        self.btn.resize(130,100)
+        self.btn.resize(130,60)
         self.btn.move(200,200)
 
         # 气泡控件
         self.bu = BubbleWidget(self)
-        self.bu.resize(150,100)
-        self.bu.setDirection(BubbleWidget.Top)
+        self.bu.resize(200,60)
+        self.bu.setDirection(BubbleWidget.Down)
         self.bu.setDurationTime(BubbleWidget.Be_Forever)
         self.bu.setAnimationEnabled(True)
         self.bu.setTrack(self.btn)
