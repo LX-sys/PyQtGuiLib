@@ -2,7 +2,8 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
     sys,
-    QWidget
+    QWidget,
+    QPushButton
 )
 
 '''
@@ -16,9 +17,15 @@ class Test_ColorPalette(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
 
-        self.cp = ColorPalette(self)
+        self.btn = QPushButton("弹出调色版",self)
+        self.btn.clicked.connect(self.test)
+
+
+        self.cp = ColorPalette()
         self.cp.move(10,10)
 
+    def test(self):
+        self.cp.show()
 
 
 if __name__ == '__main__':
