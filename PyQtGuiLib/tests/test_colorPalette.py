@@ -17,15 +17,13 @@ class Test_ColorPalette(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
 
-        self.btn = QPushButton("弹出调色版",self)
-        self.btn.clicked.connect(self.test)
-
-
-        self.cp = ColorPalette()
+        self.cp = ColorPalette(self)
         self.cp.move(10,10)
+        self.cp.clicked.connect(lambda t,c:print(t,c))
+        self.cp.colorNamed.connect(self.test)
 
-    def test(self):
-        self.cp.show()
+    def test(self,rgba):
+        print(self.cp.getRGBA())
 
 
 if __name__ == '__main__':
