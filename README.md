@@ -413,6 +413,7 @@ SwitchButton  --> 95% 测试使用中
 
 # --- 信号
 clicked  # 点击时触发
+
 # --- 类变量
 Shape_Circle  # 圆形
 Shape_Square  # 方向
@@ -431,8 +432,20 @@ setBallColor() # 设置运行球的颜色 格式 {"false":QColor,"true":QColor}
 ColorPalette --> 99% 测试使用中
 导入方式 from PyQtGuiLib.core import ColorPalette
 
+# --- 类变量
+Style_Black  # 黑色窗口风格
+Style_White  # 白色窗口风格
+Style_None   # 没有窗口风格
+
 # --- 信号
-rgbaChange  颜色改变时触发
+rgbaChange  颜色改变时触发,返回的元组 (r,g,b,a)
+colorNamed  颜色改变时触发,反正字符串 十六进制颜色名称
+clicked     点击获取颜色按钮时触发,同时返回以上两种参数
+
+# --- APi
+setStyleMode() # 设置窗体本身的风格
+getHexName()  # 当前当前十六进制颜色
+getRGBA() # 返回当前RGBA颜色
 ```
 ## 控件增强
 ### QListWidget 增强 - ListWidget
