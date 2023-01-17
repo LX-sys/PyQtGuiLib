@@ -18,12 +18,13 @@ class Test_ColorPalette(QWidget):
         self.resize(600,600)
 
         self.cp = ColorPalette(self)
+        self.cp.setStyleMode(ColorPalette.Style_White)
         self.cp.move(10,10)
         self.cp.clicked.connect(lambda t,c:print(t,c))
         self.cp.colorNamed.connect(self.test)
 
     def test(self,rgba):
-        print(self.cp.getRGBA())
+        print("-->",self.cp.getRGBA())
 
 
 if __name__ == '__main__':

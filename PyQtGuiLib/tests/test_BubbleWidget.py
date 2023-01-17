@@ -31,9 +31,18 @@ class Test(QWidget):
         self.btn.move(200,200)
 
         # 气泡控件
-        self.bu = BubbleWidget(self)
-        self.bu.move(100,100)
-        self.bu.resize(200,80)
+        self.bu_top = BubbleWidget(self)
+        self.bu_top.move(100,100)
+        self.bu_top.resize(150,70)
+
+        self.bu_top.setStyleSheet('''
+BubbleWidget[ss="1"]{
+/*qproperty-rectColor: rgb(255, 170, 0);*/
+color: rgb(170, 85, 255);
+font-size:25pt;
+}
+        ''')
+        print(self.property("ss"))
         # self.bu.setDirection(BubbleWidget.Down)
         # self.bu.setDurationTime(BubbleWidget.Be_Forever)
         # self.bu.setAnimationEnabled(True)
