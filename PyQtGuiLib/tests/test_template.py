@@ -2,7 +2,16 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
     sys,
-    QWidget
+    QWidget,
+    qt,
+    QPushButton,
+    Qt,
+    QPalette,
+    QColor,
+    QPaintEvent,
+    QPainter,
+    QBrush,
+    QSize,
 )
 
 '''
@@ -13,8 +22,6 @@ class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
-
-
 
 
 if __name__ == '__main__':
