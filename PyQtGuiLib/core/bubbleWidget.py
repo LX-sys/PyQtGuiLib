@@ -64,6 +64,17 @@ class BubbleWidget(QWidget):
         lien_x = self.width() // 2 - line_w // 2  # 线的位置-水平
         line_y = self.height()//2 - line_w//2  # 线的位置-垂直
 
+
+        # 绘制文字
+        f = QFont()
+        f.setPointSize(10)
+        painter.setFont(f)
+        # 文字大小
+        fs = textSize(f, self.text)
+        fw = fs.width()
+        fh = fs.height()
+        test_fh = 0 # 文字高
+
         # 画刷
         bru = QBrush(self.rect_color)
         painter.setBrush(bru)
@@ -78,42 +89,40 @@ class BubbleWidget(QWidget):
                      ]
             # 画矩形
             rect = QRect(self.margin,triangle_h+self.margin,self.width()-self.margin*2,rect_h-self.margin*2)
+
+            test_fh = fh//2+triangle_h
         elif self.direction == BubbleWidget.Left:
             # 画三角
             ploys = [QPointF(1,line_y),QPointF(triangle_h,line_y-line_w//2),
                      QPointF(triangle_h,line_y+line_w//2)
             ]
-            rect = QRect(triangle_h+self.margin,self.margin,rect_w,self.height())
+            rect = QRect(triangle_h+self.margin,self.margin,rect_w,self.height()-self.margin*2)
+            test_fh = fh+self.margin
         elif self.direction == BubbleWidget.Right:
             # 画三角
             ploys =[QPointF(rect_w,line_y-line_w//2),QPointF(rect_w+triangle_h,line_y),
                     QPointF(rect_w,line_y+line_w//2)
             ]
-            rect = QRect(self.margin,self.margin,rect_w-self.margin*2,rect_h)
+            rect = QRect(self.margin,self.margin,rect_w-self.margin*2,self.height()-self.margin)
+            test_fh = fh + self.margin
         else: # Down
             rect = QRect(self.margin,self.margin,self.width()-self.margin*2,rect_h-self.margin*2)
             # 画三角
             ploys =[QPointF(lien_x,rect_h),
                     QPointF(lien_x+line_w//2,rect_h+triangle_h),
                     QPointF(lien_x+line_w,rect_h)]
+            test_fh = fh // 2
         # ----
 
         painter.drawRoundedRect(rect, self.radius, self.radius)
         ppath.addPolygon(QPolygonF(ploys))
         painter.fillPath(ppath, self.triangle_color)
 
-        # 绘制文字
-        f = QFont()
-        f.setPointSize(10)
-        painter.setFont(f)
-        # 文字大小
-        fs = textSize(f, self.text)
-        fw = fs.width()
-        fh = fs.height()
+
         op = QPen()
         op.setColor(QColor(255, 255, 255))
         painter.setPen(op)
-        painter.drawText(self.width() // 2 - fw // 2, rect_h // 2 + fh // 2, self.text)
+        painter.drawText(self.width() // 2 - fw // 2, rect_h // 2 + test_fh, self.text)
 
     def paintEvent(self, e:QPaintEvent) -> None:
         painter = QPainter(self)
