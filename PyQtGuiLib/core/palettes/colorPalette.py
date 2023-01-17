@@ -17,7 +17,8 @@ from PyQtGuiLib.header import (
     QLabel,
     QSpinBox,
     QFormLayout,
-    QLineEdit
+    QLineEdit,
+    QPushButton
 )
 
 '''
@@ -54,7 +55,7 @@ class ColorLump(QWidget):
         # 当前颜色值
         self._RGBA = [255, 255, 255, 255]
         # 颜色的十六进制
-        self._colorHex = ""
+        self._colorHex = "#ffffff"
 
         self.pix2 = QPixmap(256, 256)
         self.pix2.fill(qt.transparent)
@@ -114,9 +115,9 @@ class ColorLump(QWidget):
         :param e:
         :return:
         '''
-        if (e.x() >= 0 + self._pPos_x and
+        if (e.x() >= -5 + self._pPos_x and
                 e.x() <= self._pPos_x + 255 - self.ellipse_r * 2 and
-                e.y() >= 0 + self._pPos_y and
+                e.y() >= -5 + self._pPos_y and
                 e.y() <= self._pPos_y + 255 - self.ellipse_r * 2
         ):
             self._mouse_X = e.x() - self._pPos_x
@@ -125,6 +126,13 @@ class ColorLump(QWidget):
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         self._setMousePos(e)
+        # print()
+        rgba = self.hsvToRgba(self.tonal_value, e.x(), e.y())
+        self._RGBA[0] = rgba[0]
+        self._RGBA[1] = rgba[1]
+        self._RGBA[2] = rgba[2]
+        self._RGBA[3] = rgba[3]
+        self.moveed.emit(*rgba)
 
     def mouseMoveEvent(self, e: QMouseEvent) -> None:
         self._setMousePos(e)
@@ -159,10 +167,24 @@ class ColorLump(QWidget):
 
 
 class ColorPalette(QWidget):
+    # 信号
     rgbaChange = Signal(tuple)
+    colorNamed = Signal(str) # 只返回十六进制名称
+    clicked = Signal(tuple,str) # 点击事件
+
+    # 风格
+    Style_Black = "black"
+    Style_White = "white"
+    Style_None = "none"
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.setFixedSize(255+120+2,300)
+        self.setWindowTitle("调色版")
+
+        # 风格
+        self.styleMode = ColorPalette.Style_None
+        self.setStyleMode(self.styleMode)
 
         self.Init()
         self.myEvent()
@@ -207,7 +229,7 @@ class ColorPalette(QWidget):
 
         # 右边布局
         self.f_lay = QFormLayout(self.rigth_widget)
-        self.f_lay.setContentsMargins(1,5,5,1)
+        self.f_lay.setContentsMargins(1,5,3,1)
         self.red_label = QLabel("红(R)")
         self.green_label = QLabel("绿(G)")
         self.blue_label = QLabel("蓝(B)")
@@ -218,6 +240,10 @@ class ColorPalette(QWidget):
         self.blue_sp = QSpinBox()
         self.a_sp = QSpinBox()
         self.er_line = QLineEdit()
+        # 获取颜色按钮
+        self.colorBtn = QPushButton("获取颜色")
+        self.colorBtn.setObjectName("colorBtn")
+        self.colorBtn.setFixedHeight(30)
 
         self.red_sp.setMaximum(255)
         self.green_sp.setMaximum(255)
@@ -233,11 +259,58 @@ class ColorPalette(QWidget):
         self.f_lay.addRow(self.blue_label,self.blue_sp)
         self.f_lay.addRow(self.a_label, self.a_sp)
         self.f_lay.addRow(self.er_label,self.er_line)
+        self.f_lay.setWidget(self.f_lay.rowCount(),QFormLayout.SpanningRole,self.colorBtn)
+
+    def setStyleMode(self,mode:str):
+        self.styleMode = mode
+        self.updateStyle()
+
+    # 更新风格
+    def updateStyle(self):
+        if self.styleMode == ColorPalette.Style_Black:
+            self.setStyleSheet('''
+            *{
+            font: 11pt "黑体";
+            background-color: rgb(0, 0, 0);
+            color:rgb(255, 255, 255);
+            }
+            #colorBtn:hover{
+            border:1px solid rgb(255, 255, 255);
+            font-size:10pt;
+            }
+            #colorBtn,#colorBtn:pressed{
+            border:2px solid rgb(255, 255, 255);
+            font-size:11pt;
+            }
+
+                    ''')
+        elif self.styleMode == ColorPalette.Style_White:
+            self.setStyleSheet('''
+            *{
+            font: 11pt "黑体";
+            background-color: rgb(255, 255, 255);
+            color:rgb(0, 0, 0);
+            }
+            #colorBtn:hover{
+            border:1px solid rgb(0, 0, 0);
+            font-size:10pt;
+            }
+            #colorBtn,#colorBtn:pressed{
+            border:2px solid rgb(0, 0, 0);
+            font-size:11pt;
+            }
+                    ''')
 
     def myEvent(self):
         self.chsv.hsvChange.connect(self.hsv_event)
         self.slider.valueChanged.connect(self.slider_event)
         self.color_lump.moveed.connect(self.updateRGBSP)
+        self.colorBtn.clicked.connect(lambda :self.clicked.emit(tuple(self.color_lump._RGBA),self.color_lump._colorHex))
+
+    # 发送信号
+    def sendSignl(self):
+        self.rgbaChange.emit(tuple(self.color_lump._RGBA))
+        self.colorNamed.emit(self.color_lump._colorHex)
 
     def updateRGBSP(self,r,g,b,a):
         self.red_sp.setValue(r)
@@ -245,6 +318,8 @@ class ColorPalette(QWidget):
         self.blue_sp.setValue(b)
         self.a_sp.setValue(a)
         self.er_line.setText(self.color_lump._colorHex)
+        # 发送信号
+        self.sendSignl()
 
     def hsv_event(self,hsv):
         self.color_lump.tonal_value = hsv
@@ -255,7 +330,15 @@ class ColorPalette(QWidget):
         self.updateRGBSP(*rgba)
         self.update()
         # 发送信号
-        self.rgbaChange.emit(tuple(self.color_lump._RGBA))
+        self.sendSignl()
+
+    # 返回当前十六进制颜色
+    def getHexName(self) -> str:
+        return self.color_lump._colorHex
+
+    # 返回当前RGBA颜色
+    def getRGBA(self) -> tuple:
+        return tuple(self.color_lump._RGBA.copy())
 
     # 滑块事件
     def slider_event(self,v):
@@ -263,10 +346,12 @@ class ColorPalette(QWidget):
         self.color_lump._alpha = int(v // (100 / 255))
         self.a_sp.setValue(self.color_lump._alpha)
         self.color_lump._RGBA[3]=self.color_lump._alpha
+        # 发送信号
         self.rgbaChange.emit(tuple(self.color_lump._RGBA))
         # 更新图像
         self.color_lump.updatePreview()
         self.update()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
