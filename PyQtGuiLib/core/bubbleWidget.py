@@ -73,7 +73,8 @@ class BubbleWidget(QWidget):
         fs = textSize(f, self.text)
         fw = fs.width()
         fh = fs.height()
-        test_fh = 0 # 文字高
+        test_fh = 0 # 文字垂直居中
+        test_fw = 0 # 文字水平居中
 
         # 画刷
         bru = QBrush(self.rect_color)
