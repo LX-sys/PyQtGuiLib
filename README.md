@@ -11,7 +11,7 @@
 ### python下qt支持的版本
 
 ```
-pyside2, pyside6, pyqt5, pyqt6
+pyside2, pyside6, pyqt5, pyqt6 
 ```
 
 ### 系统支持
