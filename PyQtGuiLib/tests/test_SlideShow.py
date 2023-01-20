@@ -27,17 +27,15 @@ class Test(QWidget):
 
         # 窗口轮播功能
         self.ss = SlideShow(self)
-        # self.ss.setAinDirectionMode((SlideShow.Ani_Up,SlideShow.Ani_Down))
-        # self.ss.setAutoSlideShow(True,direction=SlideShow.Ani_Down,is_not_show_btn=False)
-        # self.ss.setHideButtons(True)
+        # self.ss.setButtonsHide(True)
         self.ss.move(50,50)
         self.ss.resize(600,200)
         self.test()  # 添加测试窗口
 
-        self.ss.switchWidgeted.connect(self.my_event)
+        self.ss.changeWidget.connect(self.my_event)
 
-    def my_event(self,index:int):
-        print("当前索引:",index)
+    def my_event(self,widget:QWidget):
+        print("当前窗口:",widget)
         # if self.flag:
         #     self.ss.removeWidget(2)
         #     self.flag = False

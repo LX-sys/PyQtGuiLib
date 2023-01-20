@@ -18,7 +18,8 @@ if PYQT_VERSIONS == "PyQt5":
         QSequentialAnimationGroup,
         QParallelAnimationGroup,
         QMargins,
-        QModelIndex
+        QModelIndex,
+        pyqtProperty
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -39,7 +40,8 @@ if PYQT_VERSIONS == "PyQt6":
         QSequentialAnimationGroup,
         QParallelAnimationGroup,
         QMargins,
-        QModelIndex
+        QModelIndex,
+        pyqtProperty
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -60,7 +62,8 @@ if PYQT_VERSIONS == "PySide2":
         QSequentialAnimationGroup,
         QParallelAnimationGroup,
         QMargins,
-        QModelIndex
+        QModelIndex,
+        pyqtProperty
     )
 if PYQT_VERSIONS == "PySide6":
     from PySide6.QtCore import (
@@ -80,5 +83,6 @@ if PYQT_VERSIONS == "PySide6":
         QSequentialAnimationGroup,
         QParallelAnimationGroup,
         QMargins,
-        QModelIndex
+        QModelIndex,
+        pyqtProperty
     )

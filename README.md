@@ -115,32 +115,26 @@ setBorderWidth() # 设置边的宽度
 导入方式 from PyQtGuiLib.core import BubbleWidget
 
 气泡窗口 -- BubbleWidget API介绍
+
 # ---类变量
 Top  # 气泡方向 - 上
 Down
 Left
 Right
 
-Be_Forever # 如果将气泡的持续时间这个为这个,气泡将永远不会消失
 # ---API
-setAnimationEnabled() # 是否启用气泡启动动画
-setDurationTime() # 气泡持续时间
-setTrack() # 追踪控件(气泡会一直依附在控件周围)
-setText()  # 设置文本
-setTextColor() # 设置文本颜色
-setTextSize()  # 设置文本大小
-setAllText() # 同时设置文本,大小,颜色
-setKmPos() # 设置三角形的位置
-setKmDiameter() # 设置三角形的垂直高度
-setKmM() # 设置三角形的开口大小
-setKm() # 同时设置三角形的位置,垂直高度,开口大小
-setDirection() # 设置气泡的方向
-setBColor() # 设置背景颜色
+setDirection()  # 设置气泡箭头方向
+setText() # 设置文字(窗口会随着文字大小而改变)
+setTrack() # 控件追踪(自动出现在控件的周围)
 
-# 注意在气泡动画和持续时间同时开启时
-设置持续时间的代码一定要在,设置启动动画的前面
-# 注意在设置方向和追踪时
-设置方向的代码一定要在追踪前面
+# ----全新的QSS 设置样式例子
+BubbleWidget{
+qproperty-backgroundColor: rgba(165, 138, 255,200);  /*气泡背景颜色*/
+qproperty-radius:10;   /*气泡圆角大小*/
+qproperty-fontSize:12;  /*文字大小*/
+qproperty-arrowsSize:20; /*气泡小三角的大小*/
+qproperty-margin:3; /*文本框个小三角之间的距离*/
+}
 ```
 
 ### 靠边窗口(PullOver)
@@ -241,16 +235,16 @@ setWaterVatColor() # 设置水缸中没有被水覆盖的颜色
 setWaterVatBorderColor() # 设置水缸边缘的颜色
 ```
 
-### 窗口轮播组件(SlideShow)
+### 组件轮播(SlideShow)
 
 ```python
-窗口轮播组件  ----> 90%
+组件轮播  ----> 90%
 导入方式 from PyQtGuiLib.core import SlideShow
 
-轮播组件 -- WaterBar API介绍
+组件轮播 -- WaterBar API介绍
 
 # ---信号
-switchWidgeted  # 切换窗口时触发
+changeWidget  # 切换窗口时触发
 
 # ---- 类变量
 # 动画方向模式类变量
@@ -261,16 +255,11 @@ Ani_Up
 
 # --- Api
 addWidget()  # 添加窗口
-removeWidget() # 移除窗口(仅仅只有移除轮播组件,如果需要销毁窗口,需要自己编写代码)
-setAnimationTime() # 设置动画间隔时间(默认300毫秒)
-setAinDirectionMode() # 设置动画方向模式(例如:上下方向(SlideShow.Ani_Up,SlideShow.Ani_Down))
-setHideButtons() # 设置隐藏/显示左右按钮(默认显示)
+setCurrentIndex() # 切换到指定窗口
 setAutoSlideShow() # 设置自动轮播
-getWidgetCount() # 获取当前窗口的数量
-getWidget() # 通过索引获取窗口
-getIndex() # 获取当前索引
-next()  # 切换到下一个窗口
-up() # 切换到上一个窗口
+removeWidget() # 移除窗口(仅仅只有移除轮播组件,如果需要销毁窗口,需要自己编写代码)
+setAinDirectionMode() # 设置动画方向模式(例如:上下方向(SlideShow.Ani_Up,SlideShow.Ani_Down))
+setButtonsHide() # 设置隐藏/显示左右按钮(默认显示)
 getButtons() # 返回左右按钮对象(可以通过这个方法来重写左右按钮样式)
 ```
 

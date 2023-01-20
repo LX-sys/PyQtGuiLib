@@ -42,9 +42,9 @@ qproperty-backgroundColor: rgba(165, 138, 255,200);
 qproperty-radius:10;
 qproperty-fontSize:12;
 qproperty-arrowsSize:20;
-qproperty-margin:0;
+qproperty-margin:3;
 }
-        ''')
+''')
 
 
 if __name__ == '__main__':

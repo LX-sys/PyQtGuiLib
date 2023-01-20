@@ -1,34 +1,25 @@
 # -*- coding:utf-8 -*-
-# @time:2022/12/2317:54
+# @time:2023/1/10 12:41
 # @author:LX
 # @file:SlideShow.py
 # @software:PyCharm
+
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    QApplication,
-    sys,
     QWidget,
-    QResizeEvent,
     QPushButton,
     QPoint,
-    QSize,
     QPropertyAnimation,
     Signal
 )
 
-
+from PyQtGuiLib.styles import ButtonStyle
 
 '''
-
-    轮播图功能
-        风格: 扁平
+    组件轮播
 '''
 class SlideShow(QWidget):
     # 切换窗口事件
-    switchWidgeted = Signal(int)
-
-    # 扁平 风格
-    FlatMode = "flat"  # 经典
+    changeWidget = Signal(QWidget)
 
     # 动画的方向模式
     Ani_Left = "left"
@@ -36,26 +27,50 @@ class SlideShow(QWidget):
     Ani_Down = "down"
     Ani_Up = "up"
 
-
-    # 动画
-    Translation = "translation"  # 平移
-
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(700, 300)
+        #
+        self.widgets = []
 
-        self.show_mode = SlideShow.FlatMode # 展示模式
-        self.animation_mode = SlideShow.Translation  # 动画模式
+        self.animation_time = 1000 # 毫秒
 
-        self.animation_time = 300 # 毫秒
-
-        self.index = [-1,0]  # 索引
-        self.cu_index = self.index[1]  # 当前索引
+        # 动画运行方向,当前动作
+        self.ani_direction = (SlideShow.Ani_Left, SlideShow.Ani_Right)
 
         # 设置自动轮播,自动轮播的方向
         self.is_auto_slide = False
-        self.auto_direction = SlideShow.Ani_Right
+        self.auto_ani_direction = "R"
 
+        # 窗口索引
+        self.index = 0
+
+        # 创建两侧按钮
+        self.createButtons()
+
+    # 设置自动轮播
+    def setAutoSlideShow(self,b:bool,interval=1500,direction_:str="R"):
+        if direction_ not in ["R","L"]:
+            raise TypeError("Parameter error, Support only 'R' or 'L' !")
+
+        if interval <= self.animation_time:
+            raise ValueError("The interval between auto wheel casting must be longer than the animation time!")
+
+        self.is_auto_slide = b
+        self.startTimer(interval)
+        self.auto_ani_direction = direction_
+
+
+    # 左上方向
+    def lu_direction(self) -> str:
+        return self.ani_direction[0]
+
+    # 右下方向
+    def rd_direction(self) -> str:
+        return self.ani_direction[1]
+
+    # 创建两侧按钮
+    def createButtons(self):
         # 左右按钮
         self.Ani_Left_btn = QPushButton("左",self)
         self.Ani_Right_btn = QPushButton("右",self)
@@ -63,153 +78,10 @@ class SlideShow(QWidget):
         self.Ani_Right_btn.setObjectName("Ani_Right_btn")
         self.Ani_Left_btn.resize(50,50)
         self.Ani_Right_btn.resize(50,50)
-        self.Ani_Left_btn.clicked.connect(lambda :self.roll_event(SlideShow.Ani_Left))
-        self.Ani_Right_btn.clicked.connect(lambda :self.roll_event(SlideShow.Ani_Right))
+        self.Ani_Left_btn.clicked.connect(lambda :self.moveWidget("L"))
+        self.Ani_Right_btn.clicked.connect(lambda :self.moveWidget("R"))
         self.btnStyle()
-
-        # 窗口
-        self.widgets = []  # 所有已经添加的窗口
-        self.current_widgets = None # 当前已经展示出来的轮播窗口对象
-
-        self.defaultBackground()
-
-    def defaultBackground(self):
-        '''
-            默认背景,只有当前没有添加任何窗口时显示
-        :return:
-        '''
-        print(self.isEmpty())
-        if self.isEmpty():
-            self.setStyleSheet('''
-background-color:gray;
-border-radius:5px;
-            ''')
-    
-    # 设置动画方向模式
-    def setAinDirectionMode(self,modes:tuple):
-        if isinstance(modes,tuple):
-            self.Ani_Left_btn.disconnect()
-            self.Ani_Right_btn.disconnect()
-            self.Ani_Left_btn.clicked.connect(lambda: self.roll_event(modes[0]))
-            self.Ani_Right_btn.clicked.connect(lambda: self.roll_event(modes[1]))
-
-    # 设置动画间隔时间
-    def setAnimationTime(self,interval:int=300):
-        self.animation_time = interval
-
-    # 自动轮播
-    def setAutoSlideShow(self,b:bool,interval:int=2000,direction: str="Ani_Right",is_not_show_btn:bool=True):
-        '''
-            b: 是否启动自动轮播
-            interval:切换窗口的事件间隔
-            direction:轮播方向
-            is_not_show_btn:是否需要显示左右按钮
-        '''
-        self.is_auto_slide = b
-        if b:
-            self.startTimer(interval)
-
-        self.setHideButtons(is_not_show_btn)
-
-        self.auto_direction = direction
-        self.Ani_Left_btn.setEnabled(not b)
-        self.Ani_Right_btn.setEnabled(not b)
-
-    # 设置隐藏/显示左右按钮
-    def setHideButtons(self,b:bool=False):
-        if b:
-            self.Ani_Left_btn.hide()
-            self.Ani_Right_btn.hide()
-        else:
-            self.Ani_Left_btn.show()
-            self.Ani_Right_btn.show()
-
-    # 获取当前窗口的数量
-    def getWidgetCount(self) -> int:
-        return len(self.widgets)
-
-    # 轮播事件
-    def roll_event(self, direction: str):
-        if self.show_mode == SlideShow.FlatMode:  # 经典模式
-            widgets_count = self.getWidgetCount()
-
-            if self.isEmpty():
-                return
-
-            self.index[0] += 1
-            self.index[1] += 1
-
-            if self.index[0] > widgets_count - 1:
-                self.index[0] = 0
-
-            if self.index[1] > widgets_count - 1:
-                self.index[1] = 0
-
-            self.cu_index = self.index[1] # 设置当前索引
-            self.switchWidgeted.emit(self.index[1]) # 发送事件
-            self.rollShow(direction)
-
-    # 通过索引获取窗口
-    def getWidget(self,index:int) -> QWidget:
-        return self.widgets[index]
-
-    def isEmpty(self) -> bool:
-        return True if not self.widgets else False
-
-    # 滚动显示
-    def rollShow(self,direction: str):
-        widget = self.widgets[self.index[0]] # type:QWidget
-        widget2 = self.widgets[self.index[1]] # type:QWidget
-        self.__createWidget(widget2)
-        self.animation_(direction,widget,widget2)
-
-    # 添加窗口
-    def addWidget(self,widget:QWidget):
-        self.widgets.append(widget)
-        # 展示
-        self.show_()
-
-    # 移除窗口(2022.12.26该方法处于测试中,可能有BUG)
-    def removeWidget(self,obj_or_index):
-        '''
-            obj_or_index: 窗口对象,或者是索引
-        '''
-
-        if isinstance(obj_or_index,int):
-            widget = self.widgets[obj_or_index] # type:QWidget
-            self.widgets.remove(widget)
-            widget.hide()
-        else:
-            obj_or_index.hide()
-            self.widgets.remove(obj_or_index)
-
-    # 切换到指定窗口(暂时放弃改函数)
-    def setCurrentIndex(self,index:int=0,is_animation:bool=False):
-        if not is_animation:
-            widget = self.getWidget(index)
-
-            self.__createWidget(widget)
-
-    # 获取当前索引
-    def getIndex(self)->int:
-        if self.isEmpty():
-           return None
-
-        return self.cu_index
-
-    # 切换到下一个窗口
-    def next(self):
-        self.roll_event(SlideShow.Ani_Right)
-
-    # 切换到上一个窗口
-    def Ani_Up(self):
-        self.roll_event(SlideShow.Ani_Left)
-
-    # 两侧的按钮
-    def btnPos(self):
-        self.Ani_Left_btn.move(5, self.height() // 2 - self.Ani_Left_btn.height() // 2)
-        self.Ani_Right_btn.move(self.width() - self.Ani_Right_btn.width() - 5,
-                            self.height() // 2 - self.Ani_Left_btn.height() // 2)
+        self.btnPos()
 
     # 按钮样式
     def btnStyle(self):
@@ -236,82 +108,149 @@ border:2px solid #00557f;
 }
                 ''')
 
-    # 返回左右按钮对象
-    def getButtons(self) -> tuple:
+    def btnPos(self):
+        self.Ani_Left_btn.move(5, self.height() // 2 - self.Ani_Left_btn.height() // 2)
+        self.Ani_Right_btn.move(self.width() - self.Ani_Right_btn.width() - 5,
+                            self.height() // 2 - self.Ani_Left_btn.height() // 2)
+
+    def count(self) -> int:
+        return len(self.widgets)
+
+    # 移动窗口
+    def moveWidget(self,direction_:str):
+
+        direction = None
+
+        w_1 = self.widgets[self.index]
+        if direction_ == "R": # self.index < self.count() - 1
+            direction = self.rd_direction()
+            self.index += 1
+            if self.index > self.count()-1:
+                self.index = 0
+
+        if direction_ == "L": # and self.index >= 0
+            direction = self.lu_direction()
+            self.index -= 1
+            if self.index < -self.count():
+                self.index = -1
+
+        if not direction:
+            return
+
+        w_2 = self.widgets[self.index]
+        self.changeWidget.emit(w_2)# 切换窗口时发送信号
+        w_1.show()
+        w_2.show()
+
+        # 隐藏其他窗口
+        for w in self.widgets:
+            if w != w_1 and w != w_2:
+                w.hide()
+
+        self.ani_(w_1, w_2, direction)
+
+    def addWidget(self,widget:QWidget):
+        widget.setParent(self)
+        widget.resize(self.size())
+        widget.lower()
+        self.widgets.append(widget)
+
+        if self.count() > 1:
+            widget.hide()
+
+    # 设置动作模式
+    def setAinDirectionMode(self, mode:tuple):
+        if mode[0] not in [SlideShow.Ani_Up,SlideShow.Ani_Left] and\
+            mode[1] not in [SlideShow.Ani_Right,SlideShow.Ani_Down]:
+            raise TypeError("Parameter error!")
+
+        self.ani_direction = mode
+
+    # 设置按钮的隐藏和显示
+    def setButtonsHide(self,b:bool):
+        self.Ani_Left_btn.setHidden(b)
+        self.Ani_Right_btn.setHidden(b)
+
+    def aniDirection(self) -> tuple:
+        return self.ani_direction
+
+    # 移除窗口(只会移除,不会消毁)
+    def removeWidget(self,widget:QWidget):
+        self.widgets.remove(widget)
+
+    # 切换到指定窗口
+    def setCurrentIndex(self,index:int=0):
+        n = 0
+        direction = "R"
+        if index > self.index:
+            n = index - self.index
+
+        if index < self.index:
+            direction = "L"
+            n = self.index - index
+
+        for _ in range(abs(n)):
+            self.moveWidget(direction)
+
+
+    def ani_(self,widget_out:QWidget,widget_show:QWidget,direction:str):
+        '''
+            widget_out:被移走的窗口
+            widget_show:准备显示的窗口
+        '''
+
+        if not widget_out.parent():
+            widget_out.setParent(self)
+
+        if not widget_show.parent():
+            widget_show.setParent(self)
+
+        wid1,wid2 = widget_out,widget_show
+        wid1.resize(self.size())
+        wid2.resize(self.size())
+
+        ani_1 = QPropertyAnimation(wid1,b"pos",self)
+        ani_2 = QPropertyAnimation(wid2,b"pos",self)
+        ani_1.setDuration(self.animation_time)
+        ani_2.setDuration(self.animation_time)
+
+        if direction == SlideShow.Ani_Left:
+            s_ani_1, e_ani_1 = QPoint(0, 0), QPoint(-self.width(), 0)
+            s_ani_2, e_ani_2 = QPoint(self.width(), 0), QPoint(0, 0)
+        elif direction == SlideShow.Ani_Up:
+            s_ani_1, e_ani_1 = QPoint(0, 0), QPoint(0, -self.height())
+            s_ani_2, e_ani_2 = QPoint(0, self.height()), QPoint(0, 0)
+        elif direction == SlideShow.Ani_Down:
+            s_ani_1, e_ani_1 = QPoint(0, 0), QPoint(0, self.height())
+            s_ani_2, e_ani_2 = QPoint(0, -self.height()), QPoint(0, 0)
+        else:
+            s_ani_1,e_ani_1 = QPoint(0,0),QPoint(self.width(),0)
+            s_ani_2,e_ani_2 = QPoint(-self.width(),0),QPoint(0,0)
+
+        ani_1.setStartValue(s_ani_1)
+        ani_1.setEndValue(e_ani_1)
+
+        ani_2.setStartValue(s_ani_2)
+        ani_2.setEndValue(e_ani_2)
+
+        ani_1.start()
+        ani_2.start()
+
+    # 通过索引获取窗口
+    def getWidget(self,index:int) -> QWidget:
+        return self.widgets[index]
+
+    # 反按钮对象
+    def getButtons(self)->tuple:
         return self.Ani_Left_btn,self.Ani_Right_btn
 
-    # 展示
-    def show_(self):
-        if self.show_mode == SlideShow.FlatMode:  # 经典模式
+    def isEmpty(self) -> bool:
+        return True if not self.widgets else False
 
-            if self.isEmpty():
-                return
-
-            # 优先展示第一个窗口
-            widget = self.widgets[self.cu_index]  # type:QWidget
-            self.__createWidget(widget)
-
-            # 隐藏除了显示的以外的所有窗口
-            for i in range(self.getWidgetCount()):
-                if i != self.getIndex():
-                    self.getWidget(i).hide()
-
-    # 创建窗口
-    def __createWidget(self,widget:QWidget):
-        widget.setParent(self)
-        widget.resize(QSize(self.width(),self.height()))
-        widget.lower()
-        widget.move(QPoint(0,0))
-        widget.show()
-
-    # 动画
-    def animation_(self,direction:str,widget:QWidget,widget2:QWidget):
-        if self.animation_mode == SlideShow.Translation:
-            if len(self.widgets) >= 2:
-                move_ani = QPropertyAnimation(self)
-                move_ani2 = QPropertyAnimation(self)
-                move_ani.setPropertyName(b"pos")
-                move_ani2.setPropertyName(b"pos")
-                move_ani.setTargetObject(widget)
-                move_ani2.setTargetObject(widget2)
-
-                move_ani.setStartValue(widget.pos())
-                if direction == SlideShow.Ani_Right:
-                    end_value,start_value = QPoint(widget.width(), 0),QPoint(-widget.width(), 0)
-                elif direction == SlideShow.Ani_Left:
-                    end_value,start_value = QPoint(-widget.width(), 0),QPoint(widget.width(), 0)
-                elif direction == SlideShow.Ani_Down:
-                    end_value,start_value = QPoint(0,widget.height()),QPoint(0,-widget.height())
-                elif direction == SlideShow.Ani_Up:
-                    end_value, start_value = QPoint(0, -widget.height()), QPoint(0, widget.height())
-                else:
-                    end_value, start_value = QPoint(widget.width(), 0), QPoint(-widget.width(), 0)
-                move_ani.setEndValue(end_value)
-                move_ani2.setStartValue(start_value)
-                move_ani2.setEndValue(QPoint(0, 0))
-
-
-                move_ani.setDuration(self.animation_time)
-                move_ani2.setDuration(self.animation_time)
-
-                move_ani.start()
-                move_ani2.start()
-
-    def resizeEvent(self, e:QResizeEvent) -> None:
-        self.btnPos()
-        self.show_()
-        super().resizeEvent(e)
-
-    def timerEvent(self, e) -> None:
+    def timerEvent(self, event) -> None:
         if self.is_auto_slide:
-            self.roll_event(self.auto_direction)
+            self.moveWidget(self.auto_ani_direction)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = SlideShow()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
+    def resizeEvent(self, event) -> None:
+        self.btnPos()
+        super().resizeEvent(event)

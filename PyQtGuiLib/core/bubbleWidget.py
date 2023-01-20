@@ -1,29 +1,20 @@
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    sys,
-    QApplication,
     QWidget,
     QPainter,
-    QPainterPath,
     QPaintEvent,
     QPolygonF,
-    QRectF,
     QFont,
     QColor,
     QPointF,
-    Signal,
     QBrush,
-    QSize,
     textSize,
     QPainterPath,
     QRect,
     QPen,
     qt,
-    QStyleOption,
-    QStyle,
-    QFrame,
+    pyqtProperty
 )
-from PyQt5.QtCore import pyqtProperty
+
 
 class BubbleWidget(QWidget):
 
@@ -121,7 +112,7 @@ class BubbleWidget(QWidget):
 
         self.setTrack(self.trackWidget)
 
-    # 设计气泡箭头方向
+    # 设置气泡箭头方向
     def setDirection(self,d):
         self.direction = d
 
@@ -238,13 +229,3 @@ class BubbleWidget(QWidget):
     fontSize = pyqtProperty(int,fset=set_TextSize,fget=get_TextSize)
     arrowsSize = pyqtProperty(int,fset=set_Arrows,fget=get_Arrows)
     margin = pyqtProperty(int,fset=set_Margin,fget=get_Margin)
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = BubbleWidget()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
