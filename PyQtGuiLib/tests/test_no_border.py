@@ -40,7 +40,6 @@ border-radius:30px;
         # self.setOpacity(0.7)
 
         self.setEnableGColor(True)
-        self.setMask(True)
 
         self.flag = False
 

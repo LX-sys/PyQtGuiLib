@@ -3,6 +3,8 @@
 # @author:LX
 # @file:test_gradientBar.py
 # @software:PyCharm
+import PySide2
+
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
@@ -39,15 +41,21 @@ border-radius:30px;
 
         # 状态栏
         self.status = StatusBar(self)
+        # print(self.status.parent())
         self.status.setStatusPos(StatusBar.PosBottom)
         self.status.setStyleSheet("background-color: rgb(232, 100, 232);")
         self.status.addText("我是标签",duration=20)
-        self.status.addButton("我是按钮","border:1px solid red;")
+        self.status.addButton("我是按钮")
         self.g = GradientBar()
         self.g.setValue(80)
         self.g.setFixedSize(100,10)
         self.status.addWidget(self.g)
-        self.status.addTime(style="color: rgb(0, 0, 127);")
+        # self.status.addTime()
+
+    # def resizeEvent(self, event) -> None:
+    #     self.status.updateStatusSize()
+    #     super().resizeEvent(event)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

@@ -54,10 +54,6 @@ border-radius:30px;
         self.tbar.setBtnStyle(TitleBar.MacStyle)
         # self.tbar.setWindowColor(QColor(123,44,44,30))
 
-    def resizeEvent(self, event:QResizeEvent) -> None:
-        super().resizeEvent(event)
-        self.tbar.updateTitleSize()
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = TestTitleBar()

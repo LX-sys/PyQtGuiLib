@@ -241,6 +241,8 @@ class Public:
         self.parent.setAttribute(qt.WA_TranslucentBackground)
         self.parent.setWindowFlags(FramelessWindowHint | qt.Widget)
         self.parent.setMouseTracking(True)  # 开启鼠标跟踪
+        self.parent.setMinimumWidth(15) # 设置最小大小
+        self.parent.setMinimumHeight(15)
 
         # 加上阴影后会出BUG
         # self.geffect = QGraphicsDropShadowEffect(self.parent)

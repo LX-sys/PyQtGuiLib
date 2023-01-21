@@ -3,6 +3,7 @@
 # @author:LX
 # @file:statusBar.py
 # @software:PyCharm
+from PyQt5.QtCore import QObject
 
 from PyQtGuiLib.header import (
     is_win_sys,
@@ -28,6 +29,8 @@ from PyQtGuiLib.header import (
 '''
 
 
+from PyQtGuiLib.core.widgets.borderlessWidget import BorderlessWidget
+
 # 倒计时类
 class CountDownThread(QThread):
     # 计时完成信号
@@ -48,7 +51,7 @@ class CountDownThread(QThread):
         self.timeOuted.emit()
 
 
-class StatusBar(QWidget):
+class StatusBar(BorderlessWidget):
 
     PosBottom = "PosBottom"
     PosTop = "PosTop"
@@ -60,18 +63,24 @@ class StatusBar(QWidget):
 
         self.h = 30
 
+        # 默认半径
+        # self.setRadius((0, self.radius()[0]))
+        # print(self.radius())
+        # self.setRadius((3, 5))
+        self.setBorderWidth(0)
+
         self.__parent = None #  type:QWidget
 
+        # 状态栏位置
+        self.status_pos = StatusBar.PosBottom
+
         if args:
-            self.__parent = args[0]
+            self.setParent(args[0])
 
         # 本地时间
         self.format = "%Y-%m-%d %H:%M:%S"
         self.local_time = time.strftime(self.format, time.localtime())
         self.l_time = QLabel(self.local_time)
-
-        # 状态栏位置
-        self.status_pos = StatusBar.PosBottom
 
         # 创建倒计时类
         self.cd = CountDownThread()
@@ -87,9 +96,7 @@ class StatusBar(QWidget):
 
         self.defaultStyle()
 
-        self.updateStatusSize()
-
-        self.startTimer(1000)
+        # self.startTimer(1000)
 
     def defaultStyle(self):
         self.setStyleSheet("background-color: rgb(193, 193, 193);")
@@ -103,8 +110,10 @@ class StatusBar(QWidget):
         super().setParent(parent)
 
         if self.__parent is not None:
-            self.move(0,self.__parent.height()-self.h)
-            self.resize(self.__parent.width(),self.h)
+            self.updateStatusSize()
+
+    def parent(self) -> QObject:
+        return self.__parent
 
     # 设置状态栏位置
     def setStatusPos(self,mode:str):
@@ -165,16 +174,26 @@ class StatusBar(QWidget):
 
     def updateStatusSize(self):
         if self.status_pos == StatusBar.PosTop:
+            self.resize(self.__parent.width(), self.h)
             self.move(0, 0)
+        else:
+            print(0, self.__parent.height() - self.h)
             self.resize(self.__parent.width(), self.h)
-        elif self.status_pos == StatusBar.PosBottom:
             self.move(0, self.__parent.height() - self.h)
-            self.resize(self.__parent.width(), self.h)
 
     def timerEvent(self,e) -> None:
-        self.local_time = time.strftime(self.format, time.localtime())
-        self.l_time.setText(self.local_time)
+        try:
+            self.local_time = time.strftime(self.format, time.localtime())
+            self.l_time.setText(self.local_time)
+        except KeyboardInterrupt:
+            pass
+
 
     def paintEvent(self, e: QPaintEvent) -> None:
-        self.updateStatusSize()
         super().paintEvent(e)
+        self.updateStatusSize()
+        # painter = QPainter(self)
+        #
+        # self.updateStatusSize()
+        #
+        # painter.end()

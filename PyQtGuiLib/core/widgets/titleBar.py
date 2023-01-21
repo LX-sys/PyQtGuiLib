@@ -351,7 +351,7 @@ class TitleBar(BorderlessWidget):
             else:
                 painter.drawText(10+icon_distance, self.height() // 2 + fh // 2, self.title_text)
 
-    # 绘制tub
+    # 绘制icon
     def drawTitleIcon(self,painter: QPainter):
         f = QFont()
         f.setPointSize(self.title_size)

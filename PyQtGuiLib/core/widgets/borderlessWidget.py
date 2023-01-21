@@ -3,6 +3,8 @@
 # @author:LX
 # @file:borderlessWidget.py
 # @software:PyCharm
+from PyQt5.QtCore import QObject
+
 from PyQtGuiLib.core.widgets.borderlessWidgetABC import (
     PYQT_VERSIONS,
     QApplication,
@@ -21,6 +23,7 @@ class BorderlessWidget(QWidget,Public):
         self.child_win = True if args else False
         super().__init__(parent_=self,*args,**kwargs)
         self.resize(800, 500)
+
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
         if not self.child_win:
