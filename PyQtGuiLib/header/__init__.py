@@ -6,6 +6,7 @@ from PyQtGuiLib.header.py.common import *
 
 from PyQtGuiLib.header.versions import PYQT_VERSIONS
 from PyQtGuiLib.header.utility import is_win_sys, is_mac_sys,desktopCenter,desktopSize,textSize
+from PyQtGuiLib.header.customStyle import CustomStyle
 
 
 # 处理mac下无法运行的情况

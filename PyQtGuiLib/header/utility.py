@@ -1,5 +1,12 @@
 import platform
-from PyQtGuiLib.header import PYQT_VERSIONS,DesktopWidget,QPoint,QSize,QFontMetricsF,QFont
+from PyQtGuiLib.header import (
+    PYQT_VERSIONS,
+    DesktopWidget,
+    QPoint,
+    QSize,
+    QFontMetricsF,
+    QFont,
+)
 
 is_win_sys = True if platform.system() == "win32" else False
 
