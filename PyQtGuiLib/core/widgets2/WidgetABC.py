@@ -11,8 +11,10 @@ from PyQtGuiLib.core.widgets.borderlessWidgetABC import (
     QLinearGradient,
     QPen,
     QBrush,
-    QPoint
+    QPoint,
+    QColor
 )
+from PyQt5.QtCore import QEvent
 
 from PyQtGuiLib.header import CustomStyle
 
@@ -22,11 +24,22 @@ from PyQtGuiLib.header import CustomStyle
 
 
 class WidgetABC(QWidget,CustomStyle):
+    '''
+        支持的自定义样式
+    qproperty-radius  --> 圆角  Eg: 7
+    qproperty-backgroundColor  --> 背景颜色 Eg: rgba(165, 138, 255,200)
+    qproperty-borderWidth --> 边的宽度 Eg: 1
+    qproperty-borderStyle --> 边框的风格 Eg: solid
+    qproperty-borderColor --> 边框颜色 Eg: rgba(0,100,255,255)
+    qproperty-border   --> 边框样式 Eg: "3 solid rgba(0,100,255,255)"
+    '''
     # 渐变的方向
     G_Vertical = "vertical"
     G_Horizontal = "horizontal"
 
     def __init__(self,*args,**kwargs):
+        # 窗口操作限制器,当前窗口作为子窗口时,触发
+        self.__RestrictedOperation = False if args else True
         super().__init__(*args,**kwargs)
         self.resize(700,500)
 
@@ -43,7 +56,19 @@ class WidgetABC(QWidget,CustomStyle):
 
         # 渐变色
         self.is_e_gcolor = False  # 是否启用渐变色
-        self.w_g_direction = "vertical"  # 渐变方向
+        self.w_g_direction = "horizontal"  # 渐变方向
+        self.w_g_color = [(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]
+
+        # 操作限制
+        self.installEventFilter(self)
+
+    # 设置 限制操作
+    def setRestrictedOperation(self,b:bool):
+        self.__RestrictedOperation = b
+
+    # 设置 背景颜色渐变启动
+    def setEnableGColor(self,b:bool):
+        self.is_e_gcolor = b
 
     # 边缘检测
     def isEdge(self,pos: QPoint):
@@ -119,6 +144,13 @@ class WidgetABC(QWidget,CustomStyle):
                 if Borderless.Left in self.pressDirection:
                     x = x + pos.x()
                 self.move(x, distance_)
+    
+    def eventFilter(self, obj: 'QObject', event:QEvent) -> bool:
+        # 做为子窗口时,限制事件
+        if self.__RestrictedOperation is False and event.type() in [event.KeyRelease,event.KeyPress,event.MouseMove]:
+            return True
+        else:
+            return super().eventFilter(obj,event)
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         if self.isEdge(e.pos()):
@@ -165,16 +197,20 @@ class WidgetABC(QWidget,CustomStyle):
         op = QPen()
         op.setWidth(self.get_borderWidth())
         op.setColor(self.get_borderColor())
-        # op.setStyle(self.open_style)
+        op.setStyle(self.get_borderStyle())
         painter.setPen(op)
 
         # 绘制背景
         if self.is_e_gcolor:
             # 绘制渐变色
             if self.w_g_direction == Borderless.G_Vertical:
-                gradient = QLinearGradient(self.width(), 0, self.width(), self.height())  # 垂直线性渐变
+                p1 = QPoint(self.width(), 0)
+                p2 = QPoint(self.width(), self.height())
+                gradient = QLinearGradient(p1, p2)  # 垂直线性渐变
             else:
-                gradient = QLinearGradient(0, self.height(), self.width(), self.height())  # 水平线性渐变
+                p1 = QPoint(0, self.height())
+                p2 = QPoint(self.width(), self.height())
+                gradient = QLinearGradient(p1,p2)  # 水平线性渐变
             for v, c in self.w_g_color:
                 gradient.setColorAt(v, c)
             bgcolor = gradient
@@ -197,11 +233,12 @@ class WidgetABC(QWidget,CustomStyle):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = WidgetABC()
+    win.setEnableGColor(True)
     win.setStyleSheet('''
 WidgetABC{
 qproperty-radius:7;
 qproperty-backgroundColor: rgba(165, 138, 255,200);
-qproperty-borderWidth:0;
+qproperty-border:"4 dashdot rgba(0,100,255,255)";
 }
     ''')
     win.show()

@@ -1,11 +1,18 @@
 from PyQtGuiLib.header import (
     pyqtProperty,
-    QColor
+    QColor,
+    qt,
+    Qt,
+    Signal
 )
-
+import re
 '''
     公共自定义样式
 '''
+
+
+def strRGBA_to_RGBA(rgba_str:str)->list:
+    return [int(v) for v in re.findall(r"\d+",rgba_str)]
 
 
 class CustomStyle:
@@ -15,18 +22,22 @@ class CustomStyle:
         self._color = QColor(0,0,0)
         self._fontSize = 15
         self._fontStyle = "Heiti SC"
-        self._font = "15, Heiti SC"
+        self._font = "15 'Heiti SC'"
         self._borderWidth = 1
         self._borderStyle = "solid"
         self._borderColor = QColor(234,234,234)
-        self._border = "1, solid, QColor(234,234,234)"
+        self._border = "1 solid QColor(234,234,234)"
+
+        # 线性渐变
+        self._linearDirection = "[(0,0),(0,0)]"
+        self._linearColor = "[(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]"
+        self._linear ="[(0,0),(0,0)] [(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]"
 
         # ----
         # 内边距
         self._margin = 2
 
     def __set_radius(self,r:int):
-        print(r)
         self._radius = r
 
     def get_radius(self)->int:
@@ -35,7 +46,7 @@ class CustomStyle:
     def __set_backgroundColor(self,bgcolor:QColor):
         self._backgroundColor = QColor(*bgcolor.getRgb())
 
-    def get_backgroundColor(self)->QColor:
+    def get_backgroundColor(self) -> QColor:
         return self._backgroundColor
 
     def __set_color(self,color:QColor):
@@ -57,7 +68,7 @@ class CustomStyle:
         return self._fontStyle
 
     def __set_font(self,fontstr:str):
-        size,style = fontstr.split(",")
+        size,style = fontstr.split(" ")
         self.__set_fontSize(int(size))
         self.__set_fontStyle(style)
 
@@ -73,17 +84,29 @@ class CustomStyle:
     def __set_borderStyle(self,style:str):
         self._borderStyle = style
 
-    def get_borderStyle(self) -> str:
-        return self._borderStyle
+    def get_borderStyle(self) -> Qt.PenStyle:
+        style_dict = {
+            "dash": qt.DashLine,
+            "dot": qt.DotLine,
+            "dashdot": qt.DashDotLine,
+            "solid": qt.SolidLine
+        }
+        if style_dict.get(self._borderStyle.lower(), None):
+           return style_dict[self._borderStyle.lower()]
+        else:
+            return qt.SolidLine
 
     def __set_borderColor(self,color:QColor):
-        self._borderColor = color
+        if isinstance(color,str):
+            self._borderColor = QColor(*strRGBA_to_RGBA(color))
+        else:
+            self._borderColor = color
 
     def get_borderColor(self)->QColor:
         return self._borderColor
 
     def __set_border(self,borderstr:str):
-        width,style,color = borderstr.split(",")
+        width,style,color = borderstr.split(" ")
         self.__set_borderWidth(int(width))
         self.__set_borderStyle(style)
         self.__set_borderColor(color)
@@ -92,10 +115,23 @@ class CustomStyle:
         return "{},{},{}".format(self.get_borderWidth(),self.get_borderStyle(),self.get_borderColor())
 
     def __set_margin(self,v:int):
-        self._margin =v
+        self._margin = v
 
-    def get_margin(self)->int:
+    def get_margin(self) -> int:
         return self._margin
+
+    # 渐变
+    def __set_linearDirection(self,direction:str):
+        self._linearDirection = direction
+
+    def get_linearDirection(self) ->str:
+        return self._linearDirection
+
+    def __set_linearColor(self,color_list_str:str):
+        self._linearColor = color_list_str
+
+    def get_linearColor(self) -> list:
+        return self._linearColor
 
     radius = pyqtProperty(int,fset=__set_radius,fget=get_radius)
     color = pyqtProperty(QColor, fset=__set_color, fget=get_color)
@@ -104,7 +140,10 @@ class CustomStyle:
     fontStyle = pyqtProperty(str,fset=__set_fontStyle,fget=get_fontStyle)
     font = pyqtProperty(str,fset=__set_font,fget=get_font)
     borderWidth = pyqtProperty(int,fset=__set_borderWidth,fget=get_borderWidth)
-    borderStyle = pyqtProperty(int,fset=__set_borderStyle,fget=get_borderStyle)
+    borderStyle = pyqtProperty(str,fset=__set_borderStyle,fget=get_borderStyle)
     borderColor = pyqtProperty(QColor, fset=__set_borderColor, fget=get_borderColor)
     border = pyqtProperty(str, fset=__set_border, fget=get_border)
     margin = pyqtProperty(int,fset=__set_margin,fget=get_margin)
+    # 线性渐变
+    linearDirection = pyqtProperty(str,fset=__set_linearDirection,fget=get_linearDirection)
+    linearColor = pyqtProperty(str,fset=__set_linearColor,fget=get_linearColor)

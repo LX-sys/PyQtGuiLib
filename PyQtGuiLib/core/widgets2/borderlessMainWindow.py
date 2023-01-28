@@ -16,8 +16,19 @@ class BorderlessMainWindow(WidgetABC):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
-        self.titlebar = TitleBar(self)
-        self.titlebar.setBtnStyle(TitleBar.WinStyle)
+        self.test_w = WidgetABC(self)
+        self.test_w.resize(60,60)
+        self.test_w.move(50,50)
+        self.test_w.setRestrictedOperation(True)
+        self.test_w.setObjectName("test")
+        self.test_w.setStyleSheet('''
+        #test{
+            qproperty-backgroundColor: rgba(200, 200, 255,255);
+            qproperty-radius:3;
+        }
+        #     ''')
+        # self.titlebar = TitleBar(self)
+        # self.titlebar.setBtnStyle(TitleBar.WinStyle)
 
 
 if __name__ == '__main__':
