@@ -16,6 +16,7 @@ from PyQtGuiLib.header import (
     QRect,
     QGraphicsDropShadowEffect,
 )
+import re
 import json
 from PyQt5.QtCore import QEvent
 
@@ -32,6 +33,17 @@ class WidgetABC(QWidget,CustomStyle):
     qproperty-borderStyle --> 边框的风格 Eg: solid
     qproperty-borderColor --> 边框颜色 Eg: rgba(0,100,255,255)
     qproperty-border   --> 边框样式 Eg: "3 solid rgba(0,100,255,255)"
+    qproperty-linearDirection; --> 渐变的方向 Eg: "LR"
+        LR: 左->右
+        RL: 右->左
+        UD: 上->下
+        DU: 下->上
+        LRANG: 左上角->右下角
+        RLANG: 右下角->左上角
+        UDANG: 右上角->左下角
+        DUANG: 左下角->右上角
+        自定义: [0,0,100,100]或者[0,0,w,h]  这里的 w,h 代只窗口当前的宽和高
+    qproperty-linearColor --> 渐变色 Eg: "rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)"
     '''
     Top = "top"
     Down = "Down"
@@ -60,9 +72,8 @@ class WidgetABC(QWidget,CustomStyle):
         self.movePressState = False  # 记录移动时是否时按下的状态
 
         # 渐变色
-        self.is_e_gcolor = False  # 是否启用渐变色
+        self.__is_e_gcolor = False  # 是否启用渐变色
         self.w_g_direction = "horizontal"  # 渐变方向
-        self.w_g_color = [(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]
 
         # 操作限制
         self.installEventFilter(self)
@@ -74,7 +85,10 @@ class WidgetABC(QWidget,CustomStyle):
 
     # 设置 背景颜色渐变启动
     def setEnableGColor(self,b:bool):
-        self.is_e_gcolor = b
+        self.__is_e_gcolor = b
+
+    def isEnableGColor(self)->bool:
+        return self.__is_e_gcolor
 
     # 边缘检测
     def isEdge(self,pos: QPoint):
@@ -151,13 +165,58 @@ class WidgetABC(QWidget,CustomStyle):
                     x = x + pos.x()
                 self.move(x, distance_)
 
-    # 阴影
-    def drawShadow(self,painter:QPainter):
-        r, g, b, a = 170, 170, 234, 0
-        x, y, w, h = 0, 0, self.width(), self.height()
-        for i in range(10):
-            painter.setPen(QColor(r - i * 15, g - i * 15, b - i * 15, a + int(pow(i, 2.1))))
-            painter.drawRect(QRect(x + i, y + i, w - (i * 2), h - (i * 2)))
+    # 绘制背景
+    def drawBackgroundColor(self,painter:QPainter):
+        # 绘制背景
+        if self.__is_e_gcolor:
+            # 绘制渐变色
+            temp_linearDirection = self.get_linearDirection()
+            linearDirection_dict = {
+                "w": str(self.width()),
+                "h": str(self.height()),
+                "cw": str(self.width() // 2),
+                "ch": str(self.height() // 2)
+            }
+            for c in re.findall(r"[a-z]", temp_linearDirection):
+                v = linearDirection_dict.get(c, None)
+                if v:
+                    temp_linearDirection = temp_linearDirection.replace(c, v)
+
+            dir_value = json.loads(temp_linearDirection)
+            gradient = QLinearGradient(*dir_value)
+
+            # 分析颜色,并均分
+            colors = []
+            color_list = re.findall(r"rgba\(.+?\)", self.get_linearColor())
+            color_number = len(color_list)
+            if color_number > 2:
+                paragraph_v = 1 / (color_number - 1)
+            else:
+                paragraph_v = 0
+            v = 0  # 渐变的取值
+            for cstr in color_list:
+                v_str = re.findall(r"\d{1,3}", cstr)
+                colors.append([v, QColor(*[int(i) for i in v_str])])
+                if color_number > 2:
+                    v += paragraph_v
+            # 修改最后一个渐变值
+            colors[-1][0] = 1
+            for v, c in colors:
+                gradient.setColorAt(v, c)
+            bgcolor = gradient
+            painter.setBrush(gradient)
+        else:
+            # 绘制纯色背景
+            bgcolor = QBrush(self.get_backgroundColor())
+        painter.setBrush(bgcolor)
+
+        # 绘制
+        rect_ = self.rect()
+        rect_.setX(rect_.x() + self.get_margin())
+        rect_.setY(rect_.y() + self.get_margin())
+        rect_.setWidth(rect_.width() - self.get_margin())
+        rect_.setHeight(rect_.height() - self.get_margin())
+        painter.drawRoundedRect(rect_, self.get_radius(), self.get_radius())
 
     def eventFilter(self, obj: 'QObject', event:QEvent) -> bool:
         # 做为子窗口时,限制事件
@@ -213,45 +272,9 @@ class WidgetABC(QWidget,CustomStyle):
         op.setColor(self.get_borderColor())
         op.setStyle(self.get_borderStyle())
         painter.setPen(op)
+
         # 绘制背景
-        if self.is_e_gcolor:
-            temp_linearDirection = self.get_linearDirection()
-            # 绘制渐变色
-            if "w" in temp_linearDirection:
-                temp_linearDirection =temp_linearDirection.replace("w", str(self.width()))
-            if "h" in temp_linearDirection:
-                temp_linearDirection = temp_linearDirection.replace("h", str(self.height()))
-            dir_value = json.loads(temp_linearDirection)
-            print(dir_value)
-            gradient = QLinearGradient(*dir_value)
-            # if self.w_g_direction == WidgetABC.G_Vertical:
-            #     p1 = QPoint(self.width(), 0)
-            #     p2 = QPoint(self.width(), self.height())
-            #     gradient = QLinearGradient(p1, p2)  # 垂直线性渐变
-            # else:
-            #     p1 = QPoint(0, self.height())
-            #     p2 = QPoint(self.width(), self.height())
-            #     gradient = QLinearGradient(p1,p2)  # 水平线性渐变
-            for v, c in self.w_g_color:
-                gradient.setColorAt(v, c)
-            bgcolor = gradient
-            painter.setBrush(gradient)
-        else:
-            # 绘制纯色背景
-            bgcolor = QBrush(self.get_backgroundColor())
-        painter.setBrush(bgcolor)
-
-        # print("-->", self.get_linearDirection(),type(self.get_linearDirection()))
-
-        rect_ = self.rect()
-        rect_.setX(rect_.x() + self.get_margin())
-        rect_.setY(rect_.y() + self.get_margin())
-        rect_.setWidth(rect_.width() - self.get_margin())
-        rect_.setHeight(rect_.height() - self.get_margin())
-        painter.drawRoundedRect(rect_, self.get_radius(), self.get_radius())
-
-        # # 绘制阴影
-        # self.drawShadow(painter)
+        self.drawBackgroundColor(painter)
 
         painter.end()
 
@@ -264,8 +287,9 @@ if __name__ == '__main__':
 WidgetABC{
 qproperty-radius:7;
 qproperty-backgroundColor: rgba(234, 234, 234,255);
-qproperty-linearDirection:"[0,0,w,h]";
-/*qproperty-border:"4 dashdot rgba(0,100,255,255)";*/
+qproperty-linearDirection:"DuANG";
+qproperty-linearColor:"rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)";
+qproperty-border:"4 solid rgba(234, 234, 234, 255)";
 }
 #     ''')
     win.show()

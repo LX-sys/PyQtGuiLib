@@ -31,8 +31,8 @@ class CustomStyle:
 
         # 线性渐变
         self._linearDirection = "LR"
-        self._linearColor = "[(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]"
-        self._linear ="[0,0,0,0] [(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]"
+        self._linearColor = "rgba(153, 153, 230, 60) rgba(98, 98, 147, 255)"
+        self._linear ="[0,0,0,0] rgba(153, 153, 230, 60) rgba(98, 98, 147, 255)"
 
         # ----
         # 内边距
@@ -107,7 +107,7 @@ class CustomStyle:
         return self._borderColor
 
     def __set_border(self,borderstr:str):
-        width,style,color = borderstr.split(" ")
+        width,style,color = borderstr.split(" ",2)
         self.__set_borderWidth(int(width))
         self.__set_borderStyle(style)
         self.__set_borderColor(color)
@@ -126,7 +126,7 @@ class CustomStyle:
         '''
             qproperty-linearDirection:LR
             qproperty-linearDirection:UD
-            qproperty-linearDirection:[(0,0),(100,100)]
+            qproperty-linearDirection:"[0,0,100,100]"或者"[0,0,w,h]"
         :param direction:
         :return:
         '''
@@ -135,21 +135,28 @@ class CustomStyle:
     def get_linearDirection(self) ->str:
         linearDirection_dict = {
             "LR":[0, self.height(),self.width(), self.height()],
-            "UD":[self.width(), 0,self.width(), self.height()]
+            "RL":[self.width(), self.height(),0, self.height()],
+            "UD":[self.width(), 0,self.width(), self.height()],
+            "DU":[self.width(), self.height(),self.width(), 0],
+            "LRANG":[0,0,self.height(),self.width()],
+            "RLANG":[self.height(),self.width(),0,0],
+            "UDANG":[self.width(),0,0,self.height()],
+            "DUANG":[0,self.height(),self.width(),0]
+
         }
         try:
-            if linearDirection_dict.get(self._linearDirection,None):
-                return json.dumps(linearDirection_dict[self._linearDirection])
+            if linearDirection_dict.get(self._linearDirection.upper(),None):
+                return json.dumps(linearDirection_dict[self._linearDirection.upper()])
             else:
                 return self._linearDirection
         except Exception as e:
             print(e)
             return json.dumps(linearDirection_dict["LR"])
 
-    def __set_linearColor(self,color_list_str:str):
-        self._linearColor = color_list_str
+    def __set_linearColor(self,color_str:str):
+        self._linearColor = color_str
 
-    def get_linearColor(self) -> list:
+    def get_linearColor(self) -> str:
         return self._linearColor
 
     radius = pyqtProperty(int,fset=__set_radius,fget=get_radius)
