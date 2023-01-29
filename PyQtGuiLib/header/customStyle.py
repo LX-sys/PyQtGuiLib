@@ -3,13 +3,14 @@ from PyQtGuiLib.header import (
     QColor,
     qt,
     Qt,
-    Signal
+    QPoint,
+    QRect
 )
 import re
+import json
 '''
     公共自定义样式
 '''
-
 
 def strRGBA_to_RGBA(rgba_str:str)->list:
     return [int(v) for v in re.findall(r"\d+",rgba_str)]
@@ -29,13 +30,13 @@ class CustomStyle:
         self._border = "1 solid QColor(234,234,234)"
 
         # 线性渐变
-        self._linearDirection = "[(0,0),(0,0)]"
+        self._linearDirection = "LR"
         self._linearColor = "[(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]"
-        self._linear ="[(0,0),(0,0)] [(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]"
+        self._linear ="[0,0,0,0] [(0.3, QColor(153, 153, 230, 60)), (1, QColor(98, 98, 147, 255))]"
 
         # ----
         # 内边距
-        self._margin = 2
+        self._margin = 5
 
     def __set_radius(self,r:int):
         self._radius = r
@@ -121,11 +122,29 @@ class CustomStyle:
         return self._margin
 
     # 渐变
-    def __set_linearDirection(self,direction:str):
+    def __set_linearDirection(self,direction:QRect):
+        '''
+            qproperty-linearDirection:LR
+            qproperty-linearDirection:UD
+            qproperty-linearDirection:[(0,0),(100,100)]
+        :param direction:
+        :return:
+        '''
         self._linearDirection = direction
 
     def get_linearDirection(self) ->str:
-        return self._linearDirection
+        linearDirection_dict = {
+            "LR":[0, self.height(),self.width(), self.height()],
+            "UD":[self.width(), 0,self.width(), self.height()]
+        }
+        try:
+            if linearDirection_dict.get(self._linearDirection,None):
+                return json.dumps(linearDirection_dict[self._linearDirection])
+            else:
+                return self._linearDirection
+        except Exception as e:
+            print(e)
+            return json.dumps(linearDirection_dict["LR"])
 
     def __set_linearColor(self,color_list_str:str):
         self._linearColor = color_list_str

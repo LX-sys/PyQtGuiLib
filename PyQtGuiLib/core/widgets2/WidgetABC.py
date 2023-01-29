@@ -1,9 +1,9 @@
-from PyQtGuiLib.core.widgets.borderlessWidgetABC import (
+from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
     sys,
+    CustomStyle,
     qt,
-    Borderless,
     QWidget,
     QMouseEvent,
     QPaintEvent,
@@ -12,17 +12,17 @@ from PyQtGuiLib.core.widgets.borderlessWidgetABC import (
     QPen,
     QBrush,
     QPoint,
-    QColor
+    QColor,
+    QRect,
+    QGraphicsDropShadowEffect,
 )
+import json
 from PyQt5.QtCore import QEvent
 
-from PyQtGuiLib.header import CustomStyle
 
 '''
     所有窗口的父类
 '''
-
-
 class WidgetABC(QWidget,CustomStyle):
     '''
         支持的自定义样式
@@ -33,6 +33,11 @@ class WidgetABC(QWidget,CustomStyle):
     qproperty-borderColor --> 边框颜色 Eg: rgba(0,100,255,255)
     qproperty-border   --> 边框样式 Eg: "3 solid rgba(0,100,255,255)"
     '''
+    Top = "top"
+    Down = "Down"
+    Left = "Left"
+    Right = "Right"
+
     # 渐变的方向
     G_Vertical = "vertical"
     G_Horizontal = "horizontal"
@@ -62,6 +67,7 @@ class WidgetABC(QWidget,CustomStyle):
         # 操作限制
         self.installEventFilter(self)
 
+
     # 设置 限制操作
     def setRestrictedOperation(self,b:bool):
         self.__RestrictedOperation = b
@@ -76,13 +82,13 @@ class WidgetABC(QWidget,CustomStyle):
         w, h = self.width(), self.height()
 
         if x <= self.scope and x >= 0:
-            self.pressDirection.append(Borderless.Left)
+            self.pressDirection.append(WidgetABC.Left)
         if w - x <= self.scope:
-            self.pressDirection.append(Borderless.Right)
+            self.pressDirection.append(WidgetABC.Right)
         if y >= 0 and y <= self.scope:
-            self.pressDirection.append(Borderless.Top)
+            self.pressDirection.append(WidgetABC.Top)
         if h - y <= self.scope:
-            self.pressDirection.append(Borderless.Down)
+            self.pressDirection.append(WidgetABC.Down)
 
         if self.pressDirection:
             return True
@@ -118,33 +124,41 @@ class WidgetABC(QWidget,CustomStyle):
         x, y = self.pos().x(), self.pos().y()
 
         for direction in self.pressDirection:
-            if direction == Borderless.Right:
-                if Borderless.Down not in self.pressDirection:
+            if direction == WidgetABC.Right:
+                if WidgetABC.Down not in self.pressDirection:
                     distance = pos - self.pressPos
                     distance_ = self.width() + distance.x()
                     self.resize(distance_, self.height())
                     self.pressPos = QPoint(distance_, 0)
-            if direction == Borderless.Down:
+            if direction == WidgetABC.Down:
                 distance = pos - self.pressPos
                 distance_ = self.height() + distance.y()
-                if Borderless.Right in self.pressDirection:
+                if WidgetABC.Right in self.pressDirection:
                     distance_w = self.width() + distance.x()
                     self.resize(distance_w, distance_)
                     self.pressPos = QPoint(distance_w, distance_)
                 else:
                     self.resize(self.width(), distance_)
                     self.pressPos = QPoint(0, distance_)
-            if direction == Borderless.Left:
+            if direction == WidgetABC.Left:
                 distance_ = x + pos.x()
                 self.resize(self.width() - pos.x(), self.height())
                 self.move(distance_, y)
-            if direction == Borderless.Top:
+            if direction == WidgetABC.Top:
                 distance_ = y + pos.y()
                 self.resize(self.width(), self.height() - pos.y())
-                if Borderless.Left in self.pressDirection:
+                if WidgetABC.Left in self.pressDirection:
                     x = x + pos.x()
                 self.move(x, distance_)
-    
+
+    # 阴影
+    def drawShadow(self,painter:QPainter):
+        r, g, b, a = 170, 170, 234, 0
+        x, y, w, h = 0, 0, self.width(), self.height()
+        for i in range(10):
+            painter.setPen(QColor(r - i * 15, g - i * 15, b - i * 15, a + int(pow(i, 2.1))))
+            painter.drawRect(QRect(x + i, y + i, w - (i * 2), h - (i * 2)))
+
     def eventFilter(self, obj: 'QObject', event:QEvent) -> bool:
         # 做为子窗口时,限制事件
         if self.__RestrictedOperation is False and event.type() in [event.KeyRelease,event.KeyPress,event.MouseMove]:
@@ -199,18 +213,25 @@ class WidgetABC(QWidget,CustomStyle):
         op.setColor(self.get_borderColor())
         op.setStyle(self.get_borderStyle())
         painter.setPen(op)
-
         # 绘制背景
         if self.is_e_gcolor:
+            temp_linearDirection = self.get_linearDirection()
             # 绘制渐变色
-            if self.w_g_direction == Borderless.G_Vertical:
-                p1 = QPoint(self.width(), 0)
-                p2 = QPoint(self.width(), self.height())
-                gradient = QLinearGradient(p1, p2)  # 垂直线性渐变
-            else:
-                p1 = QPoint(0, self.height())
-                p2 = QPoint(self.width(), self.height())
-                gradient = QLinearGradient(p1,p2)  # 水平线性渐变
+            if "w" in temp_linearDirection:
+                temp_linearDirection =temp_linearDirection.replace("w", str(self.width()))
+            if "h" in temp_linearDirection:
+                temp_linearDirection = temp_linearDirection.replace("h", str(self.height()))
+            dir_value = json.loads(temp_linearDirection)
+            print(dir_value)
+            gradient = QLinearGradient(*dir_value)
+            # if self.w_g_direction == WidgetABC.G_Vertical:
+            #     p1 = QPoint(self.width(), 0)
+            #     p2 = QPoint(self.width(), self.height())
+            #     gradient = QLinearGradient(p1, p2)  # 垂直线性渐变
+            # else:
+            #     p1 = QPoint(0, self.height())
+            #     p2 = QPoint(self.width(), self.height())
+            #     gradient = QLinearGradient(p1,p2)  # 水平线性渐变
             for v, c in self.w_g_color:
                 gradient.setColorAt(v, c)
             bgcolor = gradient
@@ -220,12 +241,17 @@ class WidgetABC(QWidget,CustomStyle):
             bgcolor = QBrush(self.get_backgroundColor())
         painter.setBrush(bgcolor)
 
+        # print("-->", self.get_linearDirection(),type(self.get_linearDirection()))
+
         rect_ = self.rect()
         rect_.setX(rect_.x() + self.get_margin())
         rect_.setY(rect_.y() + self.get_margin())
         rect_.setWidth(rect_.width() - self.get_margin())
         rect_.setHeight(rect_.height() - self.get_margin())
         painter.drawRoundedRect(rect_, self.get_radius(), self.get_radius())
+
+        # # 绘制阴影
+        # self.drawShadow(painter)
 
         painter.end()
 
@@ -237,10 +263,11 @@ if __name__ == '__main__':
     win.setStyleSheet('''
 WidgetABC{
 qproperty-radius:7;
-qproperty-backgroundColor: rgba(165, 138, 255,200);
-qproperty-border:"4 dashdot rgba(0,100,255,255)";
+qproperty-backgroundColor: rgba(234, 234, 234,255);
+qproperty-linearDirection:"[0,0,w,h]";
+/*qproperty-border:"4 dashdot rgba(0,100,255,255)";*/
 }
-    ''')
+#     ''')
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
