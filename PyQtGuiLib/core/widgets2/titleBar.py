@@ -474,6 +474,8 @@ class TitleBar(WidgetABC):
         if self.movePressState:
             old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
             self.__parent.move(old_pos - self.pressPos)
+        print("--")
+        self.expandEdge(e.globalPos())
 
     def paintEvent(self, event: QPaintEvent) -> None:
         super().paintEvent(event)

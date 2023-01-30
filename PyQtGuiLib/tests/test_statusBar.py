@@ -3,8 +3,6 @@
 # @author:LX
 # @file:test_gradientBar.py
 # @software:PyCharm
-import PySide2
-
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,

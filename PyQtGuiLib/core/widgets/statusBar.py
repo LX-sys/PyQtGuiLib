@@ -50,8 +50,8 @@ class CountDownThread(QThread):
             self.time_-=1
         self.timeOuted.emit()
 
-
-class StatusBar(BorderlessWidget):
+from PyQtGuiLib.core.widgets2 import WidgetABC
+class StatusBar(WidgetABC):
 
     PosBottom = "PosBottom"
     PosTop = "PosTop"
@@ -67,7 +67,7 @@ class StatusBar(BorderlessWidget):
         # self.setRadius((0, self.radius()[0]))
         # print(self.radius())
         # self.setRadius((3, 5))
-        self.setBorderWidth(0)
+        # self.setBorderWidth(0)
 
         self.__parent = None #  type:QWidget
 
