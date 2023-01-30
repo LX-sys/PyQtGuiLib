@@ -31,11 +31,13 @@ def desktopSize() -> QSize:
 
 
 # 桌面居中位置
-def desktopCenter() -> QPoint:
+def desktopCenter(parent) -> QPoint:
     if PYQT_VERSIONS == "PyQt5":
-        return DesktopWidget().availableGeometry().center()
+        center = DesktopWidget().availableGeometry().center()
+        return QPoint(center.x()-parent.width()//2,center.y()-parent.height()//2)
     elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
-        return DesktopWidget.primaryScreen().availableGeometry().center()
+        center = DesktopWidget.primaryScreen().availableGeometry().center()
+        return QPoint(center.x()-parent.width()//2,center.y()-parent.height()//2)
     else:
         return QPoint(0,0)
 
