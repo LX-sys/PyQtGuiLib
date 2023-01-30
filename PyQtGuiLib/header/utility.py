@@ -1,4 +1,4 @@
-import platform
+import platform,math
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     DesktopWidget,
@@ -51,3 +51,46 @@ def textSize(font:QFont,text:str)->QSize:
         return QSize(int(fs.horizontalAdvance(text)+1), int(fs.height()+1)) # +1 是为了补偿丢失的像素
     else:
         return QSize(0,0)
+
+
+# RGB 转 HSV
+def rgbTohsv(r, g, b):
+    r, g, b = r/255.0, g/255.0, b/255.0
+    mx,mn = max(r, g, b),min(r, g, b)
+    df = mx-mn
+    h=0
+    if mx == mn:
+        h = 0
+    elif mx == r:h = (60 * ((g-b)/df) + 360) % 360
+    elif mx == g:h = (60 * ((b-r)/df) + 120) % 360
+    elif mx == b:h = (60 * ((r-g)/df) + 240) % 360
+
+    s = 0 if mx ==0 else df/mx
+    # if mx == 0:
+    #     s = 0
+    # else:
+    #     s = df/mx
+    v = mx
+    return h, s, v
+
+
+# HSV 转 RGB
+def hsvTorgb(h, s, v):
+    h,s,v = float(h),float(s),float(v)
+
+    h_60 = h / 60.0
+    h_60f = math.floor(h_60)
+    hi = int(h_60f) % 6
+    f = h_60 - h_60f
+
+    p,q,t = v * (1 - s),v * (1 - f * s),v * (1 - (1 - f) * s)
+    r, g, b = 0, 0, 0
+
+    if hi == 0: r, g, b = v, t, p
+    elif hi == 1: r, g, b = q, v, p
+    elif hi == 2: r, g, b = p, v, t
+    elif hi == 3: r, g, b = p, q, v
+    elif hi == 4: r, g, b = t, p, v
+    elif hi == 5: r, g, b = v, p, q
+    r, g, b = int(r * 255), int(g * 255), int(b * 255)
+    return r, g, b

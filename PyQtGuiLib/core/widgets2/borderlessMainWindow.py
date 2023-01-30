@@ -2,7 +2,9 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
     sys,
-    QPushButton
+    QPushButton,
+    QPoint,
+    QMouseEvent
 )
 '''
     新无边框窗口主窗口
@@ -12,9 +14,13 @@ from PyQtGuiLib.core.widgets2.titleBar import TitleBar
 from PyQtGuiLib.core.widgets.statusBar import StatusBar
 from PyQt5.sip import delete
 
+import ctypes
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
+
 class BorderlessMainWindow(WidgetABC):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
+
         self.crbtn = QPushButton("创建",self)
         self.crbtn.move(40,40)
         self.crbtn.clicked.connect(self.createTitleBar)
@@ -23,6 +29,7 @@ class BorderlessMainWindow(WidgetABC):
         self.delbtn.move(100,100)
         self.delbtn.clicked.connect(self.removeTitleBar)
 
+        # 标题风格
         self.__title_style = TitleBar.MacStyle
 
     def setTitleBtnStyle(self,style="mac"):
@@ -38,15 +45,18 @@ class BorderlessMainWindow(WidgetABC):
     # 创建标题栏
     def createTitleBar(self):
         if not hasattr(self,"titlebar"):
-            print(self.get_backgroundColor().getRgb()) # 准备设计颜色变化
+            h,s,v,a = self.get_backgroundColor().getHsv()
+            v = 0 if v - 30 < 0 else v-30
+
             self.titlebar = TitleBar(self)
             self.titlebar.setBtnStyle(self.titleStyle())
             self.titlebar.setStyleSheet('''
             TitleBar{
+            qproperty-fontSize:14;
             qproperty-borderWidth:0;
-            qproperty-backgroundColor: rgba(217, 217, 217,255);
+            qproperty-backgroundColor: hsv(%d, %d, %d,%d);
             }
-            ''')
+            '''%(h,s,v,a))
             self.titlebar.show()
 
     # 返回标题对象
@@ -65,12 +75,13 @@ class BorderlessMainWindow(WidgetABC):
 
 
 
-
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = BorderlessMainWindow()
+    # win.setEnableGColor(True)
     win.setStyleSheet('''
 qproperty-radius:7;
+qproperty-backgroundColor:rgba(255, 170, 127,255);
     ''')
     win.show()
 

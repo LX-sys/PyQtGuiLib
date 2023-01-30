@@ -29,7 +29,6 @@ from PyQtGuiLib.core.widgets2 import WidgetABC
     窗口的标题栏
 '''
 
-
 # 缩小,放大,关闭 三按钮基类
 class ButtonIcon(QPushButton):
     '''
@@ -228,7 +227,7 @@ class TitleBar(WidgetABC):
             self.__parent = args[0]
 
         # 标题默认高度
-        self.__title_height = 32
+        self.__title_height = 38
 
         # 保存窗口在放大之前的位置大小,已经窗口大小状态
         self.old_screen_geometry = QRect(0,0,0,0) # type:QRect
@@ -239,8 +238,8 @@ class TitleBar(WidgetABC):
         self.title_color = QColor(0,0,0)
 
         # 图标大小,图标路径
-        self.image_size = 30,30
-        self.title_icon_path = r""
+        self.image_size = 20,20
+        self.title_icon_path = r"D:\myGitProject\PyQtGuiLib\PyQtGuiLib\tests\temp_tests\1.png"
         self.is_sync_icon = True # 是否同步桌面任务栏的图标
 
         # 标题位置
@@ -261,6 +260,9 @@ class TitleBar(WidgetABC):
     def titleText(self)->str:
         return self.__title_text
 
+    def iconPath(self)->str:
+        return self.title_icon_path
+
     # 默认高度
     def defaultHeight(self)->int:
         return self.__title_height
@@ -270,8 +272,8 @@ class TitleBar(WidgetABC):
         super().setParent(parent)
 
         if self.__parent is not None:
-            self.move(0,0)
-            self.resize(self.__parent.width(),self.h)
+            self.move(self.get_margin(), 2)
+            self.resize(self.__parent.width()-self.get_margin()*2, self.defaultHeight())
 
     # 设置 缩小,放大,关闭 按钮的风格
     def setBtnStyle(self, style: str = "WinStyle"):
@@ -397,7 +399,10 @@ class TitleBar(WidgetABC):
         icon_distance = 0
 
         if self.title_icon_path:
-            icon_distance = 30
+            if self.title_pos == TitleBar.Title_Left:
+                icon_distance = 10
+            else:
+                icon_distance = 8
 
         # 文字
         fs = textSize(f,self.titleText())
@@ -406,11 +411,15 @@ class TitleBar(WidgetABC):
 
         if self.title_pos == TitleBar.Title_Left:
             if PYQT_VERSIONS in ["PyQt6","PySide6"]: # 这两个版本的文字高度计算是精准的需要-5个像素
-                painter.drawText(10+icon_distance, self.height() // 2 + fh // 2-5, self.titleText())
+                x = 10+icon_distance
+                y = self.height()// 2 + fh // 2-5
             else:
-                painter.drawText(10+icon_distance, self.height() // 2 + fh // 2, self.titleText())
+                x = 10 + icon_distance
+                y =  self.height() // 2 + fh // 2
         else:
-            painter.drawText(self.width() // 2 - fw // 2, self.height() // 2 + fh // 2, self.titleText())
+            x = self.width() // 2 - fw // 2
+            y = self.height() // 2 + fh//2
+        painter.drawText(x+icon_distance, y, self.titleText())
 
     # 绘制icon
     def drawTitleIcon(self,painter: QPainter):
@@ -419,14 +428,14 @@ class TitleBar(WidgetABC):
         fs = textSize(f,self.titleText())
         fw = fs.width()
 
-        pix = QPixmap(self.title_icon_path)
+        pix = QPixmap(self.iconPath())
         if self.title_pos == TitleBar.Title_Center:
             painter.drawPixmap(self.width() // 2 - fw // 2-self.image_size[0], self.height() // 2 - self.image_size[1] // 2, *self.image_size,
                                pix)
         if self.title_pos == TitleBar.Title_Left:
             painter.drawPixmap(5, self.height()//2-self.image_size[1]//2, *self.image_size, pix)
         if self.is_sync_icon:
-            self.__parent.setWindowIcon(QIcon(self.title_icon_path))
+            self.__parent.setWindowIcon(QIcon(self.iconPath()))
 
     # 更新标题栏大小
     def updateTitleSize(self) -> None:
@@ -451,6 +460,20 @@ class TitleBar(WidgetABC):
         self.lm.move(occ_w,lm_h)
         occ_w = occ_w+self.lm.width()+btn_w_interval
         self.cm.move(occ_w,cm_h)
+
+    def eventFilter(self, obj: 'QObject', event) -> bool:
+        return False
+
+    def mousePressEvent(self, e: QMouseEvent) -> None:
+        if e.button() == qt.LeftButton:  # 处理窗口移动
+            self.movePressState = True
+            old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            self.pressPos = old_pos - self.__parent.pos()
+
+    def mouseMoveEvent(self, e: QMouseEvent) -> None:
+        if self.movePressState:
+            old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            self.__parent.move(old_pos - self.pressPos)
 
     def paintEvent(self, event: QPaintEvent) -> None:
         super().paintEvent(event)

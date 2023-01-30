@@ -226,7 +226,7 @@ class WidgetABC(QWidget,CustomStyle):
         painter.drawRoundedRect(rect_, self.get_radius(), self.get_radius())
 
     def eventFilter(self, obj: 'QObject', event:QEvent) -> bool:
-        # 做为子窗口时,限制事件
+        # 做为子窗口时,限制事件,event.MouseMove
         if self.__RestrictedOperation is False and event.type() in [event.KeyRelease,event.KeyPress,event.MouseMove]:
             return True
         else:
@@ -264,7 +264,6 @@ class WidgetABC(QWidget,CustomStyle):
                 old_pos = e.globalPosition().toPoint()
             else:
                 old_pos = QPoint(0, 0)
-
             self.move(old_pos - self.pressPos)
         self.updateCursor(e.pos())
         self.expandEdge(e.pos())
