@@ -65,7 +65,7 @@ if PYQT_VERSIONS == "PyQt5"  :
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     Window = Qt.WindowType.Window
-    WindingFill = Qt.WindowType.WindingFill
+    WindingFill = Qt.FillRule.WindingFill
     FramelessWindowHint = Qt.WindowType.FramelessWindowHint
     WindowStaysOnTopHint =Qt.WindowType.WindowStaysOnTopHint
     ArrowCursor = Qt.CursorShape.ArrowCursor

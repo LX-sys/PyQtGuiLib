@@ -467,15 +467,19 @@ class TitleBar(WidgetABC):
     def mousePressEvent(self, e: QMouseEvent) -> None:
         if e.button() == qt.LeftButton:  # 处理窗口移动
             self.movePressState = True
-            old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            if PYQT_VERSIONS in ["PyQt5", "PySide2", "PySide6"]:
+                old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            elif PYQT_VERSIONS == "PyQt6":
+                old_pos=QPoint(self.x()+e.globalPosition().toPoint().x(),self.y()+e.globalPosition().toPoint().y())
             self.pressPos = old_pos - self.__parent.pos()
 
     def mouseMoveEvent(self, e: QMouseEvent) -> None:
         if self.movePressState:
-            old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            if PYQT_VERSIONS in ["PyQt5", "PySide2", "PySide6"]:
+                old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            elif PYQT_VERSIONS == "PyQt6":
+                old_pos=QPoint(self.x()+e.globalPosition().toPoint().x(),self.y()+e.globalPosition().toPoint().y())
             self.__parent.move(old_pos - self.pressPos)
-        print("--")
-        self.expandEdge(e.globalPos())
 
     def paintEvent(self, event: QPaintEvent) -> None:
         super().paintEvent(event)

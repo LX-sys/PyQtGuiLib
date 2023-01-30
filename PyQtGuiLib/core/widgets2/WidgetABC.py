@@ -17,10 +17,10 @@ from PyQtGuiLib.header import (
     QColor,
     QRect,
     QGraphicsDropShadowEffect,
+    QEvent
 )
 import re
 import json
-from PyQt5.QtCore import QEvent
 
 
 '''
