@@ -12,7 +12,7 @@ from PyQtGuiLib.header import (
 from PyQtGuiLib.core.widgets2 import WidgetABC
 from PyQtGuiLib.core.widgets2.titleBar import TitleBar
 from PyQtGuiLib.core.widgets2.statusBar import StatusBar
-from PyQt6.sip import delete
+from PyQt5.sip import delete
 # import ctypes
 # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 
@@ -83,8 +83,10 @@ if __name__ == '__main__':
     win = BorderlessMainWindow()
     # win.setEnableGColor(True)
     win.setStyleSheet('''
+BorderlessMainWindow{
 qproperty-radius:7;
 qproperty-backgroundColor:rgba(255, 170, 127,255);
+}
     ''')
     win.show()
 
