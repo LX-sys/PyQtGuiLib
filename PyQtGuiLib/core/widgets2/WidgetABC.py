@@ -4,11 +4,13 @@ from PyQtGuiLib.header import (
     sys,
     CustomStyle,
     qt,
+    Qt,
     QWidget,
     QMouseEvent,
     QPaintEvent,
     QPainter,
     QLinearGradient,
+    QRadialGradient,
     QPen,
     QBrush,
     QPoint,
@@ -33,7 +35,7 @@ class WidgetABC(QWidget,CustomStyle):
     qproperty-borderStyle --> 边框的风格 Eg: solid
     qproperty-borderColor --> 边框颜色 Eg: rgba(0,100,255,255)
     qproperty-border   --> 边框样式 Eg: "3 solid rgba(0,100,255,255)"
-    qproperty-linearDirection; --> 渐变的方向 Eg: "LR"
+    qproperty-linearDirection; --> 线性渐变的方向 Eg: "LR"
         LR: 左->右
         RL: 右->左
         UD: 上->下
@@ -43,7 +45,11 @@ class WidgetABC(QWidget,CustomStyle):
         UDANG: 右上角->左下角
         DUANG: 左下角->右上角
         自定义: [0,0,100,100]或者[0,0,w,h]  这里的 w,h 代只窗口当前的宽和高
-    qproperty-linearColor --> 渐变色 Eg: "rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)"
+    qproperty-linearColor --> 线性渐变色 Eg: "rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)"
+    qproperty-linear --> 线性渐变
+        Eg: "LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+        Eg: "[0,0,w,h] rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+
     '''
     Top = "top"
     Down = "Down"
@@ -78,6 +84,9 @@ class WidgetABC(QWidget,CustomStyle):
         # 操作限制
         self.installEventFilter(self)
 
+    # 设置窗口模态
+    def setWinModality(self,b:bool):
+        self.setWindowModality(Qt.ApplicationModal)
 
     # 设置 限制操作
     def setRestrictedOperation(self,b:bool):
@@ -173,9 +182,7 @@ class WidgetABC(QWidget,CustomStyle):
             temp_linearDirection = self.get_linearDirection()
             linearDirection_dict = {
                 "w": str(self.width()),
-                "h": str(self.height()),
-                "cw": str(self.width() // 2),
-                "ch": str(self.height() // 2)
+                "h": str(self.height())
             }
             for c in re.findall(r"[a-z]", temp_linearDirection):
                 v = linearDirection_dict.get(c, None)
@@ -241,7 +248,7 @@ class WidgetABC(QWidget,CustomStyle):
 
             self.pressPos = old_pos - self.pos()
 
-            self.setCursor(qt.OpenHandCursor)
+            # self.setCursor(qt.OpenHandCursor)
 
     def mouseReleaseEvent(self,e:QMouseEvent) -> None:
         self.pressDirection.clear()
@@ -275,9 +282,7 @@ class WidgetABC(QWidget,CustomStyle):
 
         # 绘制背景
         self.drawBackgroundColor(painter)
-
         painter.end()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -286,10 +291,11 @@ if __name__ == '__main__':
     win.setStyleSheet('''
 WidgetABC{
 qproperty-radius:7;
-qproperty-backgroundColor: rgba(234, 234, 234,255);
-qproperty-linearDirection:"DuANG";
-qproperty-linearColor:"rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)";
-qproperty-border:"4 solid rgba(234, 234, 234, 255)";
+qproperty-backgroundColor: rgba(0, 0, 200,255);
+/*qproperty-linearDirection:"LR";
+qproperty-linearColor:"rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";*/
+qproperty-linear:"LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+/*qproperty-border:"2 solid rgba(200, 200, 200, 255)";*/
 }
 #     ''')
     win.show()
