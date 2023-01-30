@@ -19,6 +19,10 @@ class BorderlessWidget(WidgetABC):
         self.btn.clicked.connect(self.t_event)
 
     def t_event(self):
+        self.c = WidgetABC()
+        # 无边框模态
+        self.c.setWinModality(True)
+        self.c.show()
         win.setStyleSheet('''
         WidgetABC{
         qproperty-border:"3 dot rgba(100,100,255,255)";

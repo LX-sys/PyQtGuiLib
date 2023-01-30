@@ -111,7 +111,6 @@ class BuiltStyleDesigner(BuiltStyleDesignerUI):
             print("子节点:",text)
             if not self.controls:
                 return
-
             # 设置
             self.cu_fun = text
 

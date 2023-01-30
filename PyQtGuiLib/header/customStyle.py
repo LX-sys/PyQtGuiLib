@@ -37,7 +37,7 @@ class CustomStyle:
 
         # ----
         # 内边距
-        self._margin = 5
+        self._margin = 2
 
     def __set_radius(self,r:int):
         self._radius = r
@@ -66,7 +66,7 @@ class CustomStyle:
     def __set_fontStyle(self,style:str):
         self._fontStyle = style
 
-    def get_fontStyle(self)->str:
+    def get_fontStyle(self) -> str:
         return self._fontStyle
 
     def __set_font(self,fontstr:str):

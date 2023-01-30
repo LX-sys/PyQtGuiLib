@@ -19,7 +19,8 @@ from PyQtGuiLib.header import (
     QPixmap,
     QIcon,
     desktopSize,
-    textSize
+    textSize,
+    QMouseEvent
 )
 
 from PyQtGuiLib.core.widgets2 import WidgetABC
@@ -227,7 +228,7 @@ class TitleBar(WidgetABC):
             self.__parent = args[0]
 
         # 标题默认高度
-        self.__title_height = 30
+        self.__title_height = 32
 
         # 保存窗口在放大之前的位置大小,已经窗口大小状态
         self.old_screen_geometry = QRect(0,0,0,0) # type:QRect
@@ -252,16 +253,6 @@ class TitleBar(WidgetABC):
 
         # ---
         self.createButton()
-        self.defaultStyle()
-
-    # 默认风格
-    def defaultStyle(self):
-        self.setStyleSheet('''
-TitleBar{
-qproperty-backgroundColor: rgba(165, 138, 255,200);
-qproperty-margin:0;
-}
-        ''')
 
     def setTitleText(self,text:str):
         self.__title_text = text
@@ -439,11 +430,11 @@ qproperty-margin:0;
 
     # 更新标题栏大小
     def updateTitleSize(self) -> None:
-        self.move(self.get_margin(), self.get_margin())
-        self.resize(self.__parent.width()-self.get_margin()*2, self.defaultHeight()+self.get_margin()*2)
+        self.move(self.get_margin(), 2)
+        self.resize(self.__parent.width()-self.get_margin()*2, self.defaultHeight())
 
         # 自动计算 缩小,放大,关闭 的位置
-        btn_w_interval = 15 # 按钮直接的间隔
+        btn_w_interval = 15 # 按钮之间的间隔
         # 按钮占据的总宽度
         btn_occupied_width = self.zm.width()+self.lm.width()+self.cm.width()+btn_w_interval*5
         occ_w = self.width()-btn_occupied_width
