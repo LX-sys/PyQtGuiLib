@@ -32,7 +32,8 @@ class CustomStyle:
         # 线性渐变
         self._linearDirection = "LR"
         self._linearColor = "rgba(153, 153, 230, 60) rgba(98, 98, 147, 255)"
-        self._linear ="[0,0,0,0] rgba(153, 153, 230, 60) rgba(98, 98, 147, 255)"
+        self._linear ="LR rgba(153, 153, 230, 60) rgba(98, 98, 147, 255)"
+        #
 
         # ----
         # 内边距
@@ -159,6 +160,19 @@ class CustomStyle:
     def get_linearColor(self) -> str:
         return self._linearColor
 
+    def __set_linear(self,linear_gradient:str):
+        self._linear = linear_gradient
+        if "[" in linear_gradient and "]" in linear_gradient:
+            direction,colors = linear_gradient.split("]")
+            direction+="]"
+        else:
+            direction, colors = linear_gradient.split(" ",1)
+        self.__set_linearDirection(direction)
+        self.__set_linearColor(colors)
+
+    def get_linear(self)->str:
+        return self._linear
+
     radius = pyqtProperty(int,fset=__set_radius,fget=get_radius)
     color = pyqtProperty(QColor, fset=__set_color, fget=get_color)
     backgroundColor = pyqtProperty(QColor, fset=__set_backgroundColor, fget=get_backgroundColor)
@@ -173,3 +187,4 @@ class CustomStyle:
     # 线性渐变
     linearDirection = pyqtProperty(str,fset=__set_linearDirection,fget=get_linearDirection)
     linearColor = pyqtProperty(str,fset=__set_linearColor,fget=get_linearColor)
+    linear = pyqtProperty(str,fset=__set_linear,fget=get_linear)
