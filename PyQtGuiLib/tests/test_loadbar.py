@@ -27,7 +27,7 @@ class DurationTimeThread(QThread):
         while True:
             self.added.emit(n)
             n+=1
-            self.msleep(100)
+            self.msleep(50)
             if n == 100+1:
                 print("完成")
                 break

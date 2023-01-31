@@ -18,7 +18,7 @@ class Test_ColorPalette(QWidget):
         self.resize(600,600)
 
         self.cp = ColorPalette(self)
-        self.cp.setStyleMode(ColorPalette.Style_White)
+        self.cp.setStyleMode(ColorPalette.Style_Black)
         self.cp.move(10,10)
         self.cp.clicked.connect(lambda t,c:print(t,c))
         self.cp.colorNamed.connect(self.test)

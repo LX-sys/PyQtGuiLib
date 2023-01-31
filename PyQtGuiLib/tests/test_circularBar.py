@@ -22,7 +22,7 @@ class DurationTimeThread(QThread):
         while True:
             self.added.emit(n)
             n+=1
-            self.msleep(80)
+            self.msleep(50)
             if n == 100+1:
                 break
 
@@ -32,11 +32,11 @@ class TestPullOverWidget(QMainWindow):
         self.resize(500,500)
 
         self.setObjectName("test")
-#         self.setStyleSheet('''
-# #test{
-# background-color: rgb(25, 25, 25);
-# }
-#         ''')
+        self.setStyleSheet('''
+#test{
+background-color: rgb(25, 25, 25);
+}
+        ''')
 
         self.th = DurationTimeThread()
         self.th.added.connect(self.test)
@@ -46,11 +46,11 @@ class TestPullOverWidget(QMainWindow):
         self.cir.setStyleSheet('''
 CircularBar{
 qproperty-color:rgba(100,100,100,255);
-qproperty-fontSize:15;
+/*qproperty-fontSize:15;
 qproperty-outerColor:rgba(100,255,100,255);
-qproperty-innerColor:rgba(100,255,100,255);
+qproperty-innerColor:rgba(100,255,100,255);*/
 }
-        ''')
+#         ''')
         self.cir.resize(150,150)
         self.cir.setVariableLineSegment(CircularBar.Double)
         self.cir.setOuterStyle(CircularBar.CustomDashLine)
