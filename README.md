@@ -84,29 +84,38 @@ dumpStructure(widget :QWidget ,spaceCount=0)  # 控件的组成分析函数
 ```python
 导入方式
 from PyQtGuiLib.abandonCase.widgets import (
-    BorderlessMainWindow,  # 无边框矩形主窗口
-    BorderlessFrame,  # 无边框矩形QFrame窗口
-    BorderlessWidget,  # 无边框矩形QWidget窗口
-    BorderlessStackedWidget  # 无边框矩形StackedWidget窗口
+    BorderlessWidget,  # 无边框QWidget窗口
 )
 
 特性
 无边框, 可移动, 可拉伸, 窗口颜色风格变化多样
 
-窗口系列
-类变量
-# 渐变的方向
-G_Vertical
-G_Horizontal
-
 窗口系列 - --- API介绍
-setRadius()  # 设置圆角半径(不要超过8)
-setWindowColor()  # 设置窗体颜色
-setWindowBorderColor()  # 设置边框颜色
 setEnableGColor()  # 设置是否启用渐变色
-setWindowGColor()  # 设置窗体渐变色
-setBorderStyle()  # 设置变框风格
-setBorderWidth()  # 设置边的宽度
+
+自定义QSS  --- 目前支持的
+qproperty-radius  --> 圆角  Eg: 7
+qproperty-backgroundColor  --> 背景颜色 Eg: rgba(165, 138, 255,200)
+qproperty-borderWidth --> 边的宽度 Eg: 1
+qproperty-borderStyle --> 边框的风格 Eg: solid
+qproperty-borderColor --> 边框颜色 Eg: rgba(0,100,255,255)
+qproperty-border   --> 边框样式 Eg: "3 solid rgba(0,100,255,255)"
+qproperty-linearDirection; --> 线性渐变的方向 Eg: "LR"
+    LR: 左->右
+    RL: 右->左
+    UD: 上->下
+    DU: 下->上
+    LRANG: 左上角->右下角
+    RLANG: 右下角->左上角
+    UDANG: 右上角->左下角
+    DUANG: 左下角->右上角
+    自定义: [0,0,100,100]或者[0,0,w,h]  这里的 w,h 代只窗口当前的宽和高
+qproperty-linearColor --> 线性渐变色 Eg: "rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)"
+qproperty-linear --> 线性渐变
+    Eg: "LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+    Eg: "[0,0,w,h] rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+
+
 ```
 ## 组件说明
 
