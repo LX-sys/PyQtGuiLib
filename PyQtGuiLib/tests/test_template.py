@@ -12,19 +12,19 @@ from PyQtGuiLib.header import (
     QPainter,
     QBrush,
     QSize,
-    QMainWindow
+    QMainWindow,
+    QComboBox
 )
 
 '''
     测试用例的标准模板,该代码用于复制
 '''
+from PyQtGuiLib.core.resolver import dumpStructure
 
 class Test(QMainWindow):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
-        self.setCentralWidget()
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
