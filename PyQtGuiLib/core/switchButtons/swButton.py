@@ -9,11 +9,11 @@ from PyQtGuiLib.header import (
     qt,
     Signal
 )
-
+from PyQtGuiLib.core.widgets import WidgetABC
 '''
     开关按钮
 '''
-class SwitchButton(QWidget):
+class SwitchButton(WidgetABC):
     clicked = Signal(bool)
 
     # --- 形状

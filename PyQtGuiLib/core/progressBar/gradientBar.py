@@ -5,17 +5,10 @@
 # @software:PyCharm
 
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    sys,
-    QApplication,
     QWidget,
-    Signal,
-    QFont,
     QColor,
-    QPen,
     QPainter,
     QPaintEvent,
-    QFontMetricsF,
     QSize,
     QResizeEvent,
     QLinearGradient,
@@ -23,11 +16,12 @@ from PyQtGuiLib.header import (
     Signal,
     qt
 )
+from PyQtGuiLib.core.widgets import WidgetABC
 '''
     线性渐变进度条
 '''
 
-class GradientBar(QWidget):
+class GradientBar(WidgetABC):
     # 进度改变时,发出信号
     valueChange = Signal(int)
     
@@ -155,14 +149,3 @@ class GradientBar(QWidget):
         self.degree = round(self.w/self.max_value,2)
         self.setValue(self.value())
         super().resizeEvent(e)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = GradientBar()
-    win.show()
-
-    if PYQT_VERSIONS == "PyQt6":
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
