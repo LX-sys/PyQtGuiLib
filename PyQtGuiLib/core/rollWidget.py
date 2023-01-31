@@ -221,6 +221,7 @@ border:2px solid rgb(204, 204, 204);
         widget.setFixedSize(self.default_size)
 
         self.controls.append(widget)
+        self.update()
 
     # 移除控件(未写)
     def removeWidget(self,widget:QWidget):

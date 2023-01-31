@@ -28,8 +28,8 @@ class TestNoBorder(BorderlessWidget):
         # self.setEnableGColor(True)
         self.setStyleSheet('''
         WidgetABC{
-        qproperty-radius:2;
-        qproperty-backgroundColor: rgba(240, 240, 240,230);
+        qproperty-radius:7;
+        qproperty-backgroundColor: rgba(100, 240, 240,255);
         /*qproperty-linearDirection:"LR";
         qproperty-linearColor:"rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
         qproperty-linear:"LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";*/
@@ -38,11 +38,6 @@ class TestNoBorder(BorderlessWidget):
         }
         #     ''')
 
-        self.ww = QLabel(self)
-        self.ww.setStyleSheet('''
-        background-color: rgba(240, 240, 240,230);
-        ''')
-        self.ww.resize(self.size())
 
 
         self.flag = False

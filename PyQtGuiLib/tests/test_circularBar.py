@@ -32,23 +32,30 @@ class TestPullOverWidget(QMainWindow):
         self.resize(500,500)
 
         self.setObjectName("test")
-        self.setStyleSheet('''
-#test{
-background-color: rgb(25, 25, 25);
-}
-        ''')
+#         self.setStyleSheet('''
+# #test{
+# background-color: rgb(25, 25, 25);
+# }
+#         ''')
 
         self.th = DurationTimeThread()
         self.th.added.connect(self.test)
 
 
         self.cir = CircularBar(self)
+        self.cir.setStyleSheet('''
+CircularBar{
+qproperty-color:rgba(100,100,100,255);
+qproperty-fontSize:15;
+qproperty-outerColor:rgba(100,255,100,255);
+qproperty-innerColor:rgba(100,255,100,255);
+}
+        ''')
         self.cir.resize(150,150)
         self.cir.setVariableLineSegment(CircularBar.Double)
         self.cir.setOuterStyle(CircularBar.CustomDashLine)
         self.cir.setOuterDashPattern([2,3,5,6])
         self.cir.setInnerStyle(CircularBar.DashLine)
-        self.cir.setTextSize(15)
         self.cir.move(50,50)
         self.cir.valueChange.connect(lambda v:print("v:",v))
 

@@ -36,13 +36,13 @@ class BorderlessMainWindow(WidgetABC):
 
         self.createTitleBar()
 
-        self.coreWin = WidgetABC(self)
-        self.coreWin.setStyleSheet('''
-         WidgetABC{
-         qproperty-backgroundColor:rgba(0, 255, 127,255);
-         }
-         ''')
-        self.setCentralWidget(self.coreWin)
+        # self.coreWin = WidgetABC(self)
+        # self.coreWin.setStyleSheet('''
+        #  WidgetABC{
+        #  qproperty-backgroundColor:rgba(0, 255, 127,255);
+        #  }
+        #  ''')
+        # self.setCentralWidget(self.coreWin)
 
         # self.status = StatusBar(self)
         # self.status.setStatusPos(StatusBar.PosBottom)
@@ -75,6 +75,21 @@ class BorderlessMainWindow(WidgetABC):
             }
             '''%(h,s,v,a,h,s,v,a))
             self.titlebar.show()
+
+    def paintEvent(self, event) -> None:
+        super().paintEvent(event)
+        if hasattr(self, "titlebar"):
+            h, s, v, a = self.get_backgroundColor().getHsv()
+            v = 0 if v - 30 < 0 else v - 30
+            self.titlebar.setStyleSheet('''
+                        TitleBar{
+                        qproperty-fontSize:14;
+                        qproperty-borderWidth:0;
+                        qproperty-borderColor:hsv(%d, %d, %d,%d);
+                        qproperty-backgroundColor: hsv(%d, %d, %d,%d);
+                        }
+                        ''' % (h, s, v, a, h, s, v, a))
+
 
     def setCentralWidget(self,widget:QWidget):
         if hasattr(self, "titlebar"):

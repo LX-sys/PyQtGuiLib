@@ -26,6 +26,7 @@ class Test(QMainWindow):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = Test()

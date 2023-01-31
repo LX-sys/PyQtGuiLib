@@ -6,25 +6,25 @@
 from PyQtGuiLib.header import (
     QWidget,
     Signal,
-    Qt,
     QFont,
     QColor,
     QPen,
     QPainter,
     QPaintEvent,
-    QFontMetricsF,
     QSize,
     QResizeEvent,
     QPropertyAnimation,
     QPoint,
-    QThread,
     qt,
-    textSize
+    textSize,
+    pyqtProperty
 )
 
 '''
     水球进度条
 '''
+
+from PyQtGuiLib.core.widgets import WidgetABC
 from random import randint
 
 # 小气泡
@@ -62,7 +62,7 @@ class SmallBubble(QWidget):
         painter.end()
 
 
-class WaterBar(QWidget):
+class WaterBar(WidgetABC):
     # 进度改变时,发出信号
     valueChange = Signal(int)
 
@@ -79,17 +79,15 @@ class WaterBar(QWidget):
         self.sn = 180
         self.en = 3.6
 
-        self.water_vat_color = QColor(61, 203, 255,255) # 水缸里面没有被水覆盖的颜色
-        self.water_vat_border_color = QColor(21, 185, 255,180) # 水缸边的颜色
-        self.water_color = QColor(0, 135, 203) # 水的颜色
+        self._water_vat_color = QColor(61, 203, 255,255) # 水缸里面没有被水覆盖的颜色
+        self._water_vat_border_color = QColor(21, 185, 255,180) # 水缸边的颜色
+        self._water_color = QColor(0, 135, 203) # 水的颜色
 
         # 当前百分比
         self.cu_value = 0
 
         # 文字属性
         self.text = "100%"
-        self.text_size = 40
-        self.text_color = QColor(0, 188, 188)
         self.__is_hide_text = False
 
     # 产生气泡
@@ -116,17 +114,6 @@ class WaterBar(QWidget):
     def setText(self,text:str):
         self.text = text
 
-    def setTextColor(self,color:QColor):
-        self.text_color = color
-
-    def setTextSize(self,size:int):
-        self.text_size = size
-
-    def setAllText(self,text:str,color:QColor,size:int):
-        self.setText(text)
-        self.setTextColor(color)
-        self.setTextSize(size)
-
     def isHideText(self,b:bool):
         self.__is_hide_text = b
 
@@ -142,23 +129,29 @@ class WaterBar(QWidget):
     def setBallSizeInterval(self,interval:list):
         self.size_interval = interval
 
-    # 设置水的颜色
-    def setWaterColor(self,color:QColor):
-        self.water_color = color
+    def __set_waterColor(self,color:QColor):
+        self._water_color = color
 
-    # 设置水缸中没有被水覆盖的颜色
-    def setWaterVatColor(self,color:QColor):
-        self.water_vat_color = color
+    def get_waterColor(self)->QColor:
+        return self._water_color
 
-    # 设置水缸边缘的颜色
-    def setWaterVatBorderColor(self,color:QColor):
-        self.water_vat_border_color = color
+    def __set_waterVatColor(self,color:QColor):
+        self._water_vat_color = color
+
+    def get_waterVatColor(self)->QColor:
+        return self._water_vat_color
+
+    def __set_waterVatBorderColor(self,color:QColor):
+        self._water_vat_border_color = color
+
+    def get_waterVatBorderColor(self)->QColor:
+        return self._water_vat_border_color
 
     # 画水位
     def drawWaterLevel(self,painter:QPainter):
-        painter.setPen(QPen(self.water_vat_border_color, 3))
+        painter.setPen(QPen(self.get_waterVatBorderColor(), 3))
         # 画圆
-        painter.setBrush(self.water_vat_color)
+        painter.setBrush(self.get_waterVatColor())
         painter.drawEllipse(2,2,self.w-4,self.h-4)
 
         # --------------
@@ -170,7 +163,7 @@ class WaterBar(QWidget):
         #                   self.process * 3.6 * 16)  # blue lower
 
         # 画弧
-        painter.setBrush(self.water_color)
+        painter.setBrush(self.get_waterColor())
         painter.drawChord(2,2,self.w-4,self.h-4,
                           int((-self.cu_value*1.8+270)*16),
                           int(self.cu_value*self.en*16))
@@ -181,9 +174,9 @@ class WaterBar(QWidget):
             # 绘制文字
             f = QFont()
             f.setBold(True)
-            f.setPointSize(self.text_size)
+            f.setPointSize(self.get_fontSize())
             painter.setFont(f)
-            painter.setPen(self.text_color)
+            painter.setPen(self.get_color())
             # 文字
             fs = textSize(f,self.text)
             fw = fs.width()
@@ -214,3 +207,13 @@ class WaterBar(QWidget):
         self.w = e.size().width()
         self.h = e.size().height()
         super().resizeEvent(e)
+
+    # 专属QSS
+    '''
+    waterColor --> 水的颜色
+    waterVatColor --> 水缸中没有被水覆盖的颜色
+    waterVatBorderColor --> 水缸边缘的颜色
+    '''
+    waterColor = pyqtProperty(QColor,fset=__set_waterColor,fget=get_waterColor)
+    waterVatColor = pyqtProperty(QColor,fset=__set_waterVatColor,fget=get_waterVatColor)
+    waterVatBorderColor = pyqtProperty(QColor,fset=__set_waterVatBorderColor,fget=get_waterVatBorderColor)

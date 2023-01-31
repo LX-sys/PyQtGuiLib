@@ -69,7 +69,7 @@ class WidgetABC(QWidget,CustomStyle):
         self.setAttribute(qt.WA_TranslucentBackground)
         self.setWindowFlags(qt.FramelessWindowHint | qt.Widget)
         self.setMouseTracking(True)  # 开启鼠标跟踪
-        
+
         # 用于窗口的移动属性
         self.scope = 10  # 检测鼠标是否在边缘按下的范围
         self.pressDirection = []  # 记录鼠标点击的边的方向
@@ -215,8 +215,8 @@ class WidgetABC(QWidget,CustomStyle):
         else:
             # 绘制纯色背景
             bgcolor = QBrush(self.get_backgroundColor())
-        painter.setBrush(bgcolor)
 
+        painter.setBrush(bgcolor)
         # 绘制
         rect_ = self.rect()
         rect_.setX(rect_.x() + self.get_margin())
@@ -267,18 +267,42 @@ class WidgetABC(QWidget,CustomStyle):
             self.move(old_pos - self.pressPos)
         self.updateCursor(e.pos())
         self.expandEdge(e.pos())
-    
+
     def paintEvent(self, event:QPaintEvent) -> None:
         painter = QPainter(self)
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)  # 抗锯齿
 
-        # 绘制边框
+        # 透明原本边框
         op = QPen()
+        op.setColor(qt.transparent)
+        painter.setPen(op)
+
+        # 绘制背景
+        self.drawBackgroundColor(painter)
+
+        # 绘制边框
         op.setWidth(self.get_borderWidth())
         op.setColor(self.get_borderColor())
         op.setStyle(self.get_borderStyle())
         painter.setPen(op)
 
-        # 绘制背景
-        self.drawBackgroundColor(painter)
+        painter.drawRoundedRect(self.rect(),self.get_radius(),self.get_radius())
+
         painter.end()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = WidgetABC()
+    win.setStyleSheet('''
+WidgetABC{
+qproperty-radius:0;
+/*qproperty-backgroundColor:rgba(255,0,2,255);*/
+/*qproperty-borderColor:rgba(255,0,2,255);*/
+}
+    ''')
+    win.show()
+
+    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
+        sys.exit(app.exec())
+    else:
+        sys.exit(app.exec_())

@@ -184,11 +184,6 @@ CustomDashLine # 自定义样式(这个必须配合api使用才会生效)
 
 # --- Api
 setText()  # 设置文本
-setTextColor() # 设置文本颜色
-setTextSize()  # 设置文本大小
-setAllText() # 同时设置文本,颜色,大小
-setOuterColor() # 设置外圈颜色
-setInnerColor() # 设置内圈颜色
 setOuterStyle() # 设置外圈风格(线段的风格类变量)
 setInnerStyle() # 设置内圈风格(线段的风格类变量)
 setVariableLineSegment() # 设置变化的线段(这里的参数就前3个类变量)
@@ -196,6 +191,14 @@ setValue() # 设置进度条的值0~100
 value() # 返回进度条的值
 setOuterDashPattern() # 设置外圈自定义线段样式(必须配合CustomDashLine类变量才生效)
 setInnerDashPattern() # 设置内圈自定义线段样式(必须配合CustomDashLine类变量才生效)
+
+自定义QSS
+CircularBar{
+qproperty-color:rgba(100,100,100,255);
+qproperty-fontSize:15;
+qproperty-outerColor:rgba(100,255,100,255);
+qproperty-innerColor:rgba(100,255,100,255);
+}
 ```
 
 ### 加载进度条(LoadBar)
@@ -211,14 +214,15 @@ valueChange  # 进度条变化时触发
 
 # --- Api
 setText()  # 设置文本
-setTextColor() # 设置文本颜色
-setTextSize()  # 设置文本大小
-setAllText() # 同时设置文本,颜色,大小
 isHideText() # 设置是否需要显示进度的文字
-setOuterRadius() # 设置进度条的外圆角大小(默认是20)
-setInnerRadius() # 设置进度条的内圆角大小(默认是15)
-setRadius() # 设置进度条的内外圆角
-setBorderWidth() # 设置进度条边的宽(默认是3)
+
+自定义QSS
+LoadBar{
+qproperty-color:rgba(100,200,100,255);
+qproperty-fontSize:10;
+qproperty-outerRadius:20;
+qproperty-innerRadius:15;
+}
 ```
 
 ### 水球进度条(WaterBar)
@@ -227,23 +231,26 @@ setBorderWidth() # 设置进度条边的宽(默认是3)
 水球进度条  ----> 90%
 导入方式 from PyQtGuiLib.core.progressBar import WaterBar
 
-加载进度条 -- WaterBar API介绍
+水球进度条 -- WaterBar API介绍
 
 # ---信号
 valueChange  # 进度条变化时触发
 
 # --- Api
 setText()  # 设置文本
-setTextColor() # 设置文本颜色
-setTextSize()  # 设置文本大小
-setAllText() # 同时设置文本,颜色,大小
 isHideText() # 设置是否需要显示进度的文字
 setBallInterval() # 设置每个数值变化,球产生的个数区间(默认[1,1])
 setBallSpeedInterval() # 设置每颗球移动的速度区间(默认[1200,4000])
 setBallSizeInterval() # # 设置每颗球生成的大小区间(默认[5,15])
-setWaterColor() # 设置水的颜色
-setWaterVatColor() # 设置水缸中没有被水覆盖的颜色
-setWaterVatBorderColor() # 设置水缸边缘的颜色
+
+自定义QSS
+WaterBar{
+qproperty-color:rgba(100,200,100,255);
+qproperty-fontSize:20;
+/*qproperty-waterColor:rgba(0,255,0,255);
+qproperty-waterVatBorderColor:rgba(0,173,0,255);
+qproperty-waterVatColor:rgba(0,170,255,255);*/
+}
 ```
 
 ### 组件轮播(SlideShow)
@@ -298,10 +305,10 @@ getColors()  # 返回所有的颜色和比重
 注意,这个进度条不提供文字显示,如果需要请自行编写
 ```
 
-### 标题栏(TitleBar)
+### 标题栏(TitleBar重写中)
 
 ```python
-标题栏 - ---> 99 %
+标题栏 - ---> 99 % 
 导入方式
 from PyQtGuiLib.abandonCase.widgets import TitleBar
 
@@ -335,7 +342,7 @@ app = QApplication()
 app.setWindowIcon(QIcon(路径))
 ```
 
-### 状态栏(StatusBar)
+### 状态栏(StatusBar重写中)
 
 ```python
 状态栏 - ---> 80 % 测试使用中

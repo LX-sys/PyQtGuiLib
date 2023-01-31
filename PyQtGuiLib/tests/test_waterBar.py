@@ -45,8 +45,17 @@ class TestPullOverWidget(QMainWindow):
 #         ''')
 
         self.waterbar = WaterBar(self)
+        self.waterbar.setRestrictedOperation(True)
+        self.waterbar.setStyleSheet('''
+WaterBar{
+qproperty-color:rgba(100,200,100,255);
+qproperty-fontSize:20;
+/*qproperty-waterColor:rgba(0,255,0,255);
+qproperty-waterVatBorderColor:rgba(0,173,0,255);
+qproperty-waterVatColor:rgba(0,170,255,255);*/
+}
+        ''')
         self.waterbar.resize(120,120)
-        self.waterbar.setTextSize(30)
         self.waterbar.move(50,100)
 
         self.th = DurationTimeThread()
