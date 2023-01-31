@@ -282,24 +282,3 @@ class WidgetABC(QWidget,CustomStyle):
         # 绘制背景
         self.drawBackgroundColor(painter)
         painter.end()
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = WidgetABC()
-    win.setEnableGColor(True)
-    win.setStyleSheet('''
-WidgetABC{
-qproperty-radius:7;
-qproperty-backgroundColor: rgba(0, 0, 200,255);
-/*qproperty-linearDirection:"LR";
-qproperty-linearColor:"rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";*/
-qproperty-linear:"LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
-/*qproperty-border:"2 solid rgba(200, 200, 200, 255)";*/
-}
-#     ''')
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())

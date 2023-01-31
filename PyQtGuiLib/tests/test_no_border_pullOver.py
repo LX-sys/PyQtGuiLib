@@ -7,28 +7,16 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    QMainWindow,
-    QThread,
-    Signal,
-    QColor,
-    QThread
+    QPushButton
 )
 
 from PyQtGuiLib.core import PullOver
-from PyQtGuiLib.core.widgets import ButtonWidget
-from PyQtGuiLib.core.widgets import (
-    RoundWidget,   # 圆角QWidget窗口
-    BorderlessMainWindow, # 无边框矩形主窗口
-    BorderlessFrame,      # 无边框矩形QFrame窗口
-    BorderlessWidget,     # 无边框矩形QWidget窗口
-    BorderlessStackedWidget  # 无边框矩形StackedWidget窗口
-    )
-
+from PyQtGuiLib.core.widgets import BorderlessWidget
 '''
     无边框窗口 + 窗口停靠 组合功能
 '''
 
-class TestCombination(RoundWidget):
+class TestCombination(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
@@ -39,9 +27,8 @@ background-color:#d4d4d4;
 border-radius:30px;
 }
         ''')
-        self.setOpacity(0.7)
 
-        self.show_btn = ButtonWidget()
+        self.show_btn = QPushButton()
         self.show_btn.resize(70, 70)
         self.show_btn.setObjectName("show_btn")
         self.show_btn.setStyleSheet('''

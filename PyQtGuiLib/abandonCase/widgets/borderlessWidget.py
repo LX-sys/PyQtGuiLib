@@ -1,26 +1,27 @@
 # -*- coding:utf-8 -*-
-# @time:2023/1/1322:39
+# @time:2022/12/1711:39
 # @author:LX
-# @file:borderlessFrame.py
+# @file:borderlessWidget.py
 # @software:PyCharm
 
-from PyQtGuiLib.core.widgets.borderlessWidgetABC import (
+from PyQtGuiLib.abandonCase.widgets.borderlessWidgetABC import (
     PYQT_VERSIONS,
     QApplication,
     sys,
-    Borderless,
     Public,
-    QFrame,
+    QWidget,
     QMouseEvent,
     QPaintEvent,
 )
 
-# 无边框的QFrame
-class BorderlessFrame(QFrame,Public):
+
+# 无边框的QWidget
+class BorderlessWidget(QWidget,Public):
     def __init__(self,*args,**kwargs):
         self.child_win = True if args else False
         super().__init__(parent_=self,*args,**kwargs)
         self.resize(800, 500)
+
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
         if not self.child_win:
@@ -41,9 +42,10 @@ class BorderlessFrame(QFrame,Public):
         self.borderless.pEvent(self,e)
         super().paintEvent(e)
 
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = BorderlessFrame()
+    win = BorderlessWidget()
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:

@@ -14,8 +14,7 @@ from PyQtGuiLib.header import (
     qt,
     pyqtProperty
 )
-
-from PyQtGuiLib.core.widgets2 import WidgetABC
+from PyQtGuiLib.core.widgets import WidgetABC
 
 class BubbleWidget(WidgetABC):
 
@@ -120,6 +119,8 @@ class BubbleWidget(WidgetABC):
         fs = textSize(f, self.text)
         fw = fs.width()
         fh = fs.height()
+
+        self.textExtend()
 
         # 画刷
         bru = QBrush(self.get_backgroundColor())

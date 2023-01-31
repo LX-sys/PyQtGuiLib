@@ -80,31 +80,33 @@ dumpStructure(widget :QWidget ,spaceCount=0)  # 控件的组成分析函数
 如果你在一个窗口类里面使用则不需要加
 ```
 ## 窗口系列
+
 ```python
-导入方式 
-from PyQtGuiLib.core.widgets import (
-    BorderlessMainWindow, # 无边框矩形主窗口
-    BorderlessFrame,      # 无边框矩形QFrame窗口
-    BorderlessWidget,     # 无边框矩形QWidget窗口
+导入方式
+from PyQtGuiLib.abandonCase.widgets import (
+    BorderlessMainWindow,  # 无边框矩形主窗口
+    BorderlessFrame,  # 无边框矩形QFrame窗口
+    BorderlessWidget,  # 无边框矩形QWidget窗口
     BorderlessStackedWidget  # 无边框矩形StackedWidget窗口
 )
 
 特性
-无边框,可移动,可拉伸,窗口颜色风格变化多样
+无边框, 可移动, 可拉伸, 窗口颜色风格变化多样
 
-窗口系列 类变量
+窗口系列
+类变量
 # 渐变的方向
 G_Vertical
 G_Horizontal
 
-窗口系列  ---- API介绍
-setRadius() # 设置圆角半径(不要超过8)
-setWindowColor() # 设置窗体颜色
-setWindowBorderColor() # 设置边框颜色
-setEnableGColor() # 设置是否启用渐变色
-setWindowGColor() # 设置窗体渐变色
-setBorderStyle() # 设置变框风格
-setBorderWidth() # 设置边的宽度
+窗口系列 - --- API介绍
+setRadius()  # 设置圆角半径(不要超过8)
+setWindowColor()  # 设置窗体颜色
+setWindowBorderColor()  # 设置边框颜色
+setEnableGColor()  # 设置是否启用渐变色
+setWindowGColor()  # 设置窗体渐变色
+setBorderStyle()  # 设置变框风格
+setBorderWidth()  # 设置边的宽度
 ```
 ## 组件说明
 
@@ -290,10 +292,12 @@ getColors()  # 返回所有的颜色和比重
 ### 标题栏(TitleBar)
 
 ```python
-标题栏  ----> 99%
-导入方式 from PyQtGuiLib.core.widgets import TitleBar
+标题栏 - ---> 99 %
+导入方式
+from PyQtGuiLib.abandonCase.widgets import TitleBar
 
-标题栏 -- TitleBar API介绍
+标题栏 - - TitleBar
+API介绍
 
 # ---- 类变量
 # 标题位置
@@ -305,19 +309,19 @@ MacStyle
 
 # --- Api
 setTitleText()  # 设置标题
-setTitleColor() # 设置标题颜色
+setTitleColor()  # 设置标题颜色
 setTitleSize()  # 设置标题字体大小
-setAllTitle() # 同时设置,标题,颜色,字体大小
-setTitlePos() # 设置标题的位置(例如居中: TitleBar.Title_Center)
-setBtnStyle() # 设置 缩小,放大,关闭 按钮的风格(默认: TitleBar.WinStyle)
-setAniDuration() # 设置动画的时长(默认300毫秒)
-setTitleIcon() # 设置图标(默认会同步任务栏的图标)
-setSyncWindowIcon() # 设置是否同步桌面任务栏的图标
-updateTitleSize() # 更新标题栏大小
+setAllTitle()  # 同时设置,标题,颜色,字体大小
+setTitlePos()  # 设置标题的位置(例如居中: TitleBar.Title_Center)
+setBtnStyle()  # 设置 缩小,放大,关闭 按钮的风格(默认: TitleBar.WinStyle)
+setAniDuration()  # 设置动画的时长(默认300毫秒)
+setTitleIcon()  # 设置图标(默认会同步任务栏的图标)
+setSyncWindowIcon()  # 设置是否同步桌面任务栏的图标
+updateTitleSize()  # 更新标题栏大小
 
 # -------
 注意: 图标同步任务栏的效果只在win下才有效果
-在Mac设置图标方法,下面这个设置路径是写在运行程序那里的
+在Mac设置图标方法, 下面这个设置路径是写在运行程序那里的
 app = QApplication()
 app.setWindowIcon(QIcon(路径))
 ```
@@ -325,20 +329,24 @@ app.setWindowIcon(QIcon(路径))
 ### 状态栏(StatusBar)
 
 ```python
-状态栏  ----> 80%  测试使用中
-导入方式 from PyQtGuiLib.core.widgets import StatusBar
+状态栏 - ---> 80 % 测试使用中
+导入方式
+from PyQtGuiLib.abandonCase.widgets import StatusBar
 
-状态栏 -- StatusBar API介绍
+状态栏 - - StatusBar
+API介绍
 
 # --- Api
 
-addText() # 添加文本,可以设置持续多长时间后消失
-addButton() # 添加按钮,可以设置一个点击事件
-addWidget() # 添加一个窗口
-addTime() # 添加时间
-setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
+addText()  # 添加文本,可以设置持续多长时间后消失
+addButton()  # 添加按钮,可以设置一个点击事件
+addWidget()  # 添加一个窗口
+addTime()  # 添加时间
+setTimeFormat()  # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
 
-这里所有添加的功能都可以通过 style 参数来设置样式
+这里所有添加的功能都可以通过
+style
+参数来设置样式
 ```
 ### 流式布局(FlowLayout)
 ```python

@@ -7,39 +7,31 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    QMainWindow,
-    QThread,
-    Signal,
-    QColor,
-    QThread,
     QPushButton,
     qt
 )
 
-from PyQtGuiLib.core.widgets import (
-    BorderlessMainWindow, # 无边框矩形主窗口
-    BorderlessFrame,      # 无边框矩形QFrame窗口
-    BorderlessWidget,     # 无边框矩形QWidget窗口
-    BorderlessStackedWidget  # 无边框矩形StackedWidget窗口
-    )
-
+from PyQtGuiLib.core.widgets import BorderlessWidget
 '''
-    继承窗口
+    无边框QWidget窗口 测试
 '''
 
 class TestNoBorder(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
-        self.setStyleSheet('''
-#widget{
-background-color:#d4d4d4;
-border-radius:30px;
-}
-        ''')
-        # self.setOpacity(0.7)
 
-        self.setEnableGColor(True)
+        # self.setEnableGColor(True)
+        self.setStyleSheet('''
+        WidgetABC{
+        qproperty-radius:7;
+        qproperty-backgroundColor: rgba(0, 100, 200,255);
+        /*qproperty-linearDirection:"LR";
+        qproperty-linearColor:"rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";*/
+        qproperty-linear:"LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+        /*qproperty-border:"2 solid rgba(200, 200, 200, 255)";*/
+        }
+        #     ''')
 
         self.flag = False
 

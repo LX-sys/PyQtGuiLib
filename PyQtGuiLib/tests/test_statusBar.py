@@ -7,15 +7,13 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    QResizeEvent,
-    QWidget,
 )
 
-from PyQtGuiLib.core.widgets import (
+from PyQtGuiLib.abandonCase.widgets import (
     BorderlessWidget,     # 无边框矩形QWidget窗口
     )
 
-from PyQtGuiLib.core.widgets import StatusBar
+from PyQtGuiLib.abandonCase.widgets import StatusBar
 from PyQtGuiLib.core.progressBar import GradientBar
 
 '''

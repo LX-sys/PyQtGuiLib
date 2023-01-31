@@ -1,3 +1,10 @@
+# -*- coding:utf-8 -*-
+# @time:2023/1/411:16
+# @author:LX
+# @file:statusBar.py
+# @software:PyCharm
+from PyQt5.QtCore import QObject
+
 from PyQtGuiLib.header import (
     is_win_sys,
     is_mac_sys,
@@ -5,19 +12,17 @@ from PyQtGuiLib.header import (
     QThread,
     Signal,
     QWidget,
-    QFrame,
     QHBoxLayout,
     QLabel,
     QPushButton,
     QSpacerItem,
-    QSizePolicy,
-    QPainter,
     QPaintEvent,
-    QStyleOption,
-    QStyle,
     qt
 )
-from PyQtGuiLib.core.widgets2 import WidgetABC
+'''
+    状态栏
+'''
+
 
 # 倒计时类
 class CountDownThread(QThread):
@@ -38,7 +43,7 @@ class CountDownThread(QThread):
             self.time_-=1
         self.timeOuted.emit()
 
-
+from PyQtGuiLib.core.widgets2 import WidgetABC
 class StatusBar(WidgetABC):
 
     PosBottom = "PosBottom"
@@ -100,7 +105,7 @@ class StatusBar(WidgetABC):
         if self.__parent is not None:
             self.updateStatusSize()
 
-    def parent(self):
+    def parent(self) -> QObject:
         return self.__parent
 
     # 设置状态栏位置
