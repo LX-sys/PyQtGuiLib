@@ -32,7 +32,7 @@ class Test(QWidget):
 
         # 气泡控件
         self.bu_top = BubbleWidget(self)
-        self.bu_top.setDirection(BubbleWidget.Top)
+        self.bu_top.setDirection(BubbleWidget.Left)
         self.bu_top.setText("hello world")
         self.bu_top.setTrack(self.btn)
 
