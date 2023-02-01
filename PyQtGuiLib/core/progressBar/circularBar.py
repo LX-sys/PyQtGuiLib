@@ -10,16 +10,15 @@ from PyQtGuiLib.header import (
     QSize,
     QResizeEvent,
     textSize,
-    qt,
-    pyqtProperty
+    qt
 )
 
 
-from PyQtGuiLib.core.widgets import WidgetABC
+
 '''
     圆环进度条
 '''
-class CircularBar(WidgetABC):
+class CircularBar(QWidget):
     # 进度改变时,发出信号
     valueChange = Signal(int)
 
@@ -47,6 +46,8 @@ class CircularBar(WidgetABC):
 
         # 文字
         self.text = "0%"
+        self.text_color = QColor(104, 167, 205)
+        self.text_size = 25
 
         '''
             进度发生变化时,引起变化的线段,是外圈还是内圈
@@ -56,8 +57,8 @@ class CircularBar(WidgetABC):
         self.__max_value = 100
 
         # 外圈/内圈 颜色
-        self._outer_rgb = QColor(104, 167, 205)
-        self._inner_rgb = QColor(117, 199, 255)
+        self.outer_rgb = QColor(104, 167, 205)
+        self.inner_rgb = QColor(117, 199, 255)
 
         # 外圈/内圈 线段样式
         self.outer_style = CircularBar.CustomDashLine
@@ -82,17 +83,24 @@ class CircularBar(WidgetABC):
     def setText(self,text:str):
         self.text = text
 
-    def __set_outerColor(self,color:QColor):
-        self._outer_rgb = color
+    def setTextColor(self,color:QColor):
+        self.text_color = color
 
-    def get_outerColor(self)->QColor:
-        return self._outer_rgb
+    def setTextSize(self,size:int):
+        self.text_size = size
 
-    def __set_innerColor(self,color:QColor):
-        self._inner_rgb = color
+    def setAllText(self,text:str,color:QColor,size:int):
+        self.setText(text)
+        self.setTextColor(color)
+        self.setTextSize(size)
 
-    def get_innerColor(self)->QColor:
-        return self._inner_rgb
+    # 设置外圈颜色
+    def setOuterColor(self,color:QColor):
+        self.outer_rgb = color
+
+    # 设置内圈颜色
+    def setInnerColor(self,color:QColor):
+        self.inner_rgb = color
 
     # 设置外圈风格
     def setOuterStyle(self,style):
@@ -145,13 +153,13 @@ class CircularBar(WidgetABC):
         inner_w,inner_h = self.w-20,self.h-20
 
         # ------------
-        outer_op = QPen(self.get_outerColor(),self.outer_width)
+        outer_op = QPen(self.outer_rgb,self.outer_width)
         outer_op.setStyle(self.outer_style)
         if self.outer_style == CircularBar.CustomDashLine:
             outer_op.setDashPattern(self.outer_pattern)
         painter.setPen(outer_op)
         painter.drawArc(x,y,self.w,self.h,0,self.outer_n*16)
-        inner_op = QPen(self.get_innerColor(), self.inner_width)
+        inner_op = QPen(self.inner_rgb, self.inner_width)
         inner_op.setStyle(self.inner_style)
         if self.inner_style == CircularBar.CustomDashLine:
             inner_op.setDashPattern(self.inner_pattern)
@@ -160,9 +168,9 @@ class CircularBar(WidgetABC):
         # ---------------
         # 绘制文字
         f = QFont()
-        f.setPointSize(self.get_fontSize())
+        f.setPointSize(self.text_size)
         painter.setFont(f)
-        painter.setPen(self.get_color())
+        painter.setPen(self.text_color)
         # 文字
         fs = textSize(f,self.text)
         fw = fs.width()
@@ -182,11 +190,3 @@ class CircularBar(WidgetABC):
     def resizeEvent(self, event:QResizeEvent) -> None:
         self.w,self.h = event.size().width()-13,event.size().height()-13
         super().resizeEvent(event)
-
-    # 专属QSS
-    '''
-    outerColor --> 设置外圈颜色
-    innerColor --> 设置内圈颜色
-    '''
-    outerColor = pyqtProperty(QColor,fset=__set_outerColor,fget=get_outerColor)
-    innerColor = pyqtProperty(QColor,fset=__set_innerColor,fget=get_innerColor)

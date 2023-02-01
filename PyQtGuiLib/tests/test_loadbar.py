@@ -27,7 +27,7 @@ class DurationTimeThread(QThread):
         while True:
             self.added.emit(n)
             n+=1
-            self.msleep(50)
+            self.msleep(100)
             if n == 100+1:
                 print("完成")
                 break
@@ -38,14 +38,6 @@ class TestPullOverWidget(QMainWindow):
         self.resize(800,500)
 
         self.loadbar = LoadBar(self)
-        self.loadbar.setStyleSheet('''
-LoadBar{
-qproperty-color:rgba(100,200,100,255);
-qproperty-fontSize:10;
-qproperty-outerRadius:20;
-qproperty-innerRadius:15;
-}
-        ''')
         self.loadbar.move(50,100)
         self.loadbar.resize(350,45)
         self.loadbar.setValue(0)

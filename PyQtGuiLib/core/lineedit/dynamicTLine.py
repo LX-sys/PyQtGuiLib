@@ -1,4 +1,7 @@
 from PyQtGuiLib.header import (
+    PYQT_VERSIONS,
+    QApplication,
+    sys,
     QWidget,
     QPainter,
     QPropertyAnimation,
@@ -13,7 +16,7 @@ from PyQtGuiLib.header import (
     QFont,
     textSize
 )
-from PyQtGuiLib.core.widgets import WidgetABC
+
 '''
     动态 标题输入框
 '''
@@ -35,7 +38,7 @@ class LineEdit(QLineEdit):
         super().focusOutEvent(ev)
 
 
-class DynamicTLine(WidgetABC):
+class DynamicTLine(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.w,self.h = 240,70

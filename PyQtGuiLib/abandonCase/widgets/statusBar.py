@@ -43,7 +43,7 @@ class CountDownThread(QThread):
             self.time_-=1
         self.timeOuted.emit()
 
-from PyQtGuiLib.core.widgets import WidgetABC
+from PyQtGuiLib.core.widgets2 import WidgetABC
 class StatusBar(WidgetABC):
 
     PosBottom = "PosBottom"

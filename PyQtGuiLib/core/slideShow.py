@@ -14,11 +14,10 @@ from PyQtGuiLib.header import (
 
 from PyQtGuiLib.styles import ButtonStyle
 
-from PyQtGuiLib.core.widgets import WidgetABC
 '''
     组件轮播
 '''
-class SlideShow(WidgetABC):
+class SlideShow(QWidget):
     # 切换窗口事件
     changeWidget = Signal(QWidget)
 
