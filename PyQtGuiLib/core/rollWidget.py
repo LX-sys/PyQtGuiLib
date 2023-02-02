@@ -14,6 +14,7 @@ from PyQtGuiLib.header import (
     qt
 )
 
+from PyQtGuiLib.core.widgets import WidgetABC
 '''
     滚动栏
 '''
@@ -80,19 +81,9 @@ class ControlsSystem:
         print(self.controls)
         self.stack.show()
 
-# ss = ControlsSystem()
-# for i in range(1,7):
-#     ss.append(i)
-#
-# for _ in range(3):
-#     ss.hideHead()
-#
-# for _ in range(2):
-#     ss.showHead()
-# ss.show()
 
 
-class RollWidget(QWidget):
+class RollWidget(WidgetABC):
     # 滚动栏 改变信号
     changed = Signal(QWidget)
 
@@ -221,6 +212,7 @@ border:2px solid rgb(204, 204, 204);
         widget.setFixedSize(self.default_size)
 
         self.controls.append(widget)
+        self.update()
 
     # 移除控件(未写)
     def removeWidget(self,widget:QWidget):

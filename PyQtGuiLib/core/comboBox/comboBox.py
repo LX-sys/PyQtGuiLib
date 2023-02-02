@@ -173,6 +173,7 @@ class ComboBox(QWidget):
         self.resize(self.w,self.h)
         self.raise_()
 
+        self.setWindowTitle("ComboBox")
         self.setStyleSheet('font: 11pt "华文细黑";')
 
         # 展开区域,大小,位置

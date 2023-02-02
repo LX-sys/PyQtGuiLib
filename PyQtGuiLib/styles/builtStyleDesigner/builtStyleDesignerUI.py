@@ -7,7 +7,6 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    QVBoxLayout,
     QHBoxLayout,
     QWidget,
     QFrame,
@@ -28,11 +27,11 @@ from PyQtGuiLib.header import (
     内置-样式设计器 UI 界面
 '''
 
-from PyQtGuiLib.core.widgets import BorderlessFrame,TitleBar
+from PyQtGuiLib.core.widgets import BorderlessWidget,TitleBar
 from PyQtGuiLib.core import FlowLayout
 
 
-class BuiltStyleDesignerUI(BorderlessFrame):
+class BuiltStyleDesignerUI(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(1100,850)

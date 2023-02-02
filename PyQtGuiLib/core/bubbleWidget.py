@@ -14,9 +14,9 @@ from PyQtGuiLib.header import (
     qt,
     pyqtProperty
 )
+from PyQtGuiLib.core.widgets import WidgetABC
 
-
-class BubbleWidget(QWidget):
+class BubbleWidget(WidgetABC):
 
     # 方向
     Top = "top"
@@ -34,18 +34,8 @@ class BubbleWidget(QWidget):
         # 箭头高度(三角形)
         self._arrows_h = 16
 
-        # 外边距
-        self._margin = 3
-
-        # 半径
-        self._bubbleRadius = 3
-
         # 文字
         self.text = ""
-        self._text_size = 10
-
-        # 气泡颜色背景
-        self._bubbleBgColor = QColor(152, 167, 255)
 
         # 追踪的控件
         self.trackWidget = None #type:QWidget
@@ -55,48 +45,22 @@ class BubbleWidget(QWidget):
         #
         self.setText("气泡窗口")
 
-    def set_BubbleBgColor(self,v:QColor):
-        self._bubbleBgColor = v
-
-    def get_BubbleBgColor(self) -> QColor:
-        return self._bubbleBgColor
-
-    def set_Radius(self,r:int):
-        self._bubbleRadius = r
-
-    def get_Radius(self)->int:
-        return self._bubbleRadius
-
-    def set_TextSize(self,size:int):
-        self._text_size = size
-        self.textExtend()
-
-    def get_TextSize(self)->int:
-        return self._text_size
-
     def set_Arrows(self,size:int):
         self._arrows_h = size
 
-    def get_Arrows(self)->int:
+    def get_Arrows(self) -> int:
         return self._arrows_h
-
-    def set_Margin(self,m:int):
-        self._margin = m
-
-    def get_Margin(self)->int:
-        return self._margin
     # ----------------
 
     # 设置文字
     def setText(self,text:str):
         self.text = text
-
         self.textExtend()
 
     # 文字扩展
     def textExtend(self):
         f = QFont()
-        f.setPointSize(self._text_size)
+        f.setPointSize(self.get_fontSize())
         # 文字大小
         fs = textSize(f, self.text)
         fw = fs.width()
@@ -135,7 +99,6 @@ class BubbleWidget(QWidget):
         elif self.direction == BubbleWidget.Right:
             self.move(x-self.width(),cy)
         else:
-            print(cx,y-h)
             self.move(cx,y-self.height())
 
     # 绘制气泡
@@ -150,15 +113,17 @@ class BubbleWidget(QWidget):
 
         # 绘制文字
         f = QFont()
-        f.setPointSize(self._text_size)
+        f.setPointSize(self.get_fontSize())
         painter.setFont(f)
         # 文字大小
         fs = textSize(f, self.text)
         fw = fs.width()
         fh = fs.height()
 
+        self.textExtend()
+
         # 画刷
-        bru = QBrush(self._bubbleBgColor)
+        bru = QBrush(self.get_backgroundColor())
         painter.setBrush(bru)
 
         # 画笔
@@ -170,7 +135,7 @@ class BubbleWidget(QWidget):
                      QPointF(lien_x+line_w,self._arrows_h)
                      ]
             # 画矩形
-            rect = QRect(self.margin,self._arrows_h+self.margin,self.width()-self.margin*2,rect_h-self.margin*2)
+            rect = QRect(self.get_margin(),self._arrows_h+self.get_margin(),self.width()-self.get_margin()*2,rect_h-self.get_margin()*2)
             # 文字位置
             x = self.width() // 2 - fw // 2
             y = rect_h//2 + fh//2+self._arrows_h
@@ -179,7 +144,7 @@ class BubbleWidget(QWidget):
             ploys = [QPointF(1,line_y),QPointF(self._arrows_h,line_y-line_w//2),
                      QPointF(self._arrows_h,line_y+line_w//2)
             ]
-            rect = QRect(self._arrows_h+self.margin,self.margin,rect_w-self.margin*2,self.height()-self.margin*2)
+            rect = QRect(self._arrows_h+self.get_margin(),self.get_margin(),rect_w-self.get_margin()*2,self.height()-self.get_margin()*2)
             # 文字位置
             x = self.width()//2-fw//2 + self._arrows_h//2
             y = self.height()//2 + fh//2
@@ -188,12 +153,12 @@ class BubbleWidget(QWidget):
             ploys =[QPointF(rect_w,line_y-line_w//2),QPointF(rect_w+self._arrows_h,line_y),
                     QPointF(rect_w,line_y+line_w//2)
             ]
-            rect = QRect(self.margin,self.margin,rect_w-self.margin*2,self.height()-self.margin*2)
+            rect = QRect(self.get_margin(),self.get_margin(),rect_w-self.get_margin()*2,self.height()-self.get_margin()*2)
             # 文字位置
             x = (self.width()-self._arrows_h)//2 - fw//2
             y = self.height()//2 + fh//2
         else: # Down
-            rect = QRect(self.margin,self.margin,self.width()-self.margin*2,rect_h-self.margin*2)
+            rect = QRect(self.get_margin(),self.get_margin(),self.width()-self.get_margin()*2,rect_h-self.get_margin()*2)
             # 画三角
             ploys =[QPointF(lien_x,rect_h),
                     QPointF(lien_x+line_w//2,rect_h+self._arrows_h),
@@ -202,10 +167,10 @@ class BubbleWidget(QWidget):
             x = self.width() // 2 - fw//2
             y = rect_h // 2 + fh//2
         # 绘制矩形
-        painter.drawRoundedRect(rect, self._bubbleRadius, self._bubbleRadius)
+        painter.drawRoundedRect(rect, self.get_radius(), self.get_radius())
         # 绘制三角形
         ppath.addPolygon(QPolygonF(ploys))
-        painter.fillPath(ppath, self._bubbleBgColor)
+        painter.fillPath(ppath, self.get_backgroundColor())
         # 绘制文字
         op = QPen()
         op.setColor(QColor(255, 255, 255))
@@ -223,9 +188,5 @@ class BubbleWidget(QWidget):
 
         painter.end()
 
-    # 自定义QSS
-    backgroundColor = pyqtProperty(QColor,fset=set_BubbleBgColor,fget=get_BubbleBgColor)
-    radius = pyqtProperty(int,fset=set_Radius,fget=get_Radius)
-    fontSize = pyqtProperty(int,fset=set_TextSize,fget=get_TextSize)
+    # 专属QSS
     arrowsSize = pyqtProperty(int,fset=set_Arrows,fget=get_Arrows)
-    margin = pyqtProperty(int,fset=set_Margin,fget=get_Margin)

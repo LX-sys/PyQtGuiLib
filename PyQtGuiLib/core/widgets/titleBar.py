@@ -1,14 +1,13 @@
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
+    sys,
     QWidget,
-    QFrame,
     QPainter,
     QPaintEvent,
     QRect,
     QPen,
     QFont,
-    QFontMetricsF,
     QColor,
     QPushButton,
     QPropertyAnimation,
@@ -19,22 +18,19 @@ from PyQtGuiLib.header import (
     QPoint,
     QPixmap,
     QIcon,
-    QStyle,
-    QStyleOption,
-    desktopCenter,
     desktopSize,
-    textSize
+    textSize,
+    QMouseEvent
 )
 
-from PyQtGuiLib.core.widgets import BorderlessWidget
+from PyQtGuiLib.core.widgets import WidgetABC
+
 '''
     窗口的标题栏
 '''
 
-
 # 缩小,放大,关闭 三按钮基类
 class ButtonIcon(QPushButton):
-
     '''
         缩小,放大,关闭
         win 风格
@@ -45,26 +41,26 @@ class ButtonIcon(QPushButton):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.w,self.h = 20,20
-        self.resize(self.w,self.h)
-        
+        self.w, self.h = 20, 20
+        self.resize(self.w, self.h)
+
         self.btnStyle = ButtonIcon.MacStyle
 
         self.open_width = 1
         self.radius = 3
 
     def resize(self, *args) -> None:
-        if len(args) == 1 and isinstance(args[0],QSize):
-            self.w = args[0].width(),args[0].height()
+        if len(args) == 1 and isinstance(args[0], QSize):
+            self.w = args[0].width(), args[0].height()
         else:
-            self.w,self.h = args[0],args[1]
+            self.w, self.h = args[0], args[1]
 
-        super().resize(self.w,self.h)
+        super().resize(self.w, self.h)
 
     # 设置 缩小,放大,关闭 的风格
-    def setBtnStyle(self,style:str = "WinStyle"):
+    def setBtnStyle(self, style: str = "WinStyle"):
         self.btnStyle = style
-    
+
     def isWinStyle(self) -> bool:
         return True if self.btnStyle == ButtonIcon.WinStyle else False
 
@@ -86,18 +82,18 @@ class ButtonIcon(QPushButton):
 
 # 缩小按钮
 class ZoomButton(ButtonIcon):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def drawIcon(self,painter:QPainter):
+    def drawIcon(self, painter: QPainter):
         op = QPen()
         op.setWidth(self.open_width)
         painter.setPen(op)
 
         if self.isWinStyle():
-            rect = QRect(1,1,self.width()-self.open_width-1,self.height()-self.open_width-1)
-            painter.drawRoundedRect(rect,self.radius,self.radius)
-            painter.drawLine(5,self.height()//2,self.width()-5,self.height()//2)
+            rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
+            painter.drawRoundedRect(rect, self.radius, self.radius)
+            painter.drawLine(5, self.height() // 2, self.width() - 5, self.height() // 2)
         elif self.isMacStyle():
             op.setColor(QColor(255, 199, 124))
             painter.setPen(op)
@@ -105,7 +101,7 @@ class ZoomButton(ButtonIcon):
             painter.setBrush(brush)
 
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
-            painter.drawRoundedRect(rect, self.w//2,self.h//2)
+            painter.drawRoundedRect(rect, self.w // 2, self.h // 2)
             op.setColor(QColor(50, 100, 100))
             painter.setPen(op)
             painter.drawLine(5, self.height() // 2, self.width() - 5, self.height() // 2)
@@ -114,9 +110,8 @@ class ZoomButton(ButtonIcon):
 
 # 放大按钮
 class LargeButton(ButtonIcon):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def drawIcon(self, painter: QPainter):
         op = QPen()
@@ -124,10 +119,10 @@ class LargeButton(ButtonIcon):
         painter.setPen(op)
 
         if self.isWinStyle():
-            rect1 = QRect(1, 1, 13,13)
-            rect2 = QRect(6, 6, 13,13)
-            painter.drawRoundedRect(rect1, self.radius,self.radius)
-            painter.drawRoundedRect(rect2, self.radius,self.radius)
+            rect1 = QRect(1, 1, 13, 13)
+            rect2 = QRect(6, 6, 13, 13)
+            painter.drawRoundedRect(rect1, self.radius, self.radius)
+            painter.drawRoundedRect(rect2, self.radius, self.radius)
         elif self.isMacStyle():
             op.setColor(QColor(40, 194, 50))
             painter.setPen(op)
@@ -135,22 +130,22 @@ class LargeButton(ButtonIcon):
             painter.setBrush(brush)
 
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
-            painter.drawRoundedRect(rect, self.w//2,self.h//2)
+            painter.drawRoundedRect(rect, self.w // 2, self.h // 2)
 
-            brush = QBrush(QColor(0,0,0))
+            brush = QBrush(QColor(0, 0, 0))
             painter.setBrush(brush)
             op.setColor(QColor(50, 100, 100))
             painter.setPen(op)
-            painter.drawEllipse(self.width()//2-5,self.height()//2-5,5,5)
-            painter.drawEllipse(self.width()//2+1,self.height()//2+1,5,5)
+            painter.drawEllipse(self.width() // 2 - 5, self.height() // 2 - 5, 5, 5)
+            painter.drawEllipse(self.width() // 2 + 1, self.height() // 2 + 1, 5, 5)
 
             painter.setBrush(qt.NoBrush)
 
 
 # 关闭按钮
 class CloseButton(ButtonIcon):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def drawIcon(self, painter: QPainter):
         op = QPen()
@@ -158,10 +153,10 @@ class CloseButton(ButtonIcon):
         painter.setPen(op)
 
         if self.isWinStyle():
-            rect = QRect(1,1,self.width()-self.open_width-1,self.height()-self.open_width-1)
-            painter.drawRoundedRect(rect,self.radius,self.radius)
-            painter.drawLine(5,5,self.width()-5,self.height()-5)
-            painter.drawLine(self.width()-5,5,5,self.height()-5)
+            rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
+            painter.drawRoundedRect(rect, self.radius, self.radius)
+            painter.drawLine(5, 5, self.width() - 5, self.height() - 5)
+            painter.drawLine(self.width() - 5, 5, 5, self.height() - 5)
         elif self.isMacStyle():
             op.setColor(QColor(252, 70, 70))
             painter.setPen(op)
@@ -169,7 +164,7 @@ class CloseButton(ButtonIcon):
             painter.setBrush(brush)
 
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
-            painter.drawRoundedRect(rect, self.w//2,self.h//2)
+            painter.drawRoundedRect(rect, self.w // 2, self.h // 2)
 
             op.setColor(QColor(50, 100, 100))
             painter.setPen(op)
@@ -180,11 +175,11 @@ class CloseButton(ButtonIcon):
 
 # 钉住窗口按钮
 class PegButton(ButtonIcon):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.is_flag = False
 
-    def drawIcon(self,painter:QPainter):
+    def drawIcon(self, painter: QPainter):
         op = QPen()
         op.setWidth(1)
         painter.setPen(op)
@@ -192,7 +187,7 @@ class PegButton(ButtonIcon):
         if self.isWinStyle():
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
             rect_c = QRect(3, 3, self.width() - 6, self.height() - 6)
-            painter.drawRoundedRect(rect, self.radius,self.radius)
+            painter.drawRoundedRect(rect, self.radius, self.radius)
             if self.is_flag:
                 bru = QBrush(QColor(84, 120, 186))
                 painter.setBrush(bru)
@@ -202,7 +197,7 @@ class PegButton(ButtonIcon):
             painter.setBrush(bru)
 
             rect = QRect(1, 1, self.width() - self.open_width - 1, self.height() - self.open_width - 1)
-            rect_c = QRect(3, 3, self.width()  - 6, self.height() -6)
+            rect_c = QRect(3, 3, self.width() - 6, self.height() - 6)
             painter.drawRoundedRect(rect, self.w // 2, self.h // 2)
             if self.is_flag:
                 bru = QBrush(QColor(171, 0, 0))
@@ -210,8 +205,7 @@ class PegButton(ButtonIcon):
             painter.drawRoundedRect(rect_c, self.w // 2, self.h // 2)
 
 
-class TitleBar(BorderlessWidget):
-
+class TitleBar(WidgetABC):
     # 标题的位置
     Title_Left = "TextLeft"
     Title_Center = "TitleCenter"
@@ -227,81 +221,59 @@ class TitleBar(BorderlessWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
-        # 样式表生效
-        self.setAttribute(qt.WA_StyledBackground,True)
-        self.setBorderStyle(qt.NoPen)
-
         self.__parent = None #  type:QWidget
 
         if args:
             self.__parent = args[0]
 
-        # 默认半径
-        self.setRadius((self.radius()[0],0))
-
-        # 标题位置
-        self.title_pos = TitleBar.Title_Left
-
-        # 标题高度
-        self.h = 30
-        # 标题文本
-        self.title_text= "Title"
-        self.title_color = QColor(0,0,0)
-        self.title_size = 15
-
-        # 图标大小,图标路径
-        self.image_size = 30,30
-        self.title_icon_path = r""
-        self.is_sync_icon = True # 是否同步桌面任务栏的图标
+        # 标题默认高度
+        self.__title_height = 38
 
         # 保存窗口在放大之前的位置大小,已经窗口大小状态
         self.old_screen_geometry = QRect(0,0,0,0) # type:QRect
         self.screen_state = False
 
-        # 边距
-        self.padding = self.borderWidth()
+        # 标题文本
+        self.__title_text = "Title"
+        self.title_color = QColor(0,0,0)
+
+        # 图标大小,图标路径
+        self.image_size = 20,20
+        self.title_icon_path = r"D:\myGitProject\PyQtGuiLib\PyQtGuiLib\tests\temp_tests\1.png"
+        self.is_sync_icon = True # 是否同步桌面任务栏的图标
+
+        # 标题位置
+        self.title_pos = TitleBar.Title_Center
 
         # 动画时长
         self.ani_msec = 300  # 毫秒
 
-        if self.__parent is not None:
-            self.move(self.padd(),self.padd())
-            self.resize(self.__parent.width()-self.padd()*2,self.h)
+        self.setFixedHeight(self.__title_height)
 
-        # 创建缩小,放大,关闭,钉住 按钮
-        self.zm = ZoomButton(self)
-        self.lm = LargeButton(self)
-        self.cm = CloseButton(self)
-        self.peg = PegButton(self)
-        self.is_pag = False # 是否钉住
-        # 创建缩小,放大,关闭事件
-        self.createEvent()
-
-        # 设置标题设置
-        self.setTitlePos(TitleBar.Title_Center)
-        self.updateTitleSize()  # 更新标题栏位置
-
-    # 边距
-    def padd(self)->int:
-        return self.padding
+        # ---
+        self.createButton()
 
     def setTitleText(self,text:str):
-        self.title_text = text
+        self.__title_text = text
 
-    def setTitleColor(self,color:QColor):
-        self.title_color = color
+    # 标题
+    def titleText(self)->str:
+        return self.__title_text
 
-    def setTitleSize(self,size:int):
-        self.title_size = size
+    def iconPath(self)->str:
+        return self.title_icon_path
 
-    def setAllTitle(self,text:str,color:QColor,size:int):
-        self.setTitleText(text)
-        self.setTitleColor(color)
-        self.setTitleSize(size)
+    # 默认高度
+    def defaultHeight(self)->int:
+        return self.__title_height
 
-    # 设置标题的位置
-    def setTitlePos(self,mode:str="TitleCenter"):
-        self.title_pos = mode
+    def setParent(self, parent:QWidget) -> None:
+        self.__parent = parent
+        super().setParent(parent)
+
+        if self.__parent is not None:
+            self.move(self.get_margin(), 2)
+            self.resize(self.__parent.width()-self.get_margin()*2, self.defaultHeight())
 
     # 设置 缩小,放大,关闭 按钮的风格
     def setBtnStyle(self, style: str = "WinStyle"):
@@ -310,101 +282,22 @@ class TitleBar(BorderlessWidget):
         self.cm.setBtnStyle(style)
         self.peg.setBtnStyle(style)
 
-    # 设置标题栏高度
-    def setTitleHeight(self,h:int):
-        self.h = h
+    # 创建按钮并绑定事件
+    def createButton(self):
+        # 创建缩小,放大,关闭,钉住 按钮
+        self.zm = ZoomButton(self)
+        self.lm = LargeButton(self)
+        self.cm = CloseButton(self)
+        self.peg = PegButton(self)
 
-    def setParent(self, parent:QWidget) -> None:
-        self.__parent = parent
-        super().setParent(parent)
+        self.is_pag = False  # 是否钉住
 
-        if self.__parent is not None:
-            self.move(0,0)
-            self.resize(self.__parent.width(),self.h)
+        self.zm.clicked.connect(lambda: self.ani("zoom"))
+        self.lm.clicked.connect(lambda: self.ani("arge"))
+        self.cm.clicked.connect(lambda: self.ani("close"))
+        self.peg.clicked.connect(lambda: self.ani("peg"))
 
-    # 绘制标题
-    def drawTitleText(self,painter: QPainter):
-        # 绘制文字
-        f = QFont()
-        f.setPointSize(self.title_size)
-        painter.setFont(f)
-
-        op = QPen()
-        op.setColor(self.title_color)
-        painter.setPen(op)
-
-        icon_distance = 0
-
-        if self.title_icon_path:
-            icon_distance = 30
-
-        # 文字
-        fs = textSize(f,self.title_text)
-        fw = fs.width()
-        fh = fs.height()
-        if self.title_pos == TitleBar.Title_Center:
-            painter.drawText(self.width() // 2 - fw // 2, self.height() // 2 + fh // 2, self.title_text)
-
-        if self.title_pos == TitleBar.Title_Left:
-            if PYQT_VERSIONS in ["PyQt6","PySide6"]: # 这两个版本的文字高度计算是精准的需要-5个像素
-                painter.drawText(10+icon_distance, self.height() // 2 + fh // 2-5, self.title_text)
-            else:
-                painter.drawText(10+icon_distance, self.height() // 2 + fh // 2, self.title_text)
-
-    # 绘制icon
-    def drawTitleIcon(self,painter: QPainter):
-        f = QFont()
-        f.setPointSize(self.title_size)
-        fs = textSize(f,self.title_text)
-        fw = fs.width()
-
-        pix = QPixmap(self.title_icon_path)
-        if self.title_pos == TitleBar.Title_Center:
-            painter.drawPixmap(self.width() // 2 - fw // 2-self.image_size[0], self.height() // 2 - self.image_size[1] // 2, *self.image_size,
-                               pix)
-        if self.title_pos == TitleBar.Title_Left:
-            painter.drawPixmap(5, self.height()//2-self.image_size[1]//2, *self.image_size, pix)
-        if self.is_sync_icon:
-            self.__parent.setWindowIcon(QIcon(self.title_icon_path))
-
-    def paintEvent(self, event: QPaintEvent) -> None:
-        super().paintEvent(event)
-        painter = QPainter(self)
-
-        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-
-        self.drawTitleIcon(painter)
-        self.drawTitleText(painter)
-
-        # 自动调用
         self.updateTitleSize()
-        painter.end()
-
-    # 创建缩小,放大,关闭事件
-    def createEvent(self):
-        self.zm.clicked.connect(lambda :self.ani("zoom"))
-        self.lm.clicked.connect(lambda :self.ani("arge"))
-        self.cm.clicked.connect(lambda :self.ani("close"))
-        self.peg.clicked.connect(lambda :self.ani("peg"))
-
-    # 设置动画的时长
-    def setAniDuration(self,msec:int):
-        self.ani_msec = msec
-
-    # 设置图标
-    def setTitleIcon(self,path:str,isWindowIcon:bool=True):
-        '''
-
-        :param path: 图片路径
-        :param isWindowIcon: 是否同步桌面任务栏的图标
-        :return:
-        '''
-        self.title_icon_path = path
-        self.is_sync_icon = isWindowIcon
-
-    # 设置是否同步桌面任务栏的图标
-    def setSyncWindowIcon(self,b:bool):
-        self.is_sync_icon = b
 
     # 缩小,放大,关闭 动画
     def ani(self,action:str):
@@ -492,13 +385,65 @@ class TitleBar(BorderlessWidget):
             self.__parent.repaint()
             # self.__parent.update()
 
+    # 绘制标题
+    def drawTitleText(self,painter: QPainter):
+        # 绘制文字
+        f = QFont()
+        f.setPointSize(self.get_fontSize())
+        painter.setFont(f)
+
+        op = QPen()
+        op.setColor(self.title_color)
+        painter.setPen(op)
+
+        icon_distance = 0
+
+        if self.title_icon_path:
+            if self.title_pos == TitleBar.Title_Left:
+                icon_distance = 10
+            else:
+                icon_distance = 8
+
+        # 文字
+        fs = textSize(f,self.titleText())
+        fw = fs.width()
+        fh = fs.height()
+
+        if self.title_pos == TitleBar.Title_Left:
+            if PYQT_VERSIONS in ["PyQt6","PySide6"]: # 这两个版本的文字高度计算是精准的需要-5个像素
+                x = 10+icon_distance
+                y = self.height()// 2 + fh // 2-5
+            else:
+                x = 10 + icon_distance
+                y =  self.height() // 2 + fh // 2
+        else:
+            x = self.width() // 2 - fw // 2
+            y = self.height() // 2 + fh//2
+        painter.drawText(x+icon_distance, y, self.titleText())
+
+    # 绘制icon
+    def drawTitleIcon(self,painter: QPainter):
+        f = QFont()
+        f.setPointSize(self.get_fontSize())
+        fs = textSize(f,self.titleText())
+        fw = fs.width()
+
+        pix = QPixmap(self.iconPath())
+        if self.title_pos == TitleBar.Title_Center:
+            painter.drawPixmap(self.width() // 2 - fw // 2-self.image_size[0], self.height() // 2 - self.image_size[1] // 2, *self.image_size,
+                               pix)
+        if self.title_pos == TitleBar.Title_Left:
+            painter.drawPixmap(5, self.height()//2-self.image_size[1]//2, *self.image_size, pix)
+        if self.is_sync_icon:
+            self.__parent.setWindowIcon(QIcon(self.iconPath()))
+
     # 更新标题栏大小
     def updateTitleSize(self) -> None:
-        self.move(self.padd(), self.padd())
-        self.resize(self.__parent.width()-self.padd()*2, self.h+self.padd()*2)
+        self.move(self.get_margin(), 2)
+        self.resize(self.__parent.width()-self.get_margin()*2, self.defaultHeight())
 
         # 自动计算 缩小,放大,关闭 的位置
-        btn_w_interval = 15 # 按钮直接的间隔
+        btn_w_interval = 15 # 按钮之间的间隔
         # 按钮占据的总宽度
         btn_occupied_width = self.zm.width()+self.lm.width()+self.cm.width()+btn_w_interval*5
         occ_w = self.width()-btn_occupied_width
@@ -515,3 +460,46 @@ class TitleBar(BorderlessWidget):
         self.lm.move(occ_w,lm_h)
         occ_w = occ_w+self.lm.width()+btn_w_interval
         self.cm.move(occ_w,cm_h)
+
+    def eventFilter(self, obj: 'QObject', event) -> bool:
+        return False
+
+    def mousePressEvent(self, e: QMouseEvent) -> None:
+        if e.button() == qt.LeftButton:  # 处理窗口移动
+            self.movePressState = True
+            if PYQT_VERSIONS in ["PyQt5", "PySide2", "PySide6"]:
+                old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            elif PYQT_VERSIONS == "PyQt6":
+                old_pos=QPoint(self.x()+e.globalPosition().toPoint().x(),self.y()+e.globalPosition().toPoint().y())
+            self.pressPos = old_pos - self.__parent.pos()
+
+    def mouseMoveEvent(self, e: QMouseEvent) -> None:
+        if self.movePressState:
+            if PYQT_VERSIONS in ["PyQt5", "PySide2", "PySide6"]:
+                old_pos=QPoint(self.x()+e.globalX(),self.y()+e.globalY())
+            elif PYQT_VERSIONS == "PyQt6":
+                old_pos=QPoint(self.x()+e.globalPosition().toPoint().x(),self.y()+e.globalPosition().toPoint().y())
+            self.__parent.move(old_pos - self.pressPos)
+
+    def paintEvent(self, event: QPaintEvent) -> None:
+        super().paintEvent(event)
+        painter = QPainter(self)
+
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+
+        self.drawTitleIcon(painter)
+        self.drawTitleText(painter)
+
+        # 自动调用
+        self.updateTitleSize()
+        painter.end()
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = TitleBar()
+    win.show()
+
+    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
+        sys.exit(app.exec())
+    else:
+        sys.exit(app.exec_())

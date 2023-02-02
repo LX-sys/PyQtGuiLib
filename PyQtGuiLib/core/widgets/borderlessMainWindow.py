@@ -1,69 +1,127 @@
-# -*- coding:utf-8 -*-
-# @time:2023/1/1322:35
-# @author:LX
-# @file:borderlessMainWindow.py
-# @software:PyCharm
-
-from PyQtGuiLib.core.widgets.borderlessWidgetABC import (
+from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
     sys,
-    Borderless,
-    Public,
-    QMainWindow,
+    QPushButton,
+    QPoint,
     QMouseEvent,
-    QPaintEvent,
+    delete,
+    QWidget,
+    QVBoxLayout
 )
+'''
+    新无边框窗口主窗口,(还没有设计完成,暂时先放下 2023.1.31)
+'''
+from PyQtGuiLib.core.widgets import WidgetABC
 from PyQtGuiLib.core.widgets.titleBar import TitleBar
 from PyQtGuiLib.core.widgets.statusBar import StatusBar
+# import ctypes
+# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("myappid")
 
-# 无边框的主窗口
-class BorderlessMainWindow(QMainWindow,Public):
+class BorderlessMainWindow(WidgetABC):
     def __init__(self,*args,**kwargs):
-        self.child_win = True if args else False
-        super().__init__(parent_=self,*args,**kwargs)
-        self.resize(800, 500)
+        super().__init__(*args,**kwargs)
 
-        # 默认 创建
+
+        self.crbtn = QPushButton("创建",self)
+        self.crbtn.move(40,40)
+        self.crbtn.clicked.connect(self.createTitleBar)
+
+        self.delbtn = QPushButton("删除",self)
+        self.delbtn.move(100,100)
+        self.delbtn.clicked.connect(self.removeTitleBar)
+
+        # 标题风格
+        self.__title_style = TitleBar.MacStyle
+
         self.createTitleBar()
-        self.createStatusBar()
 
+        # self.coreWin = WidgetABC(self)
+        # self.coreWin.setStyleSheet('''
+        #  WidgetABC{
+        #  qproperty-backgroundColor:rgba(0, 255, 127,255);
+        #  }
+        #  ''')
+        # self.setCentralWidget(self.coreWin)
+
+        # self.status = StatusBar(self)
+        # self.status.setStatusPos(StatusBar.PosBottom)
+        # self.status.addText("我是标签")
+
+    def setTitleBtnStyle(self,style="mac"):
+        if style.lower() == "win":
+            self.__title_style = TitleBar.WinStyle
+        else:
+            self.__title_style = TitleBar.MacStyle
+
+    # 返回标题风格
+    def titleStyle(self) -> str:
+        return self.__title_style
+
+    # 创建标题栏
     def createTitleBar(self):
-        self.tbar = TitleBar(self)
+        if not hasattr(self,"titlebar"):
+            h,s,v,a = self.get_backgroundColor().getHsv()
+            v = 0 if v - 30 < 0 else v-30
 
-    def createStatusBar(self):
-        self.status = StatusBar(self)
+            self.titlebar = TitleBar(self)
+            self.titlebar.setBtnStyle(self.titleStyle())
+            self.titlebar.setStyleSheet('''
+            TitleBar{
+            qproperty-fontSize:14;
+            qproperty-borderWidth:0;
+            qproperty-borderColor:hsv(%d, %d, %d,%d);
+            qproperty-backgroundColor: hsv(%d, %d, %d,%d);
+            }
+            '''%(h,s,v,a,h,s,v,a))
+            self.titlebar.show()
 
-    def titleBar(self)->TitleBar:
-        if hasattr(self,"tbar"):
-            return self.tbar
+    def paintEvent(self, event) -> None:
+        super().paintEvent(event)
+        if hasattr(self, "titlebar"):
+            h, s, v, a = self.get_backgroundColor().getHsv()
+            v = 0 if v - 30 < 0 else v - 30
+            self.titlebar.setStyleSheet('''
+                        TitleBar{
+                        qproperty-fontSize:14;
+                        qproperty-borderWidth:0;
+                        qproperty-borderColor:hsv(%d, %d, %d,%d);
+                        qproperty-backgroundColor: hsv(%d, %d, %d,%d);
+                        }
+                        ''' % (h, s, v, a, h, s, v, a))
 
-    def statusBar(self)->StatusBar:
-        if hasattr(self, "status"):
-            return self.status
 
-    def mousePressEvent(self, e:QMouseEvent) -> None:
-        if not self.child_win:
-            self.borderless.pressEvent(self,e)
-        super().mousePressEvent(e)
+    def setCentralWidget(self,widget:QWidget):
+        if hasattr(self, "titlebar"):
+            widget.resize(self.width()-4,self.height()-self.titlebar.height())
+            widget.move(2,self.titlebar.height()-2)
+        else:
+            widget.resize(self.size())
 
-    def mouseReleaseEvent(self, e:QMouseEvent) -> None:
-        if not self.child_win:
-            self.borderless.releaseEvent()
-        super().mouseReleaseEvent(e)
+    # 返回标题对象
+    def titleObj(self)->TitleBar:
+        if hasattr(self, "titlebar"):
+            return self.titlebar
+        else:
+            return None
 
-    def mouseMoveEvent(self, e:QMouseEvent) -> None:
-        if not self.child_win:
-            self.borderless.moveEvent(self,e)
-        super().mouseMoveEvent(e)
+    # 移除标题栏
+    def removeTitleBar(self):
+        if hasattr(self,"titlebar"):
+            self.titlebar.deleteLater()
+            delete(self.titlebar)
+            del self.titlebar
 
-    def paintEvent(self, e: QPaintEvent) -> None:
-        self.borderless.pEvent(self,e)
-        super().paintEvent(e)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = BorderlessMainWindow()
+    # win.setEnableGColor(True)
+    win.setStyleSheet('''
+qproperty-radius:7;
+qproperty-backgroundColor:rgba(255, 170, 127,255);
+    ''')
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:

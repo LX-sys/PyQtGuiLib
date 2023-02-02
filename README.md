@@ -69,6 +69,7 @@ BuiltStyleDesigner  ---> 30%
 目前支持的 控件
 QPushButton  ---> 50%
 ```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E5%86%85%E7%BD%AE%E6%A0%B7%E5%BC%8F%E8%AE%BE%E8%AE%A1%E5%99%A8.gif)
 ### 解析器
 ```python
 dumpStructure()  --> 100%
@@ -79,33 +80,46 @@ dumpStructure(widget :QWidget ,spaceCount=0)  # 控件的组成分析函数
 注意:在单独使用该函数之前,需要加 app = QApplication(sys.argv)
 如果你在一个窗口类里面使用则不需要加
 ```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%8E%A7%E4%BB%B6%E7%9A%84%E7%BB%84%E6%88%90%E5%88%86%E6%9E%90.gif)
 ## 窗口系列
+
 ```python
-导入方式 
-from PyQtGuiLib.core.widgets import (
-    BorderlessMainWindow, # 无边框矩形主窗口
-    BorderlessFrame,      # 无边框矩形QFrame窗口
-    BorderlessWidget,     # 无边框矩形QWidget窗口
-    BorderlessStackedWidget  # 无边框矩形StackedWidget窗口
+导入方式
+from PyQtGuiLib.abandonCase.widgets import (
+    BorderlessWidget,  # 无边框QWidget窗口
 )
 
 特性
-无边框,可移动,可拉伸,窗口颜色风格变化多样
+无边框, 可移动, 可拉伸, 窗口颜色风格变化多样
 
-窗口系列 类变量
-# 渐变的方向
-G_Vertical
-G_Horizontal
+窗口系列 - --- API介绍
+setEnableGColor()  # 设置是否启用渐变色
 
-窗口系列  ---- API介绍
-setRadius() # 设置圆角半径(不要超过8)
-setWindowColor() # 设置窗体颜色
-setWindowBorderColor() # 设置边框颜色
-setEnableGColor() # 设置是否启用渐变色
-setWindowGColor() # 设置窗体渐变色
-setBorderStyle() # 设置变框风格
-setBorderWidth() # 设置边的宽度
+自定义QSS  --- 目前支持的
+qproperty-radius  --> 圆角  Eg: 7
+qproperty-backgroundColor  --> 背景颜色 Eg: rgba(165, 138, 255,200)
+qproperty-borderWidth --> 边的宽度 Eg: 1
+qproperty-borderStyle --> 边框的风格 Eg: solid
+qproperty-borderColor --> 边框颜色 Eg: rgba(0,100,255,255)
+qproperty-border   --> 边框样式 Eg: "3 solid rgba(0,100,255,255)"
+qproperty-linearDirection; --> 线性渐变的方向 Eg: "LR"
+    LR: 左->右
+    RL: 右->左
+    UD: 上->下
+    DU: 下->上
+    LRANG: 左上角->右下角
+    RLANG: 右下角->左上角
+    UDANG: 右上角->左下角
+    DUANG: 左下角->右上角
+    自定义: [0,0,100,100]或者[0,0,w,h]  这里的 w,h 代只窗口当前的宽和高
+qproperty-linearColor --> 线性渐变色 Eg: "rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)"
+qproperty-linear --> 线性渐变
+    Eg: "LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+    Eg: "[0,0,w,h] rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+
+
 ```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%97%A0%E8%BE%B9%E6%A1%86%E7%AA%97%E5%8F%A3.gif)
 ## 组件说明
 
 ### 气泡窗口(BubbleWidget)
@@ -136,6 +150,7 @@ qproperty-arrowsSize:20; /*气泡小三角的大小*/
 qproperty-margin:3; /*文本框个小三角之间的距离*/
 }
 ```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%B0%94%E6%B3%A1%E7%AA%97%E5%8F%A3.gif)
 
 ### 靠边窗口(PullOver)
 
@@ -147,7 +162,7 @@ qproperty-margin:3; /*文本框个小三角之间的距离*/
 pullover() # 设置一个点击显示的按钮,窗口显示的位置,以及缩小后的位置
 setEasingCurve() # 设置东西
 ```
-
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E7%AA%97%E5%8F%A3%E9%9D%A0%E8%BE%B9.gif)
 ### 圆环进度条(CircularBar)
 
 ```python
@@ -173,11 +188,6 @@ CustomDashLine # 自定义样式(这个必须配合api使用才会生效)
 
 # --- Api
 setText()  # 设置文本
-setTextColor() # 设置文本颜色
-setTextSize()  # 设置文本大小
-setAllText() # 同时设置文本,颜色,大小
-setOuterColor() # 设置外圈颜色
-setInnerColor() # 设置内圈颜色
 setOuterStyle() # 设置外圈风格(线段的风格类变量)
 setInnerStyle() # 设置内圈风格(线段的风格类变量)
 setVariableLineSegment() # 设置变化的线段(这里的参数就前3个类变量)
@@ -185,8 +195,16 @@ setValue() # 设置进度条的值0~100
 value() # 返回进度条的值
 setOuterDashPattern() # 设置外圈自定义线段样式(必须配合CustomDashLine类变量才生效)
 setInnerDashPattern() # 设置内圈自定义线段样式(必须配合CustomDashLine类变量才生效)
-```
 
+自定义QSS
+CircularBar{
+qproperty-color:rgba(100,100,100,255);
+qproperty-fontSize:15;
+qproperty-outerColor:rgba(100,255,100,255);
+qproperty-innerColor:rgba(100,255,100,255);
+}
+```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E7%8E%AF%E5%BD%A2%E8%BF%9B%E5%BA%A6%E6%9D%A1.gif)
 ### 加载进度条(LoadBar)
 
 ```python
@@ -200,48 +218,52 @@ valueChange  # 进度条变化时触发
 
 # --- Api
 setText()  # 设置文本
-setTextColor() # 设置文本颜色
-setTextSize()  # 设置文本大小
-setAllText() # 同时设置文本,颜色,大小
 isHideText() # 设置是否需要显示进度的文字
-setOuterRadius() # 设置进度条的外圆角大小(默认是20)
-setInnerRadius() # 设置进度条的内圆角大小(默认是15)
-setRadius() # 设置进度条的内外圆角
-setBorderWidth() # 设置进度条边的宽(默认是3)
-```
 
+自定义QSS
+LoadBar{
+qproperty-color:rgba(100,200,100,255);
+qproperty-fontSize:10;
+qproperty-outerRadius:20;
+qproperty-innerRadius:15;
+}
+```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E5%8A%A0%E8%BD%BD%E8%BF%9B%E5%BA%A6%E6%9D%A1.gif)
 ### 水球进度条(WaterBar)
 
 ```python
 水球进度条  ----> 90%
 导入方式 from PyQtGuiLib.core.progressBar import WaterBar
 
-加载进度条 -- WaterBar API介绍
+水球进度条 -- WaterBar API介绍
 
 # ---信号
 valueChange  # 进度条变化时触发
 
 # --- Api
 setText()  # 设置文本
-setTextColor() # 设置文本颜色
-setTextSize()  # 设置文本大小
-setAllText() # 同时设置文本,颜色,大小
 isHideText() # 设置是否需要显示进度的文字
 setBallInterval() # 设置每个数值变化,球产生的个数区间(默认[1,1])
 setBallSpeedInterval() # 设置每颗球移动的速度区间(默认[1200,4000])
 setBallSizeInterval() # # 设置每颗球生成的大小区间(默认[5,15])
-setWaterColor() # 设置水的颜色
-setWaterVatColor() # 设置水缸中没有被水覆盖的颜色
-setWaterVatBorderColor() # 设置水缸边缘的颜色
-```
 
-### 组件轮播(SlideShow)
+自定义QSS
+WaterBar{
+qproperty-color:rgba(100,200,100,255);
+qproperty-fontSize:20;
+/*qproperty-waterColor:rgba(0,255,0,255);
+qproperty-waterVatBorderColor:rgba(0,173,0,255);
+qproperty-waterVatColor:rgba(0,170,255,255);*/
+}
+```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%B0%B4%E7%90%83%E8%BF%9B%E5%BA%A6%E6%9D%A1.gif)
+### 轮播组件(SlideShow)
 
 ```python
-组件轮播  ----> 90%
+轮播组件  ----> 90%
 导入方式 from PyQtGuiLib.core import SlideShow
 
-组件轮播 -- WaterBar API介绍
+轮播组件 -- WaterBar API介绍
 
 # ---信号
 changeWidget  # 切换窗口时触发
@@ -262,7 +284,7 @@ setAinDirectionMode() # 设置动画方向模式(例如:上下方向(SlideShow.A
 setButtonsHide() # 设置隐藏/显示左右按钮(默认显示)
 getButtons() # 返回左右按钮对象(可以通过这个方法来重写左右按钮样式)
 ```
-
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E8%BD%AE%E6%92%AD%E7%BB%84%E4%BB%B6.gif)
 ### 线性渐变进度条(GradientBar)
 
 ```python
@@ -286,14 +308,16 @@ getColors()  # 返回所有的颜色和比重
 # -----
 注意,这个进度条不提供文字显示,如果需要请自行编写
 ```
-
-### 标题栏(TitleBar)
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E7%BA%BF%E6%80%A7%E6%B8%90%E5%8F%98%E8%BF%9B%E5%BA%A6%E6%9D%A1.gif)
+### 标题栏(TitleBar重写中)
 
 ```python
-标题栏  ----> 99%
-导入方式 from PyQtGuiLib.core.widgets import TitleBar
+标题栏 - ---> 99 % 
+导入方式
+from PyQtGuiLib.abandonCase.widgets import TitleBar
 
-标题栏 -- TitleBar API介绍
+标题栏 - - TitleBar
+API介绍
 
 # ---- 类变量
 # 标题位置
@@ -305,40 +329,44 @@ MacStyle
 
 # --- Api
 setTitleText()  # 设置标题
-setTitleColor() # 设置标题颜色
+setTitleColor()  # 设置标题颜色
 setTitleSize()  # 设置标题字体大小
-setAllTitle() # 同时设置,标题,颜色,字体大小
-setTitlePos() # 设置标题的位置(例如居中: TitleBar.Title_Center)
-setBtnStyle() # 设置 缩小,放大,关闭 按钮的风格(默认: TitleBar.WinStyle)
-setAniDuration() # 设置动画的时长(默认300毫秒)
-setTitleIcon() # 设置图标(默认会同步任务栏的图标)
-setSyncWindowIcon() # 设置是否同步桌面任务栏的图标
-updateTitleSize() # 更新标题栏大小
+setAllTitle()  # 同时设置,标题,颜色,字体大小
+setTitlePos()  # 设置标题的位置(例如居中: TitleBar.Title_Center)
+setBtnStyle()  # 设置 缩小,放大,关闭 按钮的风格(默认: TitleBar.WinStyle)
+setAniDuration()  # 设置动画的时长(默认300毫秒)
+setTitleIcon()  # 设置图标(默认会同步任务栏的图标)
+setSyncWindowIcon()  # 设置是否同步桌面任务栏的图标
+updateTitleSize()  # 更新标题栏大小
 
 # -------
 注意: 图标同步任务栏的效果只在win下才有效果
-在Mac设置图标方法,下面这个设置路径是写在运行程序那里的
+在Mac设置图标方法, 下面这个设置路径是写在运行程序那里的
 app = QApplication()
 app.setWindowIcon(QIcon(路径))
 ```
 
-### 状态栏(StatusBar)
+### 状态栏(StatusBar重写中)
 
 ```python
-状态栏  ----> 80%  测试使用中
-导入方式 from PyQtGuiLib.core.widgets import StatusBar
+状态栏 - ---> 80 % 测试使用中
+导入方式
+from PyQtGuiLib.abandonCase.widgets import StatusBar
 
-状态栏 -- StatusBar API介绍
+状态栏 - - StatusBar
+API介绍
 
 # --- Api
 
-addText() # 添加文本,可以设置持续多长时间后消失
-addButton() # 添加按钮,可以设置一个点击事件
-addWidget() # 添加一个窗口
-addTime() # 添加时间
-setTimeFormat() # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
+addText()  # 添加文本,可以设置持续多长时间后消失
+addButton()  # 添加按钮,可以设置一个点击事件
+addWidget()  # 添加一个窗口
+addTime()  # 添加时间
+setTimeFormat()  # 设置时间到格式(默认: %Y-%m-%d %H:%M:%S)
 
-这里所有添加的功能都可以通过 style 参数来设置样式
+这里所有添加的功能都可以通过
+style
+参数来设置样式
 ```
 ### 流式布局(FlowLayout)
 ```python
@@ -356,7 +384,7 @@ removeWidget()
 注意: 在使用 removeWidget() 移除控件的时候,控件会被删除掉
 注意: 流式布局 无法 配合 QScrollArea 使用
 ```
-
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%B5%81%E5%BC%8F%E5%B8%83%E5%B1%80.gif)
 ### 滚动栏(RollWidget)
 
 ```python
@@ -381,7 +409,7 @@ setAniSpecial() # 设置动画特效(参数就类变量,默认特效:InCurve)
 addWidget() # 添加控件
 buttons()  # 返回两个按钮对象
 ```
-
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%BB%9A%E5%8A%A8%E6%A0%8F.gif)
 ### 动态标题输入框(DynamicTLine)
 
 ```python
@@ -393,8 +421,8 @@ setPlaceholderText() # 设置提示文字
 text() # 获取文本
 label() # 返回标题对象
 line()  # 返回输入框对象
-
 ```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E5%8A%A8%E6%80%81%E6%A0%87%E9%A2%98%E8%BE%93%E5%85%A5%E6%A1%86.gif)
 ### 开关按钮
 ```python
 SwitchButton  --> 95% 测试使用中
@@ -416,6 +444,7 @@ setBallColor() # 设置运行球的颜色 格式 {"false":QColor,"true":QColor}
 
 # --------
 ```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E5%BC%80%E5%85%B3%E6%8C%89%E9%92%AE.gif)
 ### 调色版
 ```python
 ColorPalette --> 99% 测试使用中
@@ -436,6 +465,7 @@ setStyleMode() # 设置窗体本身的风格
 getHexName()  # 当前当前十六进制颜色
 getRGBA() # 返回当前RGBA颜色
 ```
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E8%B0%83%E8%89%B2%E6%9D%BF.gif)
 ## 控件增强
 ### QListWidget 增强 - ListWidget
 
@@ -457,4 +487,4 @@ addWidget() # 添加 QWidget
 removeWidget() # 移除窗口
 getAllWidget() # 返回所有窗口
 ```
-
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/QListWidget%E5%A2%9E%E5%BC%BA%E7%89%88%E6%9C%AC.gif)

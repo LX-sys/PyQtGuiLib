@@ -142,7 +142,7 @@ class PullOver:
 
     def center(self):
         f = self.parent.frameGeometry()
-        f.moveCenter(desktopCenter())
+        f.moveCenter(desktopCenter(self.parent))
         return f.topLeft()
 
     '''

@@ -10,15 +10,19 @@ from PyQtGuiLib.header import (
     Signal,
     qt,
     QLinearGradient,
+    QConicalGradient,
     QColor,
     QMouseEvent,
     QPaintEvent,
     QPoint,
     QWidget,
-    QImage
+    QImage,
+    QBrush
 )
 
+from PyQtGuiLib.core.widgets import WidgetABC
 
+# 矩形调色器
 class ColorHsv(QWidget):
     # 返回颜色rgba
     rgbAChange = Signal(tuple)
@@ -85,10 +89,59 @@ class ColorHsv(QWidget):
         painter.setBrush(gradient)
         painter.drawRect(0, 0, self._w, 255)
 
+
+# 色轮
+class ColorWheel(WidgetABC):
+    # 返回颜色rgba
+    rgbAChange = Signal(tuple)
+    # 返回hsv 中的h (h表示色调)
+    hsvChange = Signal(int)
+
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.resize(240,240)
+        self.pix = QPixmap(self.size())
+        self.pix.fill(qt.transparent)
+        self.drawColorWheel()
+        self.img = QImage(self.pix)
+
+    def drawColorWheel(self):
+        painter = QPainter(self.pix)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+        gradient = QConicalGradient(self.width()//2,self.height()//2,6)
+        gradient.setColorAt(0,qt.red)
+        gradient.setColorAt(60/360,qt.yellow)
+        gradient.setColorAt(120/360,qt.green)
+        gradient.setColorAt(180/360,QColor(0,253,255))
+        gradient.setColorAt(240/360,qt.blue)
+        gradient.setColorAt(300/360,QColor(253, 0, 254))
+        gradient.setColorAt(1, qt.red)
+
+        bru = QBrush(gradient)
+        painter.setPen(qt.NoPen)
+        painter.setBrush(bru)
+        painter.drawEllipse(self.rect())
+
+        painter.setBrush(QBrush(qt.transparent))
+        painter.drawEllipse(20,20,200,200)
+
+    def mouseMoveEvent(self, e: QMouseEvent) -> None:
+        super().mouseMoveEvent(e)
+        x = e.pos().x()
+        y = e.pos().y()
+        print(self.img.pixelColor(x, y).getRgb())
+
+    def paintEvent(self, e) -> None:
+        painter = QPainter(self)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+        painter.drawPixmap(self.rect(),self.pix)
+
+        painter.end()
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    win = ColorHsv()
+    win = ColorWheel()
     win.show()
 
     sys.exit(app.exec_())

@@ -28,7 +28,9 @@ if PYQT_VERSIONS == "PyQt5"  :
     blue = Qt.blue
     white = Qt.white
     black = Qt.black
+    green = Qt.green
     gray = Qt.gray
+    yellow = Qt.yellow
     transparent = Qt.transparent
     Antialiasing = QPainter.Antialiasing
     SmoothPixmapTransform = QPainter.SmoothPixmapTransform
@@ -83,8 +85,10 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     red = Qt.GlobalColor.red
     blue = Qt.GlobalColor.blue
     white = Qt.GlobalColor.white
+    green = Qt.GlobalColor.green
     black = Qt.GlobalColor.black
     gray = Qt.GlobalColor.gray
+    yellow = Qt.GlobalColor.yellow
     transparent = Qt.GlobalColor.transparent
     Antialiasing = QPainter.RenderHint.Antialiasing
     SmoothPixmapTransform = QPainter.RenderHint.SmoothPixmapTransform

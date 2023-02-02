@@ -26,8 +26,8 @@ class CustomStyle:
         self._font = "15 'Heiti SC'"
         self._borderWidth = 1
         self._borderStyle = "solid"
-        self._borderColor = QColor(234,234,234)
-        self._border = "1 solid QColor(234,234,234)"
+        self._borderColor = QColor(0,0,0)
+        self._border = "1 solid QColor(0,0,0)"
 
         # 线性渐变
         self._linearDirection = "LR"
@@ -143,7 +143,6 @@ class CustomStyle:
             "RLANG":[self.height(),self.width(),0,0],
             "UDANG":[self.width(),0,0,self.height()],
             "DUANG":[0,self.height(),self.width(),0]
-
         }
         try:
             if linearDirection_dict.get(self._linearDirection.upper(),None):

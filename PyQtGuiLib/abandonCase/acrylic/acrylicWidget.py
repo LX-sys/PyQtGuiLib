@@ -3,7 +3,6 @@ from PyQtGuiLib.header import (
     sys,
     QApplication,
     Qt,
-    QWidget,
     QGridLayout,
     QLabel,
     QFont
@@ -14,7 +13,7 @@ from PyQtGuiLib.header import (
 
 from windowEffect import WindowEffect
 
-from PyQtGuiLib.core.widgets import BorderlessWidget
+from PyQtGuiLib.abandonCase.widgets import BorderlessWidget
 
 class AcrylicWidget(BorderlessWidget):
     def __init__(self,*args,**kwargs):

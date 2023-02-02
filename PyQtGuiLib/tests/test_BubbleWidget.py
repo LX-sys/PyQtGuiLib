@@ -32,17 +32,17 @@ class Test(QWidget):
 
         # 气泡控件
         self.bu_top = BubbleWidget(self)
-        self.bu_top.setDirection(BubbleWidget.Top)
+        self.bu_top.setDirection(BubbleWidget.Left)
         self.bu_top.setText("hello world")
         self.bu_top.setTrack(self.btn)
 
         self.bu_top.setStyleSheet('''
 BubbleWidget{
-qproperty-backgroundColor: rgba(165, 138, 255,200);
+qproperty-backgroundColor: rgba(100, 130, 255,200);
 qproperty-radius:10;
-qproperty-fontSize:12;
-qproperty-arrowsSize:20;
-qproperty-margin:3;
+qproperty-fontSize:15;
+qproperty-arrowsSize:12;
+qproperty-margin:0;
 }
 ''')
 
