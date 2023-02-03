@@ -123,6 +123,11 @@ class WidgetABC(QWidget,CustomStyle):
         '''
             先判断四角,再判断四边
         '''
+        if self.__RestrictedOperation is False:
+            if self.pressDirection:
+                return True
+            return
+
         if (x <= self.scope and x >= 0) and (y >= 0 and y <= self.scope) \
                 or (w - x <= self.scope) and (h - y <= self.scope):
             self.setCursor(qt.SizeFDiagCursor)
