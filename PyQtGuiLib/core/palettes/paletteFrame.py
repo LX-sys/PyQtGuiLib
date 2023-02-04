@@ -18,7 +18,8 @@ from PyQtGuiLib.header import (
     调色板框架
 '''
 
-from PyQtGuiLib.core.palettes.colorHsv import ColorHsv
+from PyQtGuiLib.core.palettes.colorHsv import ColorHsv,ColorLump,ColorRect,ColorWheel
+
 
 class PaletteFrame(QWidget):
     def __init__(self,*args,**kwargs):
@@ -33,8 +34,8 @@ background-color: rgb(19, 19, 19);
         ''')
 
         # 色块窗口
-        self.colorLumpWidget = None
-        # self.colorLumpWidget = ColorHsv()
+        # self.colorLumpWidget = None
+        self.colorLumpWidget = ColorRect()
         # self.addColorLump(self.placeholderWidget)
 
         self.setStyleSheet('''

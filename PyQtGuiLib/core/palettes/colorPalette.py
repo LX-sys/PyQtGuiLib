@@ -27,7 +27,6 @@ from PyQtGuiLib.header import (
 
 from PyQtGuiLib.core.palettes.colorHsv import ColorHsv
 
-
 # 中间色块
 class ColorLump(QWidget):
     rgbaChange = Signal(tuple)
@@ -351,6 +350,8 @@ class ColorPalette(QWidget):
         # 更新图像
         self.color_lump.updatePreview()
         self.update()
+
+
 
 
 if __name__ == '__main__':
