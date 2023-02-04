@@ -16,18 +16,11 @@ from PyQtGuiLib.header import (
     QPaintEvent,
     QPoint,
     QWidget,
-    QImage,
     QBrush,
     QVBoxLayout,
-    QEvent,
     QLabel,
-    Qt,
     QRect
 )
-from PyQt5.QtCore import QObject
-from PyQtGuiLib.core.widgets import WidgetABC
-from PyQt5.QtGui import qRed,qBlue,qGreen
-
 
 # 移动圆圈类
 class MousePoint:
@@ -155,20 +148,23 @@ class ColorHsv(ColorABC):
 
 class ColorLump(ColorABC):
     def __init__(self,*args,**kwargs):
-        self.__bgcolor = QColor(0, 255, 0, 255)
+
         super().__init__(*args,**kwargs)
+        self.__bgcolor = QColor(0, 255, 0, 255)
 
         # 鼠标是否过半
         self.is_half = False
         self.setUI()
 
+    def setAlpha(self,a:int):
+        self.__bgcolor.setAlpha(a)
+        self.colorLayer()
+
     def setBgColor(self,color:QColor):
         self.__bgcolor = color
-        self.grayLayer()
         self.colorLayer()
-        self.createPixmap()
 
-    def bgColor(self)->QColor:
+    def bgColor(self) -> QColor:
         return self.__bgcolor
 
     def setUI(self):
@@ -251,6 +247,9 @@ class ColorRect(QWidget):
         self.vlayout.addWidget(self.color_hsv)
         self.vlayout.addWidget(self.color_lump)
 
+    def setAlpha(self,a:int):
+        self.color_lump.setAlpha(a)
+
     def myEvent(self):
         self.color_hsv.rgbaChange.connect(self.change_lump_event)
         self.color_hsv.hsvChange.connect(self.hsvChange.emit)
@@ -272,24 +271,65 @@ class ColorWheel(ColorABC):
         super().__init__(*args,**kwargs)
         self.resize(240,240)
 
+        # 如果亮度过低,则改变圆圈颜色
+        self.is_alpha = False
+
+        self.colors = [(0,QColor(255, 0, 0,255)),
+                       (60,QColor(255, 255, 0,255)),
+                       (120,QColor(0, 255, 0,255)),
+                       (180,QColor(0,255,255,255)),
+                       (240,QColor(0, 0, 255,255)),
+                       (300,QColor(255, 0, 255,255)),
+                       (360,QColor(255, 0, 0,255))
+                       ]
+
         self.setAttribute(qt.WA_TranslucentBackground)
         self.setWindowFlags(qt.FramelessWindowHint | qt.Widget)
 
         self.setUI()
 
+    def setAlpha(self,a:int):
+        for _,color in self.colors:
+            color.setAlpha(a)
+
+        self.is_alpha = True if(a <= 220) else False
+
+        self.createColorWheel()
+
     def setUI(self):
+        # 底色
+        self.bgColorWheel()
+        self.createColorWheel()
+
+    # 色轮底色
+    def bgColorWheel(self):
+        self.bgpix = QPixmap(self.size())
+        self.bgpix.fill(qt.transparent)
+
+        painter = QPainter(self.bgpix)
+        painter.setRenderHints(qt.Antialiasing)
+
+        gradient = QConicalGradient(self.width() // 2, self.height() // 2, 6)
+        color = QColor(0,0,0,255)
+        for v in range(0,420,60):
+            gradient.setColorAt(v / 360, color)
+
+        bru = QBrush(gradient)
+        painter.setPen(qt.NoPen)
+        painter.setBrush(bru)
+        painter.drawEllipse(self.rect())
+
+    def createColorWheel(self):
         self.pix = QPixmap(self.size())
         self.pix.fill(qt.transparent)
 
-    def __painter__(self,painter:QPainter):
-        gradient = QConicalGradient(self.width()//2,self.height()//2,6)
-        gradient.setColorAt(0,qt.red)
-        gradient.setColorAt(60/360,qt.yellow)
-        gradient.setColorAt(120/360,qt.green)
-        gradient.setColorAt(180/360,QColor(0,253,255))
-        gradient.setColorAt(240/360,qt.blue)
-        gradient.setColorAt(300/360,QColor(253, 0, 254))
-        gradient.setColorAt(1, qt.red)
+        painter = QPainter(self.pix)
+        gradient = QConicalGradient(self.width() // 2, self.height() // 2, 6)
+        painter.setRenderHints(qt.Antialiasing)
+
+        # 绘制
+        for v, color in self.colors:
+            gradient.setColorAt(v / 360, color)
 
         bru = QBrush(gradient)
         painter.setPen(qt.NoPen)
@@ -297,8 +337,19 @@ class ColorWheel(ColorABC):
         painter.drawEllipse(self.rect())
 
         painter.setBrush(QBrush(qt.transparent))
-        painter.drawEllipse(20,20,200,200)
+        painter.drawEllipse(20, 20, 200, 255)
         painter.setPen(qt.white)
+
+
+    def __painter__(self,painter:QPainter):
+        painter.drawPixmap(self.rect(), self.bgpix)
+        if self.is_alpha:
+            painter.setPen(qt.white)
+        painter.drawPixmap(self.rect(), self.pix)
+
+
+
+
 
 
 class Test(QWidget):
@@ -307,8 +358,8 @@ class Test(QWidget):
         self.resize(800,800)
 
         self.clump = ColorWheel(self)
-        # self.clump.resize(self.width(),self.clump.height())
         self.clump.resize(240,240)
+        self.clump.setAlpha(220)
         # self.clump.show()
 
         self.bt = QLabel(self)

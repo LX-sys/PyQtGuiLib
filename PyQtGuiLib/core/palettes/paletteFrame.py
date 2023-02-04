@@ -11,17 +11,22 @@ from PyQtGuiLib.header import (
     QPushButton,
     QSpinBox,
     QSlider,
-    qt
+    qt,
+    Signal
 )
 
 '''
     调色板框架
 '''
 
-from PyQtGuiLib.core.palettes.colorHsv import ColorHsv,ColorLump,ColorRect,ColorWheel
+from PyQtGuiLib.core.palettes.colorHsv import ColorRect,ColorWheel
 
 
 class PaletteFrame(QWidget):
+    rgbaChange = Signal(tuple)
+    hsvChange = Signal(tuple)
+    nameChange = Signal(str)
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(480,340)
@@ -34,21 +39,21 @@ background-color: rgb(19, 19, 19);
         ''')
 
         # 色块窗口
-        # self.colorLumpWidget = None
-        self.colorLumpWidget = ColorRect()
+        self.colorLumpWidget = None
+        self.colorLumpWidget = ColorWheel()
         # self.addColorLump(self.placeholderWidget)
 
-        self.setStyleSheet('''
-#leftWidget{
-background-color: rgb(255, 255, 173);
-}
-#rightWidget{
-background-color: rgb(164, 255, 185);
-}
-#lucency{
-background-color: rgb(198, 217, 255);
-}
-        ''')
+#         self.setStyleSheet('''
+# #leftWidget{
+# background-color: rgb(255, 255, 173);
+# }
+# #rightWidget{
+# background-color: rgb(164, 255, 185);
+# }
+# #lucency{
+# background-color: rgb(198, 217, 255);
+# }
+#         ''')
         self.Init()
         self.myEvent()
 
@@ -80,9 +85,9 @@ background-color: rgb(198, 217, 255);
 
         self.label_r,self.label_g,self.label_b,self.label_a,self.label_bin = [
             QLabel("红(R)"),
-            QLabel("红(G)"),
-            QLabel("红(B)"),
-            QLabel("红(A)"),
+            QLabel("绿(G)"),
+            QLabel("蓝(B)"),
+            QLabel("透(A)"),
             QLabel("十六"),
         ]
         self.lineedit_r, self.lineedit_g, self.lineedit_b, self.lineedit_a,self.lineedit_bin = [
@@ -91,6 +96,8 @@ background-color: rgb(198, 217, 255);
         ]
         for line in [self.lineedit_r,self.lineedit_g,self.lineedit_b,self.lineedit_a]:
             line.setMaximum(255)
+            line.setEnabled(False)
+        self.lineedit_a.setValue(255)
         self.formLayout = QFormLayout(self.rightWidget)
         self.formLayout.addRow(self.label_r,self.lineedit_r)
         self.formLayout.addRow(self.label_g,self.lineedit_g)
@@ -109,6 +116,8 @@ background-color: rgb(198, 217, 255);
         self.slider.setOrientation(qt.Horizontal)
         self.s_num = QSpinBox()
         self.s_num.setMaximum(255)
+        self.slider.setValue(255)
+        self.s_num.setValue(255)
         self.lucencyHLayout.addWidget(self.t)
         self.lucencyHLayout.addWidget(self.slider)
         self.lucencyHLayout.addWidget(self.s_num)
@@ -138,6 +147,17 @@ background-color: rgb(198, 217, 255);
     def myEvent(self):
         self.slider.valueChanged.connect(lambda v:self.slider_event(v,"QSpinBox"))
         self.s_num.valueChanged.connect(lambda v:self.slider_event(v,"QSlider"))
+        #
+        if self.isColorLump():
+            self.placeholderWidget.rgbaChange.connect(self.spbox_event)
+            self.placeholderWidget.nameChange.connect(self.lineedit_bin.setText)
+    # spbox事件
+    def spbox_event(self,rgba):
+        r,g,b,a = rgba
+        self.lineedit_r.setValue(r)
+        self.lineedit_g.setValue(g)
+        self.lineedit_b.setValue(b)
+
 
     # 滚动条事件
     def slider_event(self,v:int,obj_str:str):
@@ -146,6 +166,11 @@ background-color: rgb(198, 217, 255);
 
         if obj_str == "QSlider":
             self.slider.setValue(v)
+
+        if self.isColorLump():
+            self.placeholderWidget.setAlpha(v)
+            self.lineedit_a.setValue(v)
+            self.update()
 
     def resizeEvent(self, event) -> None:
         self.updateSize()
