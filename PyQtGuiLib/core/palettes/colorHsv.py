@@ -1,7 +1,6 @@
 '''
     color_HSV
 '''
-import PySide2
 
 from PyQtGuiLib.header import (
     QApplication,
@@ -20,10 +19,14 @@ from PyQtGuiLib.header import (
     QImage,
     QBrush,
     QVBoxLayout,
-    QEvent
+    QEvent,
+    QLabel,
+    Qt,
+    QRect
 )
 from PyQt5.QtCore import QObject
 from PyQtGuiLib.core.widgets import WidgetABC
+from PyQt5.QtGui import qRed,qBlue,qGreen
 
 
 # 移动圆圈类
@@ -60,38 +63,26 @@ class MousePoint:
     def drawImage(self):
         pass
 
-
-# 颜色
-class ColorHsv(QWidget):
+# 所有调色图像的抽象
+class ColorABC(QWidget):
     # 返回颜色rgba
-    rgbAChange = Signal(tuple)
-    # 返回hsv 中的h (h表示色调)
+    '''
+    rgbaChange:返回(r,g,b,a)
+    hsvChange:返回(h,s,v,a)
+    nameChange:返回 #xxxxxx
+    '''
+    rgbaChange = Signal(tuple)
     hsvChange = Signal(tuple)
     nameChange = Signal(str)
 
-    def __init__(self,*args):
-        self._w,self._h = 700,40
+    def __init__(self,*args,**kwargs):
         # 移动点的大小
-        self._mouse = MousePoint(0,0,4)
+        self._mouse = MousePoint(0, 0, 4)
 
-        super(ColorHsv, self).__init__(*args)
+        super().__init__(*args,**kwargs)
 
-        self.setFixedHeight(self._h)
-        self.setUI()
-        self.installEventFilter(self)
-
-    def setUI(self):
-        self.pix = QPixmap(self.size())
-        self.pix.fill(qt.transparent)
-        self.createHuePixmap()
-        self.img = QImage(self.pix)
-
-    def paintEvent(self, e: QPaintEvent) -> None:
-        painter = QPainter(self)
-        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-        painter.setPen(qt.white)
-        painter.drawPixmap(self.rect(),self.pix)
-        painter.drawEllipse(*self._mouse.size(),self._mouse.r()*2,self._mouse.r()*2)
+    def setR(self,r):
+        self._mouse.r(r)
 
     def _update(self,pos:QPoint):
         x,y = pos.x(),pos.y()
@@ -104,14 +95,15 @@ class ColorHsv(QWidget):
 
     # 发送信号
     def sendSignal(self,x,y):
-        pixel_color = self.img.pixelColor(x, y)
-        hsv_v = pixel_color.getHsv()
-        color = pixel_color.getRgb()
-        cname = pixel_color.name()
-        # print("{} - {} - {}".format(hsv_v,color,cname))
-        self.hsvChange.emit(hsv_v)
-        self.rgbAChange.emit(color)
-        self.nameChange.emit(cname)
+        color = self.grab(QRect(x, y, 1, 1)).toImage().pixelColor(0, 0)
+        print(color.getRgb())
+        self.hsvChange.emit(color.getHsv())
+        self.rgbaChange.emit(color.getRgb())
+        self.nameChange.emit(color.name())
+
+    # 留给子类重写的部分
+    def __painter__(self,painter:QPainter):
+        pass
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         self._update(e.pos())
@@ -119,200 +111,112 @@ class ColorHsv(QWidget):
     def mouseMoveEvent(self, e: QMouseEvent) -> None:
         self._update(e.pos())
 
+    def paintEvent(self, event:QPaintEvent) -> None:
+        painter = QPainter(self)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+
+        self.__painter__(painter)
+        painter.drawEllipse(*self._mouse.size(), self._mouse.r() * 2, self._mouse.r() * 2)
+        painter.end()
+
+
+class ColorHsv(ColorABC):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        self.setFixedHeight(40)
+        self.setUI()
+
+    def setUI(self):
+        self.pix = QPixmap(self.size())
+        self.pix.fill(qt.transparent)
+        self.createHuePixmap()
+
+    def __painter__(self,painter:QPainter):
+        painter.setPen(qt.white)
+        painter.drawPixmap(self.rect(),self.pix)
+
     # 创建HSV颜色条
     def createHuePixmap(self):
         painter = QPainter(self.pix)
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)  # 抗锯齿
-        gradient = QLinearGradient(self.width(),0,0, 0)
+        gradient = QLinearGradient(self.width(), 0, 0, 0)
 
         i = 0.0
         gradient.setColorAt(0, QColor.fromHsvF(0, 1, 1, 1))
         while i < 1.0:
-            gradient.setColorAt(i, QColor.fromHsvF(i,1,1,1))
-            i += 1.0/16.0
+            gradient.setColorAt(i, QColor.fromHsvF(i, 1, 1, 1))
+            i += 1.0 / 16.0
         gradient.setColorAt(1, QColor.fromHsvF(0, 1, 1, 1))
         painter.setPen(qt.NoPen)
         painter.setBrush(gradient)
         painter.drawRect(self.rect())
 
 
-class ColorLump(QWidget):
-    rgbaChange = Signal(tuple)
-    hsvChange = Signal(int)
-    nameChange = Signal(str)
-
-    moveed = Signal(int,int,int,int) # 鼠标移动信信号
-
+class ColorLump(ColorABC):
     def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        # h 色调值  s  v
-        self.tonal_value = 350
-        self.s_value = 255
-        self.v_value = 255
-        # 图像位置
-        self._pPos_x = 0
-        self._pPos_y = 0
-
-        # 移动圆圈的大小
-        self._mouse_X = 0
-        self._mouse_Y = 0
-        self.ellipse_r = 8  # 半径
-        self._mouse_color = qt.white  # 圆圈颜色
-
-        # 透明度
-        self._alpha = 255
-
-        # 当前颜色值
-        self._RGBA = [255, 255, 255, 255]
-        # 颜色的十六进制
-        self._colorHex = "#ffffff"
-
-        self.pix2 = QPixmap(self.size())
-        self.pix2.fill(qt.transparent)
-
-        # --
-        self.preview()
-        self.createSVPixmap()
-        self.updatePreview()
-
-    def paintEvent(self, e: QPaintEvent) -> None:
-        painter = QPainter(self)
-        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
-        # 下面这两句的位置不能换
-        painter.drawPixmap(self._pPos_x, self._pPos_y, self.pix2)
-        painter.drawPixmap(self._pPos_x, self._pPos_y, self.pix)
-
-        painter.setPen(self._mouse_color)
-        painter.drawEllipse(self._mouse_X + self._pPos_x, self._mouse_Y + self._pPos_y,
-                            self.ellipse_r * 2, self.ellipse_r * 2)
-
-    def preview(self):
-        self.pix = QPixmap(self.size())
-        self.pix.fill(qt.transparent)
-
-        painter = QPainter(self.pix)
-        painter.setRenderHint(QPainter.Antialiasing)
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
-
-        gradient = QLinearGradient(0,0,0,360)
-        gradient.setColorAt(0,QColor(0,0,0,0))
-        gradient.setColorAt(1,QColor(0,0,0,255))
-
-        painter.setPen(qt.NoPen)
-        painter.setBrush(gradient)
-        painter.drawRect(self.rect())
-
-    def _setSV(self, s: int, v: int) -> None:
-        self.s_value = s
-        self.v_value = v
-
-        # hsv转成rgba
-
-    def hsvToRgba(self, h: int, s: int, v: int) -> tuple:
-        color = QColor()
-        color.setHsv(h, s, v)
-        # 设置十六进制
-        self._colorHex = color.name()
-        self._setSV(s, v)
-        self._RGBA = list(color.getRgb())
-        self._RGBA[3] = self._alpha
-        return tuple(self._RGBA)
-
-    def _setMousePos(self, e: QMouseEvent):
-        '''
-            检查鼠标是否点击在图像上,并设置鼠标位置
-        :param e:
-        :return:
-        '''
-        if (e.x() >= -5 + self._pPos_x and
-                e.x() <= self._pPos_x + 255 - self.ellipse_r * 2 and
-                e.y() >= -5 + self._pPos_y and
-                e.y() <= self._pPos_y + 255 - self.ellipse_r * 2
-        ):
-            self._mouse_X = e.x() - self._pPos_x
-            self._mouse_Y = e.y() - self._pPos_y
-            self.update()
-
-    def mousePressEvent(self, e: QMouseEvent) -> None:
-        self._setMousePos(e)
-        # print()
-        rgba = self.hsvToRgba(self.tonal_value, e.x(), e.y())
-        self._RGBA[0] = rgba[0]
-        self._RGBA[1] = rgba[1]
-        self._RGBA[2] = rgba[2]
-        self._RGBA[3] = rgba[3]
-        self.moveed.emit(*rgba)
-
-    def mouseMoveEvent(self, e: QMouseEvent) -> None:
-        self._setMousePos(e)
-        # 这里y需要减一个255,将颜色矫正,不然是反的
-        x = e.pos().x() - self._pPos_x
-        y = 255 - e.pos().y() + self._pPos_y
-        if x >= 0 and x <= 255 and y >= 0 and y <= 255:
-            rgba = self.hsvToRgba(self.tonal_value, x, y)
-            self._RGBA[0]=rgba[0]
-            self._RGBA[1]=rgba[1]
-            self._RGBA[2]=rgba[2]
-            self._RGBA[3]=rgba[3]
-            self.moveed.emit(*rgba)
-            self.update()
-
-    def createSVPixmap(self):
-        self.pix2 = QPixmap(self.size())
-        self.pix2.fill(qt.transparent)
-
-    def updatePreview(self):
-        color = QColor()
-        color.setHsv(self.tonal_value, 255, 255, self._alpha)
-
-        painter = QPainter(self.pix2)
-        painter.setRenderHint(QPainter.Antialiasing)
-        gradient = QLinearGradient(0, 0, 360, 0)
-        gradient.setColorAt(1, color)
-        gradient.setColorAt(0, QColor("#ffffff"))
-        painter.setPen(qt.NoPen)
-        painter.setBrush(gradient)
-        painter.drawRect(self.rect())
-
-class ColorLump2(QWidget):
-    rgbaChange = Signal(tuple)
-    hsvChange = Signal(int)
-    nameChange = Signal(str)
-
-    moveed = Signal(int,int,int,int) # 鼠标移动信信号
-
-    def __init__(self,*args,**kwargs):
+        self.__bgcolor = QColor(0, 255, 0, 255)
         super().__init__(*args,**kwargs)
 
+        # 鼠标是否过半
+        self.is_half = False
         self.setUI()
 
+    def setBgColor(self,color:QColor):
+        self.__bgcolor = color
+        self.grayLayer()
+        self.colorLayer()
+        self.createPixmap()
+
+    def bgColor(self)->QColor:
+        return self.__bgcolor
 
     def setUI(self):
+        self.grayLayer()
+        self.colorLayer()
+
+    def mouseMoveEvent(self, e: QMouseEvent) -> None:
+        super().mouseMoveEvent(e)
+        # 过半判断
+        self.is_half = True if(e.y() > self.height()//2) else False
+
+    # 灰色图层
+    def grayLayer(self):
+        self.gray_pix = QPixmap(self.size())
+        self.gray_pix.fill(qt.transparent)
+        self.createGrayPixmap()
+
+    # 彩色图层
+    def colorLayer(self):
         self.pix = QPixmap(self.size())
         self.pix.fill(qt.transparent)
         self.createPixmap()
-        self.img = QImage(self.pix)
 
-
-    def paintEvent(self, e: QPaintEvent) -> None:
-        painter = QPainter(self)
-        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-        painter.setPen(qt.white)
+    def __painter__(self,painter:QPainter):
         painter.drawPixmap(self.rect(),self.pix)
-        # painter.drawEllipse(*self._mouse.size(),self._mouse.r()*2,self._mouse.r()*2)
+        if self.is_half:
+            painter.setPen(qt.white)
+        painter.drawPixmap(self.rect(), self.gray_pix)
+
+    def createGrayPixmap(self):
+        painter = QPainter(self.gray_pix)
+        painter.setRenderHints(qt.Antialiasing)
+
+        gradient = QLinearGradient(0, 0, 0, self.height())
+        gradient.setColorAt(0, QColor(0, 0, 0, 0))
+        gradient.setColorAt(1, QColor("#000"))
+        painter.setPen(qt.NoPen)
+        painter.setBrush(gradient)
+        painter.drawRect(self.rect())
 
     def createPixmap(self):
-        self.pix = QPixmap(self.size())
-        self.pix.fill(qt.transparent)
-
         painter = QPainter(self.pix)
-        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+        painter.setRenderHints(qt.Antialiasing)
 
-        painter.setCompositionMode(QPainter.CompositionMode_Source)
+        gradient = QLinearGradient(0, 0, self.width(), 0)
+        gradient.setColorAt(0, QColor("#fff"))
 
-        gradient = QLinearGradient(0, 0,self.width(),0)
-        gradient.setColorAt(0, QColor(255, 255, 255, 255))
-        gradient.setColorAt(1, QColor(0, 255, 0, 255))
+        gradient.setColorAt(1, self.bgColor())
 
         painter.setPen(qt.NoPen)
         painter.setBrush(gradient)
@@ -322,9 +226,9 @@ class ColorLump2(QWidget):
 # -----------------------------
 
 # 矩形
-class ColorRect(WidgetABC):
+class ColorRect(QWidget):
     # 返回颜色rgba
-    rgbAChange = Signal(tuple)
+    rgbaChange = Signal(tuple)
     # 返回hsv 中的h (h表示色调)
     hsvChange = Signal(int)
     nameChange = Signal(str)
@@ -347,32 +251,37 @@ class ColorRect(WidgetABC):
         self.vlayout.addWidget(self.color_hsv)
         self.vlayout.addWidget(self.color_lump)
 
-
     def myEvent(self):
-        pass
+        self.color_hsv.rgbaChange.connect(self.change_lump_event)
+        self.color_hsv.hsvChange.connect(self.hsvChange.emit)
+        self.color_hsv.nameChange.connect(self.nameChange.emit)
+        self.color_lump.rgbaChange.connect(self.rgbaChange.emit)
+        self.color_lump.hsvChange.connect(self.hsvChange.emit)
+        self.color_lump.nameChange.connect(self.nameChange.emit)
+
+    def change_lump_event(self,rgba:tuple):
+        self.rgbaChange.emit(rgba)
+        # ----
+        self.color_lump.setBgColor(QColor(*rgba))
+        self.update()
+
 
 # 色轮
-class ColorWheel(WidgetABC):
-    # 返回颜色rgba
-    rgbAChange = Signal(tuple)
-    # 返回hsv 中的h (h表示色调)
-    hsvChange = Signal(int)
-    nameChange = Signal(str)
-
+class ColorWheel(ColorABC):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(240,240)
+
+        self.setAttribute(qt.WA_TranslucentBackground)
+        self.setWindowFlags(qt.FramelessWindowHint | qt.Widget)
+
+        self.setUI()
+
+    def setUI(self):
         self.pix = QPixmap(self.size())
         self.pix.fill(qt.transparent)
-        self.drawColorWheel()
-        self.img = QImage(self.pix)
 
-        self.setMouseTracking(False)
-        # self.setRestrictedOperation(False)
-
-    def drawColorWheel(self):
-        painter = QPainter(self.pix)
-        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+    def __painter__(self,painter:QPainter):
         gradient = QConicalGradient(self.width()//2,self.height()//2,6)
         gradient.setColorAt(0,qt.red)
         gradient.setColorAt(60/360,qt.yellow)
@@ -389,28 +298,39 @@ class ColorWheel(WidgetABC):
 
         painter.setBrush(QBrush(qt.transparent))
         painter.drawEllipse(20,20,200,200)
+        painter.setPen(qt.white)
 
-    def keyPressEvent(self, event) -> None:
-        super().keyPressEvent(event)
 
-    def mouseMoveEvent(self, e: QMouseEvent) -> None:
-        super().mouseMoveEvent(e)
-        if self.pressState:
-            x = e.pos().x()
-            y = e.pos().y()
-            print(self.img.pixelColor(x, y).getRgb())
+class Test(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.resize(800,800)
 
-    def paintEvent(self, e) -> None:
-        painter = QPainter(self)
-        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-        painter.drawPixmap(self.rect(),self.pix)
+        self.clump = ColorWheel(self)
+        # self.clump.resize(self.width(),self.clump.height())
+        self.clump.resize(240,240)
+        # self.clump.show()
 
-        painter.end()
+        self.bt = QLabel(self)
+        self.bt.resize(60,60)
+        self.bt.move(600,60)
+        self.bt.setStyleSheet('''
+        background-color: rgb(0, 0, 0, 255);
+        ''')
+
+        self.clump.nameChange.connect(self.te)
+    def te(self,v):
+        print(v)
+        self.bt.setStyleSheet('''
+        background-color: %s;
+        '''%(v))
+        self.update()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    win = ColorLump2()
+    win = Test()
     win.show()
 
     sys.exit(app.exec_())
