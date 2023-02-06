@@ -40,7 +40,7 @@ background-color: rgb(19, 19, 19);
 
         # 色块窗口
         self.colorLumpWidget = None
-        self.colorLumpWidget = ColorWheel()
+        self.colorLumpWidget = ColorRect()
         # self.addColorLump(self.placeholderWidget)
 
 #         self.setStyleSheet('''
