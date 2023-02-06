@@ -59,7 +59,13 @@ if PYQT_VERSIONS == "PyQt5":
         QGraphicsBlurEffect,
         QGraphicsColorizeEffect,
         QWizard,
-        QWizardPage
+        QWizardPage,
+        QSplashScreen,
+        QFileDialog,
+        QPlainTextEdit,
+        QStatusBar,
+        QCompleter,
+        QDockWidget
     )
 if PYQT_VERSIONS == "PyQt6":
     from PyQt6.QtWidgets import (
@@ -119,7 +125,13 @@ if PYQT_VERSIONS == "PyQt6":
         QGraphicsBlurEffect,
         QGraphicsColorizeEffect,
         QWizard,
-        QWizardPage
+        QWizardPage,
+        QSplashScreen,
+        QFileDialog,
+        QPlainTextEdit,
+        QStatusBar,
+        QCompleter,
+        QDockWidget
 )
 
 if PYQT_VERSIONS == "PySide2":
@@ -182,7 +194,13 @@ if PYQT_VERSIONS == "PySide2":
         QGraphicsBlurEffect,
         QGraphicsColorizeEffect,
         QWizard,
-        QWizardPage
+        QWizardPage,
+        QSplashScreen,
+        QFileDialog,
+        QPlainTextEdit,
+        QStatusBar,
+        QCompleter,
+        QDockWidget
     )
 
 if PYQT_VERSIONS == "PySide6":
@@ -243,5 +261,11 @@ if PYQT_VERSIONS == "PySide6":
         QGraphicsBlurEffect,
         QGraphicsColorizeEffect,
         QWizard,
-        QWizardPage
+        QWizardPage,
+        QSplashScreen,
+        QFileDialog,
+        QPlainTextEdit,
+        QStatusBar,
+        QCompleter,
+        QDockWidget
     )
