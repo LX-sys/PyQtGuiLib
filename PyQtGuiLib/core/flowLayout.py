@@ -1,14 +1,9 @@
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    QApplication,
-    sys,
     QWidget,
-    QPushButton,
     QSize,
     QRect,
     QPoint,
     qt,
-    QMargins,
     QLayout,
     QLayoutItem
 )

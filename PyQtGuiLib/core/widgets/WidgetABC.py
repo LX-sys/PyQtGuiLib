@@ -300,7 +300,7 @@ if __name__ == '__main__':
     win = WidgetABC()
     win.setStyleSheet('''
 WidgetABC{
-qproperty-radius:0;
+qproperty-radius:5;
 /*qproperty-backgroundColor:rgba(255,0,2,255);*/
 /*qproperty-borderColor:rgba(255,0,2,255);*/
 }
