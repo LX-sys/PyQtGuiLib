@@ -21,6 +21,14 @@ win
 mac
 ```
 
+### 安装方式
+
+```
+pip install PyQtGuiLib
+```
+
+
+
 ### 项目目录说明	
 
 ```python
