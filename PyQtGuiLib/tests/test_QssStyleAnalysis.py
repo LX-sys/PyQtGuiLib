@@ -4,6 +4,7 @@
 # @file:test_QssStyleAnalysis.py
 # @software:PyCharm
 
+
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
@@ -11,23 +12,10 @@ from PyQtGuiLib.header import (
     QWidget,
     qt,
     QPushButton,
-    Qt,
-    QPalette,
-    QColor,
-    QPaintEvent,
-    QPainter,
-    QBrush,
-    QSize,
-    QMainWindow,
-    QLineEdit,
-    desktopCenter,
-    QPixmap,
-    QLinearGradient,
     QLabel,
-    QFont,
-    textSize,
-    QFontMetricsF,
-    Qt
+    Qt,
+    QMainWindow,
+    QPainterPath
 )
 
 from PyQtGuiLib.styles import QssStyleAnalysis
@@ -38,21 +26,27 @@ class Test(QMainWindow):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
 
-
-
+        self.l = QLabel("测试标签",self)
         self.btn = QPushButton("测试按钮",self)
 
         # QSS 解析器
-        self.qss = QssStyleAnalysis(self.btn)
+        self.qss = QssStyleAnalysis(self)
         self.qss.setQSS('''
         QPushButton{
-        	color: rgb(0, 255, 127);
-        	background-color:rgb(0, 170, 0);
-        }''')
-        self.qss.qss("QPushButton").updateAttr("color","red")
+        color: rgb(0, 255, 127);
+        background-color:rgb(0, 170, 0);
+        }
+        QPushButton:hover{
+        }
+        ''')
+        self.qss.appendQSSDict({
+            "QLabel":{
+                "border":"2px solid yellow"
+            }
+        })
+        self.qss.selector("QPushButton:hover").updateAttr("border", "2px solid blue")
 
-
-
+        self.l.move(30, 30)
         self.btn.resize(150,80)
         self.btn.move(80,80)
 

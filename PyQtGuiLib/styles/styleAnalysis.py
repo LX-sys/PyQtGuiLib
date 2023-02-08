@@ -11,6 +11,7 @@
 
 import re
 
+
 def dictTostr(qss_dict)->str:
     combination = ""
     for selector, attribute in qss_dict.items():
@@ -20,9 +21,12 @@ def dictTostr(qss_dict)->str:
         combination += "}\n"
     return combination
 
+
 class Qss:
-    def __init__(self,qss:str,parent=None):
+    def __init__(self,qss:str,qs=None,parent=None):
         self.__parent =parent
+        self.__qs = qs
+
         self._qss_str = qss
         self._qss_dict = dict()
         self._qss_header = ""
@@ -74,13 +78,10 @@ class Qss:
 
     def updateAttr(self,key,value):
         self._qss_dict[self.header()][key]=value
-        # print(self._qss_dict)
         self._qss_str = dictTostr(self._qss_dict)
         self.Init()
         if self.__parent:
-            self.__parent.setStyleSheet(self._qss_str)
-
-
+            self.__qs.updateStyleSheet()
 
     def __str__(self):
         return self._qss_str
@@ -89,10 +90,10 @@ class Qss:
 class QssStyleAnalysis:
     def __init__(self,parent=None):
         self.__parent = parent
-        self._qss = [] # type:Qss
+        self._qss = [] # type:[Qss]
         self._map_qss = dict()
 
-    # 分解多组QSS
+    # Decompose multiple groups of QSS
     def groupDecomposition(self,styles):
         styles=re.findall(r".*?}", styles, re.DOTALL)
         return [v.strip() for v in styles]
@@ -102,10 +103,10 @@ class QssStyleAnalysis:
 
     def setQSS(self,qss:str):
         # Preprocessing qss
-        self._qss = [Qss(qss,self.__parent) for qss in self.groupDecomposition(qss)]
+        self._qss = [Qss(qss,self,self.__parent) for qss in self.groupDecomposition(qss)]
         # Mapping coordinate
         for i in range(self.count()):
-            self._map_qss[self.qssIndex(i).header()]=i
+            self._map_qss[self.selectorIndex(i).header()]=i
 
         if self.__parent:
             self.__parent.setStyleSheet(qss)
@@ -113,43 +114,64 @@ class QssStyleAnalysis:
     def setQSSDict(self,qss_dict:dict):
         self.setQSS(dictTostr(qss_dict))
 
+    def appendQSS(self,qss:str):
+        new_qss = [Qss(qss,self,self.__parent) for qss in self.groupDecomposition(qss)]
+        old_count = self.count()
+        self._qss.extend(new_qss)
+
+        # remap
+        for i in range(old_count,self.count()):
+            self._map_qss[self.selectorIndex(i).header()]=i
+
+        if self.__parent:
+            self.__parent.setStyleSheet(self.toStr())
+
+    def appendQSSDict(self,qss_dict:dict):
+        self.appendQSS(dictTostr(qss_dict))
+
     def printShow(self):
         for qss in self._qss:
             print(qss)
 
-    def qssKey(self,key)->Qss:
-        return self.qssIndex(self._map_qss[key])
+    def selectorKey(self,key)->Qss:
+        return self.selectorIndex(self._map_qss[key])
 
-    def qssIndex(self,i)->Qss:
+    def selectorIndex(self,i:int)->Qss:
         return self._qss[i]
 
-    def qss(self,ang)->Qss:
+    def selector(self,ang)->Qss:
         if isinstance(ang,int):
-            return self.qssIndex(i)
+            return self.selectorIndex(ang)
         elif isinstance(ang,str):
-            return self.qssKey(ang)
+            return self.selectorKey(ang)
         else:
             raise TypeError("Parameter error!")
 
     def toDict(self)->dict:
         qss_dict = dict()
         for i in range(self.count()):
-            qss_dict.update(self.qssIndex(i).toDict())
+            qss_dict.update(self.selectorIndex(i).toDict())
         return qss_dict
 
+    def toStr(self)->str:
+        return dictTostr(self.toDict())
+
     # 更新样式
-    def updateStyleSheet(self,ang,parent=None):
+    def updateStyleSheet(self,ang=None,parent=None):
+        if ang is None:
+            ang = self._qss[0].header()
         if parent is None and self.__parent is None:
             raise TypeError("Unable to update!")
         elif parent:
-            parent.setStyleSheet(str(self.qss(ang)))
+            self.selector(ang)
         elif self.__parent:
             parent = self.__parent
-            parent.setStyleSheet(str(self.qss(ang)))
+            self.selector(ang)
+        parent.setStyleSheet(self.toStr())
         parent.update()
 
     def __str__(self):
-        return dictTostr(self.toDict())
+        return self.toStr()
 
 style = '''
 #MainWindow{
