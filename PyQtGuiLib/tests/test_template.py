@@ -36,15 +36,10 @@ from PyQt5.QtGui import QFontMetrics
 from PyQtGuiLib.core.resolver import dumpStructure
 
 
-from PyQtGuiLib.tests.temp_tests.tip import Tip
-
 class Test(QMainWindow):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
-
-        self.tip = Tip(63,"hello wrold","",self)
-        self.tip.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
