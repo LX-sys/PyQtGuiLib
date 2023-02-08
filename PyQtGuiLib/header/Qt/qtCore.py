@@ -22,7 +22,8 @@ if PYQT_VERSIONS == "PyQt5":
         QMargins,
         QModelIndex,
         pyqtProperty,
-        QEvent
+        QEvent,
+        QObject
     )
 
 if PYQT_VERSIONS == "PyQt6":
@@ -47,7 +48,8 @@ if PYQT_VERSIONS == "PyQt6":
         QMargins,
         QModelIndex,
         pyqtProperty,
-        QEvent
+        QEvent,
+        QObject
     )
 
 if PYQT_VERSIONS == "PySide2":
@@ -72,7 +74,8 @@ if PYQT_VERSIONS == "PySide2":
         QMargins,
         QModelIndex,
         pyqtProperty,
-        QEvent
+        QEvent,
+        QObject
     )
 if PYQT_VERSIONS == "PySide6":
     from PySide6.QtCore import (
@@ -96,5 +99,6 @@ if PYQT_VERSIONS == "PySide6":
         QMargins,
         QModelIndex,
         pyqtProperty,
-        QEvent
+        QEvent,
+        QObject
     )
