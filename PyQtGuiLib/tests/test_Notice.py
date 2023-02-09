@@ -41,9 +41,9 @@ class Test(QWidget):
         }
                 ''')
         self.notice.appendTip("hello wrold",5000)
-        self.notice.appendTip("11111111",8000)
-        # self.notice.appendTip("11111111",5000)
-        # self.notice.setText("我是通知栏",8000)
+        self.notice.appendTip("11111111",7000)
+        self.notice.appendTip("8888",8000)
+        self.notice.appendTip("我是通知栏",10000)
         self.notice.show()
 
     def test_add(self):
