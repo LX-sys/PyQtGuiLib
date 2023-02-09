@@ -59,7 +59,6 @@ class Qss:
 
     def bodySubdivision(self)->list:
         bodysub_list = []
-        # bodysub_list = re.findall(r"[a-z].*?;",bodysub,re.DOTALL)
 
         for v in self.body().split(";"):
             if v:
@@ -76,12 +75,29 @@ class Qss:
     def toDict(self)->dict:
         return self._qss_dict
 
+    def attr(self,key)->str:
+        if key in self.bodyToDict():
+            return self.bodyToDict()[key]
+        else:
+           raise TypeError("Without this attribute,'%s'" % key)
+
     def updateAttr(self,key,value):
         self._qss_dict[self.header()][key]=value
         self._qss_str = dictTostr(self._qss_dict)
         self.Init()
         if self.__parent:
+            print("更新")
             self.__qs.updateStyleSheet()
+
+    def removeAttr(self,key):
+        if key in self._qss_dict[self.header()]:
+            del self._qss_dict[self.header()][key]
+            self._qss_str = dictTostr(self._qss_dict)
+            self.Init()
+            if self.__parent:
+                self.__qs.updateStyleSheet()
+        else:
+            raise TypeError("Without this attribute,'%s'"%key)
 
     def __str__(self):
         return self._qss_str
@@ -91,7 +107,12 @@ class QssStyleAnalysis:
     def __init__(self,parent=None):
         self.__parent = parent
         self._qss = [] # type:[Qss]
+        # map
         self._map_qss = dict()
+        self._reverse_map_qss = dict()
+
+    def setParent(self,parent):
+        self.__parent = parent
 
     # Decompose multiple groups of QSS
     def groupDecomposition(self,styles):
@@ -105,11 +126,20 @@ class QssStyleAnalysis:
         # Preprocessing qss
         self._qss = [Qss(qss,self,self.__parent) for qss in self.groupDecomposition(qss)]
         # Mapping coordinate
-        for i in range(self.count()):
-            self._map_qss[self.selectorIndex(i).header()]=i
+        self.__mappCoordinate(0,self.count())
 
         if self.__parent:
             self.__parent.setStyleSheet(qss)
+
+    # Bidirectional mapping
+    def __mappCoordinate(self,s,e):
+        for i in range(s,e):
+            self._map_qss[self.selectorIndex(i).header()] = i
+            self._reverse_map_qss[str(i)] = self.selectorIndex(i).header()
+
+    # Inherits styles that have been set elsewhere
+    def inherit(self):
+        self.__parent.setStyleSheet(self.__parent.styleSheet())
 
     def setQSSDict(self,qss_dict:dict):
         self.setQSS(dictTostr(qss_dict))
@@ -120,8 +150,7 @@ class QssStyleAnalysis:
         self._qss.extend(new_qss)
 
         # remap
-        for i in range(old_count,self.count()):
-            self._map_qss[self.selectorIndex(i).header()]=i
+        self.__mappCoordinate(old_count,self.count())
 
         if self.__parent:
             self.__parent.setStyleSheet(self.toStr())
@@ -139,11 +168,37 @@ class QssStyleAnalysis:
     def selectorIndex(self,i:int)->Qss:
         return self._qss[i]
 
+    # def selectorPoint(self,key):
+    #     if "." in key:
+    #         selector,attr = key.split(".")
+    #         print(selector,attr)
+
     def selector(self,ang)->Qss:
         if isinstance(ang,int):
             return self.selectorIndex(ang)
         elif isinstance(ang,str):
             return self.selectorKey(ang)
+        else:
+            raise TypeError("Parameter error!")
+
+    def removeSelectorIndex(self,index:int):
+        self._qss.remove(self._qss[index])
+        self.updateStyleSheet()
+        select_name = self._reverse_map_qss[str(index)]
+        del self._map_qss[select_name]
+        del self._reverse_map_qss[str(index)]
+
+        # Rebidirectional mapping
+        self.__mappCoordinate(0,self.count())
+
+    def removeSelectorKey(self,key:str):
+        self.removeSelectorIndex(self._map_qss[key])
+
+    def removeSelector(self,ang):
+        if isinstance(ang, int):
+            return self.removeSelectorIndex(ang)
+        elif isinstance(ang, str):
+            return self.removeSelectorKey(ang)
         else:
             raise TypeError("Parameter error!")
 
@@ -167,6 +222,8 @@ class QssStyleAnalysis:
         elif self.__parent:
             parent = self.__parent
             self.selector(ang)
+
+        parent.setStyleSheet("")
         parent.setStyleSheet(self.toStr())
         parent.update()
 

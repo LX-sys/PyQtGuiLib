@@ -30,25 +30,47 @@ class Test(QMainWindow):
         self.btn = QPushButton("测试按钮",self)
 
         # QSS 解析器
-        self.qss = QssStyleAnalysis(self)
-        self.qss.setQSS('''
-        QPushButton{
-        color: rgb(0, 255, 127);
-        background-color:rgb(0, 170, 0);
-        }
-        QPushButton:hover{
-        }
-        ''')
-        self.qss.appendQSSDict({
-            "QLabel":{
-                "border":"2px solid yellow"
-            }
-        })
-        self.qss.selector("QPushButton:hover").updateAttr("border", "2px solid blue")
+        # self.qss = QssStyleAnalysis(self)
+        # self.qss.setQSS('''
+        # QPushButton{
+        # color: rgb(0, 255, 127);
+        # background-color:rgb(0, 170, 0);
+        # }
+        # QPushButton:hover{
+        # }
+        # ''')
+        # self.qss.appendQSSDict({
+        #     "QLabel":{
+        #         "border":"2px solid yellow",
+        #         "background-color":"rgb(150,20,200)",
+        #     },
+        #     "QLabel:hover": {
+        #         "border": "2px solid blue",
+        #         "color": "red",
+        #     }
+        # })
+        # self.qss.selector("QPushButton").updateAttr("background-color", "rgb(255,0,0)")
+        # # self.qss.selectorPoint("QPushButton.color")
 
         self.l.move(30, 30)
         self.btn.resize(150,80)
         self.btn.move(80,80)
+
+        # 创建一个针对整个窗口的 QSS 解析器
+        self.qss = QssStyleAnalysis(self)
+        # 对窗口上所有按钮,标签设置样式
+        self.qss.setQSS('''
+                QPushButton{
+                color: rgb(0, 255, 127);
+                background-color:rgb(0, 170, 0);
+                }
+                QLabel{
+                color: rgb(42, 55, 127);
+                background-color:rgb(255, 170, 0);
+                }
+                ''')
+        self.qss.selector("QPushButton").updateAttr("background-color", "red")  #
+        print(self.styleSheet())
 
 
 if __name__ == '__main__':
