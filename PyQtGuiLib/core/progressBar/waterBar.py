@@ -6,18 +6,15 @@
 from PyQtGuiLib.header import (
     QWidget,
     Signal,
-    Qt,
     QFont,
     QColor,
     QPen,
     QPainter,
     QPaintEvent,
-    QFontMetricsF,
     QSize,
     QResizeEvent,
     QPropertyAnimation,
     QPoint,
-    QThread,
     qt,
     textSize
 )

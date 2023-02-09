@@ -6,7 +6,9 @@ from PyQtGuiLib.header import (
     QSize,
     QFontMetricsF,
     QFont,
+    QWidget,
 )
+from PyQtGuiLib.header.customStyle import CustomStyle
 
 is_win_sys = True if platform.system() == "win32" else False
 
@@ -94,3 +96,12 @@ def hsvTorgb(h, s, v):
     elif hi == 5: r, g, b = v, p, q
     r, g, b = int(r * 255), int(g * 255), int(b * 255)
     return r, g, b
+
+
+class Widget(QWidget,CustomStyle):
+    def __init__(self,*args,**kwargs):
+        if PYQT_VERSIONS in ["PySide6", "PySide2"]:
+            QWidget.__init__(self, *args, **kwargs)
+            CustomStyle.__init__(self, *args, **kwargs)
+        else:
+            super().__init__(*args, **kwargs)

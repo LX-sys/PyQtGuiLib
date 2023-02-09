@@ -1,10 +1,9 @@
 from PyQtGuiLib.header import (
     QWidget,
-    CustomStyle,
+    Widget,
     QPainter,
     QBrush,
     QColor,
-    QKeyEvent,
     QFont,
     QPaintEvent,
     qt,
@@ -12,8 +11,8 @@ from PyQtGuiLib.header import (
     textSize,
     QThread,
     Signal,
-    QPen,
     QGraphicsDropShadowEffect,
+
 )
 
 
@@ -34,7 +33,7 @@ class Time(QThread):
 '''
     通知栏
 '''
-class Notice(QWidget,CustomStyle):
+class Notice(Widget):
     U_Center = "U_Center"
     Left_Down= "Left_Down"
     Rigth_Down = "Rigth_Down"
@@ -80,15 +79,12 @@ class Notice(QWidget,CustomStyle):
         w = self.__parent.width()
         h = self.__parent.height()
 
-        try:
-            if self.__pos == Notice.Left_Down:
-                self.move(self.get_margin(),h-self.height()-self.get_margin()*2)
-            elif self.__pos == Notice.Rigth_Down:
-                self.move(w-self.width()-self.get_margin(),h-self.height()-self.get_margin()*2)
-            else:
-                self.move(w//2-self.width()//2,self.get_margin())
-        except:
-            pass
+        if self.__pos == Notice.Left_Down:
+            self.move(self.get_margin(),h-self.height()-self.get_margin()*2)
+        elif self.__pos == Notice.Rigth_Down:
+            self.move(w-self.width()-self.get_margin(),h-self.height()-self.get_margin()*2)
+        else:
+            self.move(w//2-self.width()//2,self.get_margin())
 
     def paintEvent(self, event:QPaintEvent) -> None:
         painter = QPainter(self)

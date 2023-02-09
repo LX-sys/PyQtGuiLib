@@ -4,9 +4,6 @@
 # @file:loadBar.py
 # @software:PyCharm
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    sys,
-    QApplication,
     QWidget,
     Signal,
     QFont,
@@ -14,7 +11,6 @@ from PyQtGuiLib.header import (
     QPen,
     QPainter,
     QPaintEvent,
-    QFontMetricsF,
     QSize,
     QResizeEvent,
     qt,
@@ -155,14 +151,3 @@ class LoadBar(QWidget):
         self.w = e.size().width()
         self.h = e.size().height()
         super().resizeEvent(e)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = LoadBar()
-    win.show()
-
-    if PYQT_VERSIONS == "PyQt6":
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())

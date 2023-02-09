@@ -1,7 +1,6 @@
 from PyQtGuiLib.header import (
     QWidget,
     Signal,
-    Qt,
     QFont,
     QColor,
     QPen,
