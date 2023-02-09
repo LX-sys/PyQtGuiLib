@@ -12,6 +12,7 @@ from PyQtGuiLib.header import (
     QThread,
     Signal,
     QGraphicsDropShadowEffect,
+    QObject,
 
 )
 
@@ -34,13 +35,15 @@ class Time(QThread):
     通知栏
 '''
 class Notice(Widget):
+    finish = Signal(QObject)
+
     U_Center = "U_Center"
     Left_Down= "Left_Down"
     Rigth_Down = "Rigth_Down"
 
     def __init__(self,parent=None):
         super().__init__(parent)
-        self.resize(250,50)
+        self.resize(220,40)
         self.__parent = parent
 
         self.setWindowFlags(qt.FramelessWindowHint|qt.WindowStaysOnTopHint|qt.WindowTransparentForInput)
@@ -59,6 +62,7 @@ class Notice(Widget):
         self.setGraphicsEffect(self.shadow)
 
     def finish_event(self):
+        self.finish.emit(self)
         self.deleteLater()
         self.__parent.update()
 
@@ -106,28 +110,46 @@ class Notice(Widget):
         y = self.height()//2 + fs.height()//2
         painter.drawText(x,y,self.text())
 
-        # self.updatePos()
         painter.end()
 
     def closeEvent(self, event) -> None:
         super().closeEvent(event)
 
 
-class Notices:
+class Notices(QObject):
     def __init__(self,parent:QWidget):
+        super().__init__(parent)
         self.winp = parent
 
         # 通知组
         self.notices = []
 
+        self.style = ""
+
+    def count(self)->int:
+        return len(self.notices)
+
+    def finish_event(self,obj:QObject):
+        self.notices.remove(obj)
+        print(self.notices)
+        for wid in self.notices:
+            pass
+
     def appendTip(self,text:str,interval=3000):
         tip = Notice(self.winp)
+        tip.finish.connect(self.finish_event)
         tip.setText(text,interval)
+        if self.style:
+            tip.setStyleSheet(self.style)
         self.notices.append(tip)
+        print(self.count())
+        x,y = tip.x(),tip.y()
+
+        tip.move(x,y+(self.count()-1)*tip.height()+5)
+        tip.show()
 
     def setStyleSheet(self,style:str):
-        for wid in self.notices:
-            wid.setStyleSheet(style)
+        self.style = style
 
     def show(self):
         w = self.winp.width()

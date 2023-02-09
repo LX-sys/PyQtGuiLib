@@ -27,28 +27,28 @@ class Test(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
 
-        self.th = Time()
-        self.th.add.connect(self.test_add)
-        self.th.start()
+        # self.th = Time()
+        # self.th.add.connect(self.test_add)
+        # self.th.start()
 
 
         self.notice = Notices(self)
+        self.notice.setStyleSheet('''
+        Notice{
+        qproperty-radius:5;
+        qproperty-backgroundColor:rgba(153, 241, 255,150);
+        qproperty-fontSize:18;
+        }
+                ''')
         self.notice.appendTip("hello wrold",5000)
-        # self.notice.appendTip("11111111",5000)
+        self.notice.appendTip("11111111",8000)
         # self.notice.appendTip("11111111",5000)
         # self.notice.setText("我是通知栏",8000)
-        self.notice.setStyleSheet('''
-Notice{
-qproperty-radius:5;
-qproperty-backgroundColor:rgba(153, 241, 255,150);
-qproperty-fontSize:18;
-}
-        ''')
         self.notice.show()
 
     def test_add(self):
         self.notice.appendTip("ttest{}".format(randint(1,1000)),randint(4000,7000))
-        self.notice.show()
+        # self.notice.show()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
