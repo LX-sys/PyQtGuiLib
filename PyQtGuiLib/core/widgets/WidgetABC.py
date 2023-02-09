@@ -284,7 +284,7 @@ class WidgetABC(QWidget,CustomStyle):
             else:
                 old_pos = QPoint(0, 0)
             self.move(old_pos - self.pressPos)
-        # e.position()
+
         self.updateCursor(e.pos())
         self.expandEdge(e.pos())
 

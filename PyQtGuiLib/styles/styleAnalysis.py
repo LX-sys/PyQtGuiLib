@@ -168,11 +168,6 @@ class QssStyleAnalysis:
     def selectorIndex(self,i:int)->Qss:
         return self._qss[i]
 
-    # def selectorPoint(self,key):
-    #     if "." in key:
-    #         selector,attr = key.split(".")
-    #         print(selector,attr)
-
     def selector(self,ang)->Qss:
         if isinstance(ang,int):
             return self.selectorIndex(ang)
@@ -187,6 +182,7 @@ class QssStyleAnalysis:
         select_name = self._reverse_map_qss[str(index)]
         del self._map_qss[select_name]
         del self._reverse_map_qss[str(index)]
+
 
         # Rebidirectional mapping
         self.__mappCoordinate(0,self.count())
@@ -218,10 +214,11 @@ class QssStyleAnalysis:
         if parent is None and self.__parent is None:
             raise TypeError("Unable to update!")
         elif parent:
-            self.selector(ang)
+            pass
+            # self.selector(ang)
         elif self.__parent:
             parent = self.__parent
-            self.selector(ang)
+            # self.selector(ang)
 
         parent.setStyleSheet("")
         parent.setStyleSheet(self.toStr())
@@ -229,35 +226,3 @@ class QssStyleAnalysis:
 
     def __str__(self):
         return self.toStr()
-
-style = '''
-#MainWindow{
-	background-color: rgb(255, 255, 255);
-	background-color: qradialgradient(spread:pad, cx:0.466, cy:0.482364, radius:0.433, fx:0.119699, fy:0.223154, stop:0 rgba(11, 8, 8, 255), stop:1 rgba(255, 255, 255, 255));
-	color: rgb(255, 255, 127);
-}
-QDASD,DWWW{
-background-color: rgb(255, 255, 255);
-color: rgb(255, 255, 127);
-}
-'''
-
-style_dict = {'#MainWindow': {'background-color': 'qradialgradient(spread:pad, cx:0.466, cy:0.482364, radius:0.433, fx:0.119699, fy:0.223154, stop:0 rgba(11, 8, 8, 255), stop:1 rgba(255, 255, 255, 255))', 'color': 'rgb(255, 255, 127)'}, 'QDASD,DWWW': {'background-color': 'rgb(255, 255, 255)', 'color': 'rgb(255, 255, 127)'}}
-
-#
-# qsa = QssStyleAnalysis()
-# qsa.setQSSDict(style_dict)
-# print(qsa)
-# qsa.setQSS(style)
-# print(qsa.toDict())
-# print(qsa.qss("#MainWindow").bodyToDict())
-# print(qsa.qssIndex(0).headerSubdivision())
-# print(qsa.qssIndex(0).bodyToDict())
-# print(qsa.qssIndex(1).bodyToDict())
-# qsa.qss("#MainWindow").updateAttr("background-color","#000")
-
-# def tt(a):
-#     a.updateAttr("background-color","red")
-#     print(a)
-#
-# tt(qsa.qss("#MainWindow"))

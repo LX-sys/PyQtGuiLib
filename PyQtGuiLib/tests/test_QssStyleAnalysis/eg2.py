@@ -1,8 +1,7 @@
 # -*- coding:utf-8 -*-
-# @time:2023/2/914:20
+# @time:2023/2/918:26
 # @author:LX
-# @file:eg1.py
-# @software:PyCharm
+# @file:eg2.py
 
 
 from PyQtGuiLib.header import (
@@ -42,7 +41,7 @@ class Test(QWidget):
         self.btn2.move(250,80)
 
         '''
-            解析 测试1 
+            解析 测试2
         '''
 
         # 创建一个针对整个窗口的 QSS 解析器
@@ -58,15 +57,13 @@ class Test(QWidget):
         background-color:rgb(255, 170, 0);
         }
         ''')
-        print(self.qss.toStr()) # 返回样式的原始的类型
-        print(self.qss.toDict()) # 返回样式的字典类型
-        print("----------------------------------------------------")
-        print(self.qss.selector("QPushButton").header()) # 获取按钮的选择器
-        print(self.qss.selector("QPushButton").headerSubdivision()) # 在有多个选择器的这个才能看到效果
-        print(self.qss.selector("QPushButton").body()) # 获取该选择器的原始样式
-        print(self.qss.selector("QPushButton").bodySubdivision()) # 将原始样式已列表的形式返回
-        print(self.qss.selector("QLabel").bodyToDict()) # 将原始样式已字典的形式返回(不带选择器)
-        print(self.qss.selector("QLabel").toDict()) # 将原始样式已字典的形式返回(带选择器)
+
+        print("-------------------------------")
+        print(self.qss.selector("QPushButton").attr("color")) # 获取该选择器下面某个属性的值
+        self.qss.selector("QPushButton").updateAttr("background-color","red") # 修改背景样式
+        # self.qss.selector("QLabel").removeAttr("background-color") # 移除该标签的属性
+        self.qss.removeSelector("QPushButton") # 移除该选择器的所有样式
+        # self.qss.removeSelectorIndex(0) # 移除该选择器的所有样式
 
 
 if __name__ == '__main__':
