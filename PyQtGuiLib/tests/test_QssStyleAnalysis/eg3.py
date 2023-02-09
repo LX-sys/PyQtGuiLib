@@ -1,9 +1,3 @@
-# -*- coding:utf-8 -*-
-# @time:2023/2/918:26
-# @author:LX
-# @file:eg2.py
-
-
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
@@ -13,10 +7,6 @@ from PyQtGuiLib.header import (
     QPushButton,
     QLabel,
     Qt,
-    QFrame,
-    QStyleOption,
-    QPainter,
-    QStyle
 )
 
 from PyQtGuiLib.styles import QssStyleAnalysis
@@ -41,40 +31,32 @@ class Test(QWidget):
         self.btn2.move(250,80)
 
         '''
-            解析 测试2
+            解析 测试1 
         '''
 
-        # 创建一个针对整个窗口的 QSS 解析器
-        self.qss = QssStyleAnalysis(self)
+        # 创建一个针对 测试按钮 的QSS解析器
+        self.qss = QssStyleAnalysis(self.btn)
         # 对窗口上所有按钮,标签设置样式
         self.qss.setQSS('''
         QPushButton{
         color: rgb(0, 255, 127);
         background-color:rgb(0, 170, 0);
         }
-        QLabel{
-        color: rgb(42, 55, 127);
-        background-color:rgb(255, 170, 0);
-        }
         ''')
 
-        print("-------------------------------")
-        print(self.qss.selector("QPushButton").attr("color")) # 获取该选择器下面某个属性的值
-        self.qss.selector("QPushButton").updateAttr("background-color","red") # 修改背景样式
-        # self.qss.selector("QLabel").removeAttr("background-color") # 移除该标签的属性
-        self.qss.removeSelector("QPushButton") # 移除该选择器的所有样式
+        # 重新创建一个针对 测试按钮 的QSS解析器
+        # 通过 inherit() 可以将'测试按钮'的样式 传承到 '测试按钮2号' 上
+        self.btnqss = QssStyleAnalysis(self.btn)
+        self.btnqss.inherit()
+        self.btnqss.setParent(self.btn2) # 关键语句
 
-        print("--------")
-        self.qss.appendQSSDict({
-            "QPushButton":{
-                "border":"2px solid red"
-            }
+        print(self.btnqss.toStr())
+        self.btnqss.selector("QPushButton").updateAttr("color","blue")
+        self.btnqss.appendQSSDict({
+          "QPushButton:hover":{
+              "border":"1px solid blue"
+          }
         })
-        self.qss.appendQSS('''
-        QPushButton:hover{
-        border:2px solid blue;
-        }
-        ''')
 
 
 if __name__ == '__main__':

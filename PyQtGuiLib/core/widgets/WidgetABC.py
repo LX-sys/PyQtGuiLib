@@ -10,13 +10,10 @@ from PyQtGuiLib.header import (
     QPaintEvent,
     QPainter,
     QLinearGradient,
-    QRadialGradient,
     QPen,
     QBrush,
     QPoint,
     QColor,
-    QRect,
-    QGraphicsDropShadowEffect,
     QEvent
 )
 import re
@@ -26,14 +23,6 @@ import json
 '''
     所有窗口的父类
 '''
-# class TTT(QWidget,CustomStyle):
-#     def __init__(self, *args, **kwargs):
-#         QWidget.__init__(self,*args, **kwargs)
-#         CustomStyle.__init__(self,*args, **kwargs)
-#
-#
-#     def tt(self):
-#         print("Dsa")
 
 class WidgetABC(QWidget,CustomStyle):
     '''

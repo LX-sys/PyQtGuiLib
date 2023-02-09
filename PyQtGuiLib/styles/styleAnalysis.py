@@ -86,7 +86,6 @@ class Qss:
         self._qss_str = dictTostr(self._qss_dict)
         self.Init()
         if self.__parent:
-            print("更新")
             self.__qs.updateStyleSheet()
 
     def removeAttr(self,key):
@@ -129,6 +128,7 @@ class QssStyleAnalysis:
         self.__mappCoordinate(0,self.count())
 
         if self.__parent:
+            self.__parent.setStyleSheet("")
             self.__parent.setStyleSheet(qss)
 
     # Bidirectional mapping
@@ -139,7 +139,7 @@ class QssStyleAnalysis:
 
     # Inherits styles that have been set elsewhere
     def inherit(self):
-        self.__parent.setStyleSheet(self.__parent.styleSheet())
+        self.setQSS(self.__parent.styleSheet())
 
     def setQSSDict(self,qss_dict:dict):
         self.setQSS(dictTostr(qss_dict))
@@ -153,6 +153,7 @@ class QssStyleAnalysis:
         self.__mappCoordinate(old_count,self.count())
 
         if self.__parent:
+            self.__parent.setStyleSheet("")
             self.__parent.setStyleSheet(self.toStr())
 
     def appendQSSDict(self,qss_dict:dict):

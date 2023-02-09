@@ -27,8 +27,6 @@ mac
 pip install PyQtGuiLib
 ```
 
-
-
 ### 项目目录说明	
 
 ```python
@@ -89,6 +87,42 @@ dumpStructure(widget :QWidget ,spaceCount=0)  # 控件的组成分析函数
 如果你在一个窗口类里面使用则不需要加
 ```
 ![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%8E%A7%E4%BB%B6%E7%9A%84%E7%BB%84%E6%88%90%E5%88%86%E6%9E%90.gif)
+### QSS 样式解析器(QssStyleAnalysis)
+
+```python
+QssStyleAnalysis  ---> 99%(测试中) 
+
+导入方式 from PyQtGuiLib.styles import QssStyleAnalysis
+
+Api ------
+setParent() # 设置父类对象
+setQSS(样式字符串) # 设置样式
+setQSSDict(字典样式) # 设置样式
+appendQSS(样式字符串) # 追加样式
+appendQSSDict(字典样式) # 追加样式
+
+toStr() # 返回样式的原始字符串
+toDict() # 返回样式的字典
+selector(选择器or下标) # 返回QSS对象
+   --- header() # 返回选择器的名称
+   --- headerSubdivision() # 返回列表形式的选择器名称
+   --- body() # 返回属性的原始字符串类型
+   --- bodySubdivision() # 将原始属性以列表的形式返回
+   --- bodyToDict() # 将原始属性以字典的形式返回(不带选择器)
+   --- toDict() # 将原始属性以字典的形式返回(带选择器)
+   --- attr(key) # 返回属性的值
+   --- updateAttr(key,value) # 更新/增加一个属性的值
+   --- removeAttr(key) # 移除一个属性
+removeSelector(选择器or下标) # 移除该选择器的样式
+inherit() # 样式传承 (详细用法查看 eg3案例) 
+
+# ============
+代码案例位置
+PyQtGuiLib -> tests -> test_QssStyleAnalysis 目录下
+```
+
+
+
 ## 窗口系列
 
 ```python
