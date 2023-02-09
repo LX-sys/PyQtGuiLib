@@ -13,7 +13,13 @@ if PYQT_VERSIONS == "PyQt6":
     from PyQt6.sip import delete
 
 if PYQT_VERSIONS == "PySide2":
-    from PySide2.sip import delete
+    try:
+        from PySide2.sip import delete
+    except:
+        pass
 
 if PYQT_VERSIONS == "PySide6":
-    from PySide6.sip import delete
+    try:
+        from PySide6.sip import delete
+    except:
+        pass

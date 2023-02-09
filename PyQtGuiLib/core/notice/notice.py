@@ -14,7 +14,6 @@ from PyQtGuiLib.header import (
     Signal,
     QPen,
     QGraphicsDropShadowEffect,
-    delete
 )
 
 
@@ -45,7 +44,7 @@ class Notice(QWidget,CustomStyle):
         self.resize(250,50)
         self.__parent = parent
 
-        self.setWindowFlags(qt.FramelessWindowHint|qt.WindowStaysOnTopHint|Qt.WindowTransparentForInput)
+        self.setWindowFlags(qt.FramelessWindowHint|qt.WindowStaysOnTopHint|qt.WindowTransparentForInput)
         self.setAttribute(qt.WA_TranslucentBackground,True)
 
         self.__text = "hello wrold"
@@ -63,7 +62,6 @@ class Notice(QWidget,CustomStyle):
     def finish_event(self):
         self.deleteLater()
         self.__parent.update()
-        delete(self)
 
 
     def setText(self,text,interval=8000):
@@ -151,6 +149,10 @@ class Notices:
         y = 0
 
         for wid in self.notices:
-            wid.move(w // 2 - wid.width() // 2, wid.get_margin()+y)
-            y+=wid.height()+wid.get_margin()*2
-            wid.show()
+            print(wid)
+            try:
+                wid.move(w // 2 - wid.width() // 2, wid.get_margin()+y)
+                y+=wid.height()+wid.get_margin()*2
+                wid.show()
+            except:
+                pass

@@ -26,6 +26,15 @@ import json
 '''
     所有窗口的父类
 '''
+# class TTT(QWidget,CustomStyle):
+#     def __init__(self, *args, **kwargs):
+#         QWidget.__init__(self,*args, **kwargs)
+#         CustomStyle.__init__(self,*args, **kwargs)
+#
+#
+#     def tt(self):
+#         print("Dsa")
+
 class WidgetABC(QWidget,CustomStyle):
     '''
         支持的自定义样式
@@ -63,7 +72,11 @@ class WidgetABC(QWidget,CustomStyle):
     def __init__(self,*args,**kwargs):
         # 窗口操作限制器,当前窗口作为子窗口时,触发
         self.__RestrictedOperation = False if args else True
-        super().__init__(*args,**kwargs)
+        if PYQT_VERSIONS in ["PySide6","PySide2"]:
+            QWidget.__init__(self,*args, **kwargs)
+            CustomStyle.__init__(self,*args, **kwargs)
+        else:
+            super().__init__(*args,**kwargs)
         self.resize(700,500)
 
         self.setAttribute(qt.WA_TranslucentBackground)
@@ -219,6 +232,7 @@ class WidgetABC(QWidget,CustomStyle):
             painter.setBrush(gradient)
         else:
             # 绘制纯色背景
+            # print("-->",self.get_backgroundColor())
             bgcolor = QBrush(self.get_backgroundColor())
 
         painter.setBrush(bgcolor)
@@ -270,6 +284,7 @@ class WidgetABC(QWidget,CustomStyle):
             else:
                 old_pos = QPoint(0, 0)
             self.move(old_pos - self.pressPos)
+        # e.position()
         self.updateCursor(e.pos())
         self.expandEdge(e.pos())
 
@@ -300,7 +315,7 @@ if __name__ == '__main__':
     win = WidgetABC()
     win.setStyleSheet('''
 WidgetABC{
-qproperty-radius:5;
+ qproperty-radius:5;
 /*qproperty-backgroundColor:rgba(255,0,2,255);*/
 /*qproperty-borderColor:rgba(255,0,2,255);*/
 }

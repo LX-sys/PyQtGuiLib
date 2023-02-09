@@ -73,9 +73,9 @@ if PYQT_VERSIONS == "PySide2":
         QParallelAnimationGroup,
         QMargins,
         QModelIndex,
-        pyqtProperty,
+        Property as pyqtProperty,
         QEvent,
-        QObject
+        QObject,
     )
 if PYQT_VERSIONS == "PySide6":
     from PySide6.QtCore import (
@@ -98,7 +98,7 @@ if PYQT_VERSIONS == "PySide6":
         QParallelAnimationGroup,
         QMargins,
         QModelIndex,
-        pyqtProperty,
+        Property as pyqtProperty,
         QEvent,
         QObject
     )

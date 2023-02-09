@@ -9,6 +9,7 @@ from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy,QEasingCurve
 
 if PYQT_VERSIONS == "PyQt5"  :
     FramelessWindowHint = Qt.FramelessWindowHint
+    WindowTransparentForInput = Qt.WindowTransparentForInput
     Window = Qt.Window
     WindingFill = Qt.WindingFill
     WindowStaysOnTopHint = Qt.WindowStaysOnTopHint
@@ -66,9 +67,10 @@ if PYQT_VERSIONS == "PyQt5"  :
 
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
+    WindowTransparentForInput = Qt.WindowType.WindowTransparentForInput
+    FramelessWindowHint = Qt.WindowType.FramelessWindowHint
     Window = Qt.WindowType.Window
     WindingFill = Qt.FillRule.WindingFill
-    FramelessWindowHint = Qt.WindowType.FramelessWindowHint
     WindowStaysOnTopHint =Qt.WindowType.WindowStaysOnTopHint
     ArrowCursor = Qt.CursorShape.ArrowCursor
     SizeFDiagCursor = Qt.CursorShape.SizeFDiagCursor

@@ -5,7 +5,6 @@ from PyQtGuiLib.header import (
     QPushButton,
     QPoint,
     QMouseEvent,
-    delete,
     QWidget,
     QVBoxLayout
 )
@@ -109,7 +108,6 @@ class BorderlessMainWindow(WidgetABC):
     def removeTitleBar(self):
         if hasattr(self,"titlebar"):
             self.titlebar.deleteLater()
-            delete(self.titlebar)
             del self.titlebar
 
 

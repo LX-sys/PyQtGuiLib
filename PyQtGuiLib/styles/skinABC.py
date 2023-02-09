@@ -32,7 +32,8 @@ def colorToRGB(color:str) -> tuple:
 
     r_, g_, b_ = [0], [0], [0]
     if "#" == color[0]:  # 类型 #xxxxxx
-        if (v := len(color)) != 7:
+        v = len(color)
+        if v != 7:
             difference = 7 - v  # 差值
             if difference > 0:
                 color += "0" * difference

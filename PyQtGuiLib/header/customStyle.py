@@ -1,10 +1,10 @@
 from PyQtGuiLib.header import (
-    pyqtProperty,
     QColor,
     qt,
     Qt,
     QPoint,
-    QRect
+    QRect,
+    pyqtProperty
 )
 import re
 import json
@@ -17,7 +17,8 @@ def strRGBA_to_RGBA(rgba_str:str)->list:
 
 
 class CustomStyle:
-    def __init__(self):
+    def __init__(self,*args,**kwargs):
+        print("进来")
         self._radius = 0
         self._backgroundColor = QColor(234, 234, 234)
         self._color = QColor(0,0,0)
