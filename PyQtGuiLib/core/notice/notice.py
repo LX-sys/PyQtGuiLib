@@ -132,8 +132,11 @@ class Notices(QObject):
     def finish_event(self,obj:QObject):
         self.notices.remove(obj)
         print(self.notices)
+        # 未写完
         for wid in self.notices:
-            pass
+            x, y = wid.x(), wid.y()
+            wid.move(x,y-(self.count()-1)*wid.height()+5)
+        self.winp.update()
 
     def appendTip(self,text:str,interval=3000):
         tip = Notice(self.winp)
