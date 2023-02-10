@@ -36,7 +36,7 @@ from PyQt5.QtGui import QFontMetrics
 from PyQtGuiLib.core.resolver import dumpStructure
 
 
-class Test(QMainWindow):
+class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(600,600)

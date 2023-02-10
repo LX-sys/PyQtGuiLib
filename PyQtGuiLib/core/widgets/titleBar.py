@@ -20,7 +20,8 @@ from PyQtGuiLib.header import (
     QIcon,
     desktopSize,
     textSize,
-    QMouseEvent
+    QMouseEvent,
+    Qt
 )
 
 from PyQtGuiLib.core.widgets import WidgetABC
