@@ -8,7 +8,10 @@
 
     QSS 样式解析器
 '''
-
+from PyQtGuiLib.header import (
+    SyntaxError,
+    KeyError
+)
 import re
 
 
@@ -39,7 +42,7 @@ class Qss:
         if header:
             self._qss_header = header[0].replace("\n", "").replace("{", "")
         else:
-            raise TypeError("Syntax error, missing {")
+            raise SyntaxError("Syntax error, missing {")
 
         # ---
         body = re.findall(r"{(.*)}", self._qss_str, re.DOTALL)
@@ -79,7 +82,7 @@ class Qss:
         if key in self.bodyToDict():
             return self.bodyToDict()[key]
         else:
-           raise TypeError("Without this attribute,'%s'" % key)
+           raise KeyError("Without this attribute,'%s'" % key)
 
     def updateAttr(self,key,value):
         self._qss_dict[self.header()][key]=value
@@ -128,8 +131,7 @@ class QssStyleAnalysis:
         self.__mappCoordinate(0,self.count())
 
         if self.__parent:
-            self.__parent.setStyleSheet("")
-            self.__parent.setStyleSheet(qss)
+            self.__updateStyhle(self.__parent)
 
     # Bidirectional mapping
     def __mappCoordinate(self,s,e):
@@ -153,8 +155,7 @@ class QssStyleAnalysis:
         self.__mappCoordinate(old_count,self.count())
 
         if self.__parent:
-            self.__parent.setStyleSheet("")
-            self.__parent.setStyleSheet(self.toStr())
+            self.__updateStyhle(self.__parent)
 
     def appendQSSDict(self,qss_dict:dict):
         self.appendQSS(dictTostr(qss_dict))
@@ -208,12 +209,17 @@ class QssStyleAnalysis:
     def toStr(self)->str:
         return dictTostr(self.toDict())
 
+    def __updateStyhle(self,parent):
+        parent.setStyleSheet("")
+        parent.setStyleSheet(self.toStr())
+        parent.update()
+
     # 更新样式
     def updateStyleSheet(self,ang=None,parent=None):
         if ang is None:
             ang = self._qss[0].header()
         if parent is None and self.__parent is None:
-            raise TypeError("Unable to update!")
+            raise TypeError("Cannot update without a parent class!")
         elif parent:
             pass
             # self.selector(ang)
@@ -221,9 +227,7 @@ class QssStyleAnalysis:
             parent = self.__parent
             # self.selector(ang)
 
-        parent.setStyleSheet("")
-        parent.setStyleSheet(self.toStr())
-        parent.update()
+        self.__updateStyhle(parent)
 
     def __str__(self):
         return self.toStr()
