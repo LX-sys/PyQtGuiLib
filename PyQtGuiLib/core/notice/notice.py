@@ -12,10 +12,14 @@ from PyQtGuiLib.header import (
     QThread,
     Signal,
     QGraphicsDropShadowEffect,
-    QObject,
-
+    QPropertyAnimation,
+    QPoint,
+    QObject
 )
 
+U_Center = "U_Center"
+Left_Down = "Left_Down"
+Rigth_Down = "Rigth_Down"
 
 class Time(QThread):
     finish = Signal()
@@ -37,10 +41,6 @@ class Time(QThread):
 class Notice(Widget):
     finish = Signal(QObject)
 
-    U_Center = "U_Center"
-    Left_Down= "Left_Down"
-    Rigth_Down = "Rigth_Down"
-
     def __init__(self,parent=None):
         super().__init__(parent)
         self.resize(220,40)
@@ -50,7 +50,7 @@ class Notice(Widget):
         self.setAttribute(qt.WA_TranslucentBackground,True)
 
         self.__text = "hello wrold"
-        self.__pos = Notice.U_Center
+        self.__pos = U_Center
 
         self.tth = Time()
         self.tth.finish.connect(self.finish_event)
@@ -66,7 +66,6 @@ class Notice(Widget):
         self.deleteLater()
         self.__parent.update()
 
-
     def setText(self,text,interval=8000):
         self.__text = text
         self.updatePos()
@@ -76,16 +75,13 @@ class Notice(Widget):
     def text(self)->str:
         return self.__text
 
-    def appendText(self,str):
-        pass
-
     def updatePos(self):
         w = self.__parent.width()
         h = self.__parent.height()
 
-        if self.__pos == Notice.Left_Down:
+        if self.__pos == Left_Down:
             self.move(self.get_margin(),h-self.height()-self.get_margin()*2)
-        elif self.__pos == Notice.Rigth_Down:
+        elif self.__pos == Rigth_Down:
             self.move(w-self.width()-self.get_margin(),h-self.height()-self.get_margin()*2)
         else:
             self.move(w//2-self.width()//2,self.get_margin())
@@ -123,57 +119,57 @@ class Notices(QObject):
 
         # 通知组
         self.notices = []
+        # 记录高度
+        self.notice_heights = []
+
+        self.spacing = 9
 
         self.style = ""
+
+    def setSpacing(self,n):
+        self.spacing = n
 
     def count(self)->int:
         return len(self.notices)
 
     def finish_event(self,obj:QObject):
         self.notices.remove(obj)
-        print(self.notices)
         # 未写完
-        for wid in self.notices:
-            x, y = wid.x(), wid.y()
-            wid.move(x,y-(self.count()-1)*wid.height()+5)
-        self.winp.update()
+        if self.notices:
+            for tip in self.notices:
+                self.aniPos(tip,
+                            tip.pos(),
+                            QPoint(tip.x(), tip.y()-tip.height()-self.spacing))
+                # tip.move(tip.x(), tip.y()-tip.height()-self.spacing)
 
-    def appendTip(self,text:str,interval=3000):
+    # 动画
+    def aniPos(self,obj,spos:QPoint,epos:QPoint):
+        self.ani = QPropertyAnimation(self)
+        self.ani.setTargetObject(obj)
+        self.ani.setPropertyName(b"pos")
+        self.ani.setStartValue(spos)
+        self.ani.setEndValue(epos)
+        self.ani.setDuration(100)
+        self.ani.start()
+
+    def appendTip(self,text:str,interval=3):
         tip = Notice(self.winp)
         tip.finish.connect(self.finish_event)
-        tip.setText(text,interval)
+        tip.setText(text,interval*1000)
         if self.style:
             tip.setStyleSheet(self.style)
         self.notices.append(tip)
-        print(self.count())
-        x,y = tip.x(),tip.y()
+        self.notice_heights.append(QPoint(tip.x(),self.count()*tip.height()+self.spacing))
+        print(self.notice_heights)
+        if self.count()>1:
+            # t_tip = self.notices[-1]
+            self.aniPos(tip,QPoint(tip.x(),0),
+                        self.notice_heights[self.count()-2])
+            # tip.move(tip.x(), t_tip.y()+t_tip.height()+self.spacing)
+        else:
+            tip.move(tip.x(), 0)
 
-        tip.move(x,y+(self.count()-1)*tip.height()+5)
         tip.show()
 
     def setStyleSheet(self,style:str):
         self.style = style
-
-    def show(self):
-        w = self.winp.width()
-        h = self.winp.height()
-
-        for wid in self.notices:
-            try:
-                if wid is None:
-                    print("wid:",wid)
-                # else:
-                #     print()
-            except Exception as e:
-                print(e)
-
-        y = 0
-
-        for wid in self.notices:
-            print(wid)
-            try:
-                wid.move(w // 2 - wid.width() // 2, wid.get_margin()+y)
-                y+=wid.height()+wid.get_margin()*2
-                wid.show()
-            except:
-                pass
