@@ -185,7 +185,6 @@ class QssStyleAnalysis:
         del self._map_qss[select_name]
         del self._reverse_map_qss[str(index)]
 
-
         # Rebidirectional mapping
         self.__mappCoordinate(0,self.count())
 
