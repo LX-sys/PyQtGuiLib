@@ -118,7 +118,7 @@ if __name__ == '__main__':
     # win.setEnableGColor(True)
     win.setStyleSheet('''
 qproperty-radius:7;
-qproperty-backgroundColor:rgba(255, 170, 127,150);
+qproperty-backgroundColor:rgba(255, 170, 127,255);
     ''')
     win.show()
 

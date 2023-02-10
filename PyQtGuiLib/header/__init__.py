@@ -8,6 +8,7 @@ from PyQtGuiLib.header.py.common import *
 from PyQtGuiLib.header.versions import PYQT_VERSIONS
 from PyQtGuiLib.header.utility import *
 from PyQtGuiLib.header.customStyle import CustomStyle
+from PyQtGuiLib.header.error import *
 
 
 # 处理mac下无法运行的情况
