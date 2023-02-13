@@ -101,6 +101,11 @@ class Qss:
         else:
             raise TypeError("Without this attribute,'%s'"%key)
 
+    def isAttr(self,key):
+        if self._qss_dict[self.header()].get(key):
+            return True
+        return False
+
     def __str__(self):
         return self._qss_str
 
@@ -131,7 +136,7 @@ class QssStyleAnalysis:
         self.__mappCoordinate(0,self.count())
 
         if self.__parent:
-            self.__updateStyhle(self.__parent)
+            self.__updateStyle(self.__parent)
 
     # Bidirectional mapping
     def __mappCoordinate(self,s,e):
@@ -148,6 +153,21 @@ class QssStyleAnalysis:
 
     def appendQSS(self,qss:str):
         new_qss = [Qss(qss,self,self.__parent) for qss in self.groupDecomposition(qss)]
+
+        '''
+            Handle attribute fusion when the appended attribute conflicts with the original attribute
+        '''
+        temp_hear = []
+        for qss in new_qss:
+            if self.isSelectKey(qss.header()):
+                temp_hear.append(qss.header())
+
+        for attr,value in self.toDict()[qss.header()].items():
+            if qss.isAttr(attr) is False:
+                qss.updateAttr(attr, value)
+
+        del temp_hear
+
         old_count = self.count()
         self._qss.extend(new_qss)
 
@@ -155,14 +175,11 @@ class QssStyleAnalysis:
         self.__mappCoordinate(old_count,self.count())
 
         if self.__parent:
-            self.__updateStyhle(self.__parent)
+            self.__updateStyle(self.__parent)
 
     def appendQSSDict(self,qss_dict:dict):
         self.appendQSS(dictTostr(qss_dict))
 
-    def printShow(self):
-        for qss in self._qss:
-            print(qss)
 
     def selectorKey(self,key)->Qss:
         return self.selectorIndex(self._map_qss[key])
@@ -199,6 +216,11 @@ class QssStyleAnalysis:
         else:
             raise TypeError("Parameter error!")
 
+    def isSelectKey(self,key):
+        if self._map_qss.get(key):
+            return True
+        return False
+
     def toDict(self)->dict:
         qss_dict = dict()
         for i in range(self.count()):
@@ -208,7 +230,7 @@ class QssStyleAnalysis:
     def toStr(self)->str:
         return dictTostr(self.toDict())
 
-    def __updateStyhle(self,parent):
+    def __updateStyle(self, parent):
         parent.setStyleSheet("")
         parent.setStyleSheet(self.toStr())
         parent.update()
@@ -226,7 +248,7 @@ class QssStyleAnalysis:
             parent = self.__parent
             # self.selector(ang)
 
-        self.__updateStyhle(parent)
+        self.__updateStyle(parent)
 
     def __str__(self):
         return self.toStr()
