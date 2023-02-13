@@ -10,6 +10,7 @@ from PyQtGuiLib.header import (
 )
 from PyQtGuiLib.header.customStyle import CustomStyle
 
+
 is_win_sys = True if platform.system() == "win32" else False
 
 is_mac_sys = True if platform.system() == "Darwin" else False
@@ -60,7 +61,7 @@ def rgbTohsv(r, g, b):
     r, g, b = r/255.0, g/255.0, b/255.0
     mx,mn = max(r, g, b),min(r, g, b)
     df = mx-mn
-    h=0
+    h = 0
     if mx == mn:
         h = 0
     elif mx == r:h = (60 * ((g-b)/df) + 360) % 360
@@ -68,10 +69,7 @@ def rgbTohsv(r, g, b):
     elif mx == b:h = (60 * ((r-g)/df) + 240) % 360
 
     s = 0 if mx ==0 else df/mx
-    # if mx == 0:
-    #     s = 0
-    # else:
-    #     s = df/mx
+
     v = mx
     return h, s, v
 
@@ -96,6 +94,20 @@ def hsvTorgb(h, s, v):
     elif hi == 5: r, g, b = v, p, q
     r, g, b = int(r * 255), int(g * 255), int(b * 255)
     return r, g, b
+
+
+# 加载UI文件
+def loadUic(ui_path:str) -> QWidget:
+    if PYQT_VERSIONS in ["PyQt5","PyQt6"]:
+        from PyQtGuiLib.header import uic
+        return uic.loadUi(ui_path)
+    elif PYQT_VERSIONS in ["PySide2","PySide6"]:
+        from PyQtGuiLib.header import QFile,QUiLoader
+        uif = QFile(ui_path)
+        loader = QUiLoader()
+        ui = loader.load(uif)
+        uif.close()
+        return ui
 
 
 class Widget(QWidget,CustomStyle):
