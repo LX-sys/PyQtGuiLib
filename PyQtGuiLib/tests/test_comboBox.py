@@ -16,7 +16,7 @@ from PyQtGuiLib.header import (
     QPushButton
 )
 
-from PyQtGuiLib.core.comboBox import ComboBox
+from PyQtGuiLib.core.comboBox.combBox import ComBox
 
 '''
     下拉框 测试用例
@@ -28,14 +28,16 @@ class TestComboBox(QMainWindow):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
 
-        self.combox = ComboBox(self)
+        self.combox = ComBox(self)
         # self.combox.setFocus()
-        self.combox.resize(300,40)
+        self.combox.resize(300,50)
         self.combox.move(100,100)
-        print(self.combox.pos())
+        print(self.styleSheet())
 
-    def test(self,e):
-        print(e)
+        # print(self.combox.pos())
+
+    # def test(self,e):
+    #     print(e)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

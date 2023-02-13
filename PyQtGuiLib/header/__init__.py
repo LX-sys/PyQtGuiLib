@@ -2,6 +2,8 @@ from PyQtGuiLib.header.Qt.qtWidgets import *
 from PyQtGuiLib.header.Qt.qtGui import *
 from PyQtGuiLib.header.Qt.qtCore import *
 from PyQtGuiLib.header.Qt.qtSip import *
+from PyQtGuiLib.header.Qt.qtUic import *
+
 from PyQtGuiLib.header.Qt import qt
 from PyQtGuiLib.header.py.common import *
 
