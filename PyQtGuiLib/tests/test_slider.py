@@ -37,13 +37,12 @@ class Test(QWidget):
         self.resize(600,600)
 
         self.sl = Slider(self)
-        self.sl.move(50,50)
         self.sl.resize(300,40)
-        # self.sl.setValue(50)
-        # self.sl.setBuffValue(80)
         self.sl.setStyleSheet('''
         Slider{
 qproperty-radius:4;
+qproperty-flowColor:rgb(255,0,0);
+qproperty-iconSize:18;
         }
             ''')
 

@@ -171,9 +171,8 @@ class Slider(Widget):
 
     # 缓冲层
     def drawBuffBgColor(self,painter:QPainter):
-        if self.buff_w:
-            self.__drawRoundedRect(painter,self.get_buffColor(),
-                                   self.buff_w)
+        self.__drawRoundedRect(painter,self.get_buffColor(),
+                               self.buff_w)
 
     # 底色
     def drawBackgroundColor(self,painter:QPainter):

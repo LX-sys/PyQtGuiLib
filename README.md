@@ -194,6 +194,31 @@ qproperty-margin:3; /*文本框个小三角之间的距离*/
 ```
 ![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E6%B0%94%E6%B3%A1%E7%AA%97%E5%8F%A3.gif)
 
+### 滑块(Slider)
+
+```python
+滑块  ----> 90% 完成
+from PyQtGuiLib.core import Slider
+
+信号
+valueChanged
+
+滑块 -- Slider API介绍
+setValue() # 设置进度条的值
+setBuffValue() # 设置缓冲层的值
+setBuffValue() # 设置最大值
+
+# 自定义样式
+qproperty-radius 设置圆角
+qproperty-bgColor 设置背景颜色
+qproperty-buffColor 设置缓冲层颜色
+qproperty-flowColor 设置浮动层颜色
+qproperty-iconColor 设置图标颜色
+qproperty-iconSize  设置图标大小
+```
+
+
+
 ### 靠边窗口(PullOver)
 
 ```python
