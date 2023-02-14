@@ -21,13 +21,14 @@ from PyQtGuiLib.header import (
     QFont,
     textSize,
     QFontMetricsF,
-    Qt
+    Qt,
+    QVBoxLayout
 )
 
-from PyQtGuiLib.core import Slider
-
+# from PyQtGuiLib.core import Slider
+from PyQtGuiLib.core.slider.slider2 import Slider
 '''
-    测试用例的标准模板,该代码用于复制
+    测试 滑块
 '''
 
 
@@ -37,25 +38,28 @@ class Test(QWidget):
         self.resize(600,600)
 
         self.sl = Slider(self)
-        self.sl.resize(300,30)
-        self.sl.move(100,100)
-
-        self.sl.setValue(0)
-        # self.sl.setPercentageValue(100)
-
-        self.sl.setBuffPercentageValue(80)
-        self.sl.valueChanged.connect(self.test)
-
+        self.sl.move(50,50)
+        self.sl.resize(300,40)
+        # self.sl.setFixedSize(300,40)
         self.sl.setStyleSheet('''
         Slider{
-qproperty-radius:5;
-qproperty-margin:3;
+qproperty-radius:4;
 qproperty-backgroundColor:rgb(200, 200, 200);
-qproperty-iconBackgroundColor:rgb(200, 100, 200);
-qproperty-sliderH:15;
+qproperty-iconBackgroundColor:rgb(253, 52, 62);
+qproperty-sliderH:8;
 qproperty-iconSize:20;
         }
             ''')
+        #
+        # self.vboy = QVBoxLayout(self)
+        # self.vboy.addWidget(self.sl)
+
+        self.sl.valueChanged.connect(self.test)
+        self.sl.setMaxValue(250)
+        self.sl.setValue(250)
+        # self.sl.setBuffValue(250)
+
+        # self.vboy.addWidget(self.sl2)
 
     def test(self,v):
         print("v:",v)
