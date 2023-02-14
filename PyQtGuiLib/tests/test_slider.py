@@ -25,8 +25,7 @@ from PyQtGuiLib.header import (
     QVBoxLayout
 )
 
-# from PyQtGuiLib.core import Slider
-from PyQtGuiLib.core.slider.slider2 import Slider
+from PyQtGuiLib.core import Slider
 '''
     测试 滑块
 '''
@@ -40,26 +39,16 @@ class Test(QWidget):
         self.sl = Slider(self)
         self.sl.move(50,50)
         self.sl.resize(300,40)
-        # self.sl.setFixedSize(300,40)
+        # self.sl.setValue(50)
+        # self.sl.setBuffValue(80)
         self.sl.setStyleSheet('''
         Slider{
 qproperty-radius:4;
-qproperty-backgroundColor:rgb(200, 200, 200);
-qproperty-iconBackgroundColor:rgb(253, 52, 62);
-qproperty-sliderH:8;
-qproperty-iconSize:20;
         }
             ''')
-        #
-        # self.vboy = QVBoxLayout(self)
-        # self.vboy.addWidget(self.sl)
 
-        self.sl.valueChanged.connect(self.test)
-        self.sl.setMaxValue(250)
-        self.sl.setValue(250)
-        # self.sl.setBuffValue(250)
-
-        # self.vboy.addWidget(self.sl2)
+        self.vboy = QVBoxLayout(self)
+        self.vboy.addWidget(self.sl)
 
     def test(self,v):
         print("v:",v)
