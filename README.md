@@ -197,16 +197,17 @@ qproperty-margin:3; /*文本框个小三角之间的距离*/
 ### 滑块(Slider)
 
 ```python
-滑块  ----> 90% 完成
+滑块  ----> 95% 完成
 from PyQtGuiLib.core import Slider
 
 信号
 valueChanged
 
 滑块 -- Slider API介绍
-setValue() # 设置进度条的值
-setBuffValue() # 设置缓冲层的值
-setBuffValue() # 设置最大值
+setValue(int) # 设置进度条的值
+setBuffValue(int) # 设置缓冲层的值
+setMaxValue(int) # 设置最大值
+setHoverIcon(bool) # 设置图标是否具有 hover 效果
 
 # 自定义样式
 qproperty-radius 设置圆角
@@ -215,6 +216,7 @@ qproperty-buffColor 设置缓冲层颜色
 qproperty-flowColor 设置浮动层颜色
 qproperty-iconColor 设置图标颜色
 qproperty-iconSize  设置图标大小
+qproperty-bgHeight  设置背景高度
 ```
 
 
