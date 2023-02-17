@@ -10,6 +10,7 @@ from PyQtGuiLib.header import (
     QApplication,
     QWidget,
     QPushButton,
+    QVBoxLayout
 )
 
 from PyQtGuiLib.core import BubbleWidget
@@ -24,11 +25,18 @@ class Test(QWidget):
         self.resize(800,500)
 
         # self.setWindowOpacity(0.5)
-
+        self.vboy = QVBoxLayout(self)
 
         self.btn = QPushButton("一号玩家",self)
         self.btn.resize(130,60)
         self.btn.move(400,200)
+
+        self.btn2 = QPushButton("二号玩家", self)
+        self.btn2.resize(130, 60)
+        self.btn2.move(400, 400)
+
+        self.vboy.addWidget(self.btn)
+        self.vboy.addWidget(self.btn2)
 
         # 气泡控件
         self.bu_top = BubbleWidget(self)
