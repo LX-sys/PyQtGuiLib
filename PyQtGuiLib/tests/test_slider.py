@@ -51,6 +51,7 @@ class Test(QWidget):
 
         self.sl.setHoverIcon(False)
         self.sl.setMaxValue(30000)
+        self.sl.setBuffValue(18000)
         self.sl.move(100,100)
         self.sl.valueChanged.connect(self.test)
         # self.sl.setBuffValue(30)
