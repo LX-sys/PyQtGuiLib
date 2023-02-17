@@ -13,9 +13,10 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
-    QMainWindow,
+    QWidget,
     QThread,
     Signal,
+    QHBoxLayout,
     QColor,
     QSlider
 )
@@ -23,6 +24,8 @@ from PyQtGuiLib.header import (
 from PyQtGuiLib.core.progressBar import WaterBar
 from PyQtGuiLib.core.progressBar import CircularBar
 from PyQtGuiLib.core.progressBar import LoadBar
+from PyQtGuiLib.core.progressBar import GradientBar
+
 
 class DurationTimeThread(QThread):
     added = Signal(int)
@@ -40,7 +43,7 @@ class DurationTimeThread(QThread):
                 print("完成")
                 break
 
-class TestPullOverWidget(QMainWindow):
+class TestPullOverWidget(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(800,500)
@@ -51,6 +54,8 @@ class TestPullOverWidget(QMainWindow):
 # background-color: rgb(0, 0, 0);
 # }
 #         ''')
+
+        self.vboy = QHBoxLayout(self)
 
         self.waterbar = WaterBar(self)
         self.waterbar.move(100,250)
@@ -71,6 +76,10 @@ class TestPullOverWidget(QMainWindow):
         self.cir.setTextSize(15)
         self.cir.move(50, 50)
 
+        self.vboy.addWidget(self.waterbar)
+        self.vboy.addWidget(self.loadbar)
+        self.vboy.addWidget(self.cir)
+        #
         self.th = DurationTimeThread()
         self.th.added.connect(self.test)
         self.th.start()
