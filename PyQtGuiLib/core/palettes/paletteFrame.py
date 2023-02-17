@@ -12,7 +12,8 @@ from PyQtGuiLib.header import (
     QSpinBox,
     QSlider,
     qt,
-    Signal
+    Signal,
+    QColor
 )
 
 '''
@@ -24,10 +25,15 @@ from PyQtGuiLib.core.palettes.colorHsv import ColorRect,ColorWheel
 
 class PaletteFrame(QWidget):
     rgbaChange = Signal(tuple)
-    hsvChange = Signal(tuple)
+    # hsvChange = Signal(tuple)
     nameChange = Signal(str)
+    clickColor = Signal(tuple)
 
-    def __init__(self,*args,**kwargs):
+    Rect = "ColorRect"
+    Wheel = "ColorWheel"
+
+
+    def __init__(self,*args,shape="ColorRect",**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(480,340)
 
@@ -39,9 +45,10 @@ background-color: rgb(19, 19, 19);
         ''')
 
         # 色块窗口
-        self.colorLumpWidget = None
-        self.colorLumpWidget = ColorRect()
-        # self.addColorLump(self.placeholderWidget)
+        if shape == PaletteFrame.Wheel:
+            self.colorLumpWidget = ColorWheel()
+        else:
+            self.colorLumpWidget = ColorRect()
 
 #         self.setStyleSheet('''
 # #leftWidget{
@@ -56,6 +63,7 @@ background-color: rgb(19, 19, 19);
 #         ''')
         self.Init()
         self.myEvent()
+
 
     def Init(self):
         self.hboxLayout = QHBoxLayout(self)
@@ -138,11 +146,6 @@ background-color: rgb(19, 19, 19);
             return True
         return False
 
-    # 添加颜色块
-    def addColorLump(self,wdiget:QWidget):
-        wdiget.setParent(self)
-        wdiget.move(0,0)
-
     # 事件
     def myEvent(self):
         self.slider.valueChanged.connect(lambda v:self.slider_event(v,"QSpinBox"))
@@ -150,14 +153,38 @@ background-color: rgb(19, 19, 19);
         #
         if self.isColorLump():
             self.placeholderWidget.rgbaChange.connect(self.spbox_event)
-            self.placeholderWidget.nameChange.connect(self.lineedit_bin.setText)
+            self.placeholderWidget.nameChange.connect(self.lineedit_edit_event)
+            self.colorButton.clicked.connect(self.click_color_event)
+
+    # 点击获取颜色
+    def click_color_event(self):
+        self.clickColor.emit(self.getRGBA())
+
+    def getRGBA(self)->tuple:
+        r = self.lineedit_r.text()
+        g = self.lineedit_g.text()
+        b = self.lineedit_b.text()
+        a = self.lineedit_a.text()
+        rgba = r,g,b,a
+        return rgba
+
+    # 发送 十六进制 颜色
+    def lineedit_edit_event(self,color_name):
+        self.lineedit_bin.setText(color_name)
+        self.nameChange.emit(color_name)
+
+    # 元祖 转 QColor
+    def tupleToQColor(self,arga:tuple):
+        return QColor(*arga)
+
     # spbox事件
     def spbox_event(self,rgba):
         r,g,b,a = rgba
         self.lineedit_r.setValue(r)
         self.lineedit_g.setValue(g)
         self.lineedit_b.setValue(b)
-
+        # 发送信号
+        self.rgbaChange.emit(rgba)
 
     # 滚动条事件
     def slider_event(self,v:int,obj_str:str):
@@ -170,6 +197,11 @@ background-color: rgb(19, 19, 19);
         if self.isColorLump():
             self.placeholderWidget.setAlpha(v)
             self.lineedit_a.setValue(v)
+            r = self.lineedit_r.text()
+            g = self.lineedit_g.text()
+            b = self.lineedit_b.text()
+            rgba = r,g,b,v
+            self.rgbaChange.emit(rgba)
             self.update()
 
     def resizeEvent(self, event) -> None:
@@ -178,7 +210,7 @@ background-color: rgb(19, 19, 19);
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = PaletteFrame()
+    win = PaletteFrame(shape=PaletteFrame.Rect)
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6","PySide6"]:

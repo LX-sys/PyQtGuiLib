@@ -3,8 +3,6 @@
 '''
 
 from PyQtGuiLib.header import (
-    QApplication,
-    sys,
     QPixmap,
     QPainter,
     Signal,
@@ -18,7 +16,6 @@ from PyQtGuiLib.header import (
     QWidget,
     QBrush,
     QVBoxLayout,
-    QLabel,
     QRect
 )
 
@@ -89,7 +86,7 @@ class ColorABC(QWidget):
     # 发送信号
     def sendSignal(self,x,y):
         color = self.grab(QRect(x, y, 1, 1)).toImage().pixelColor(0, 0)
-        print(color.getRgb())
+        # print(color.getRgb())
         self.hsvChange.emit(color.getHsv())
         self.rgbaChange.emit(color.getRgb())
         self.nameChange.emit(color.name())
@@ -346,42 +343,3 @@ class ColorWheel(ColorABC):
         if self.is_alpha:
             painter.setPen(qt.white)
         painter.drawPixmap(self.rect(), self.pix)
-
-
-
-
-
-
-class Test(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.resize(800,800)
-
-        self.clump = ColorWheel(self)
-        self.clump.resize(240,240)
-        self.clump.setAlpha(220)
-        # self.clump.show()
-
-        self.bt = QLabel(self)
-        self.bt.resize(60,60)
-        self.bt.move(600,60)
-        self.bt.setStyleSheet('''
-        background-color: rgb(0, 0, 0, 255);
-        ''')
-
-        self.clump.nameChange.connect(self.te)
-    def te(self,v):
-        print(v)
-        self.bt.setStyleSheet('''
-        background-color: %s;
-        '''%(v))
-        self.update()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    win = Test()
-    win.show()
-
-    sys.exit(app.exec_())
