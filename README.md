@@ -197,7 +197,7 @@ qproperty-margin:3; /*文本框个小三角之间的距离*/
 ### 滑块(Slider)
 
 ```python
-滑块  ----> 95% 完成
+滑块  ----> 100% 完成
 from PyQtGuiLib.core import Slider
 
 信号
@@ -235,7 +235,7 @@ setEasingCurve() # 设置东西
 ### 圆环进度条(CircularBar)
 
 ```python
-圆环进度条  ----> 99%
+圆环进度条  ----> 100%  完成
 导入方式 from PyQtGuiLib.core.progressBar import CircularBar
 
 圆环进度条 -- PullOver API介绍
@@ -301,7 +301,7 @@ qproperty-innerRadius:15;
 ### 水球进度条(WaterBar)
 
 ```python
-水球进度条  ----> 90%
+水球进度条  ----> 100%  完成
 导入方式 from PyQtGuiLib.core.progressBar import WaterBar
 
 水球进度条 -- WaterBar API介绍
@@ -516,23 +516,24 @@ setBallColor() # 设置运行球的颜色 格式 {"false":QColor,"true":QColor}
 ![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E5%BC%80%E5%85%B3%E6%8C%89%E9%92%AE.gif)
 ### 调色版
 ```python
-ColorPalette --> 99% 测试使用中
+ColorPalette --> 100%  完成
 导入方式 from PyQtGuiLib.core import ColorPalette
 
 # --- 类变量
-Style_Black  # 黑色窗口风格
-Style_White  # 白色窗口风格
-Style_None   # 没有窗口风格
+Rect   		# 	颜色区域为矩形
+Wheel     #   颜色区域为圆形
 
 # --- 信号
 rgbaChange  颜色改变时触发,返回的元组 (r,g,b,a)
-colorNamed  颜色改变时触发,反正字符串 十六进制颜色名称
-clicked     点击获取颜色按钮时触发,同时返回以上两种参数
+nameChange  颜色改变时触发,反正字符串 十六进制颜色名称
+clickColor  点击获取颜色按钮时触发,返回的元组 (r,g,b,a)
 
 # --- APi
-setStyleMode() # 设置窗体本身的风格
-getHexName()  # 当前当前十六进制颜色
 getRGBA() # 返回当前RGBA颜色
+
+# ----注意类变量必须在类创建传递才可以
+Eg:
+  self.pcolor = PaletteFrame(self,shape=PaletteFrame.Rect)
 ```
 ![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E8%B0%83%E8%89%B2%E6%9D%BF.gif)
 ## 控件增强
