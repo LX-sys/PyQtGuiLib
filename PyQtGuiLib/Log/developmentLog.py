@@ -132,12 +132,18 @@
     --- 新增滑块(Slider)
 
 2023.2.18 [2.3.18.10]
-    ---  修改原来导入导入颜色板的方式
-        原来: from PyQtGuiLib.core import ColorPalette (与这个相关文件以删除)
+    --- 修改原来导入导入颜色板的方式
+        原来: from PyQtGuiLib.core import ColorPalette (与这个相关文件已删除)
         现在: from PyQtGuiLib.core import PaletteFrame
         并更新代码,将原来的代码拆分为,获取颜色的框架,与独立的颜色区域,
         在框架中可以嵌入不同的颜色区别,目前支持(Rect,Wheel)
-    --- 更新文档
+    --- 修复 QSS解析器 已知BUG,
+        修复 isSelectKey() 取值成功,但是值为0,导致整个函数返回False的BUG
+        并新增对 无选择器的QSS语法  
+                  color: rgb(0, 255, 127);
+                  background-color:rgb(0, 170, 0);
+        进行处理,该语法只能用过setQSS方法设置
+        新增 QSS解析器例子,位置 PyQtGuiLib -> tests -> test_QssStyleAnalysis -> eg6.py
 '''
 
 

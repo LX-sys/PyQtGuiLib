@@ -26,9 +26,9 @@ class Test_ColorPalette(QWidget):
         self.pcolor = PaletteFrame(self,shape=PaletteFrame.Rect)
         self.pcolor.resize(500,300)
         self.pcolor.move(10,10)
-        # self.pcolor.rgbaChange.connect(self.test)
+        self.pcolor.rgbaChange.connect(self.test)
         # self.pcolor.nameChange.connect(self.test_name)
-        self.pcolor.clickColor.connect(self.test_click)
+        # self.pcolor.clickColor.connect(self.test_click)
 
         # 测试按钮
         self.btn = QPushButton("test",self)

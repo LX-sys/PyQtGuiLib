@@ -123,8 +123,22 @@ class QssStyleAnalysis:
 
     # Decompose multiple groups of QSS
     def groupDecomposition(self,styles):
-        styles=re.findall(r".*?}", styles, re.DOTALL)
-        return [v.strip() for v in styles]
+        re_styles=re.findall(r".*?}", styles, re.DOTALL)
+        if not re_styles: #
+            '''
+                Deal with special circumstances:
+                        color: rgb(0, 255, 127);
+                        background-color:rgb(0, 170, 0);
+            '''
+            str_p = str(type(self.__parent))
+            if "QtWidgets" in str_p:
+                head = re.findall("QtWidgets\.(.*)\'",str_p)
+            else:
+                head = re.findall("\.(.*)\'",str_p)
+
+            re_styles = [head[0]+"{"+styles+"}"]
+
+        return [v.strip() for v in re_styles]
 
     def count(self) -> int:
         return len(self._qss)
@@ -153,26 +167,24 @@ class QssStyleAnalysis:
 
     def appendQSS(self,qss:str):
         new_qss = [Qss(qss,self,self.__parent) for qss in self.groupDecomposition(qss)]
-
         '''
             Handle attribute fusion when the appended attribute conflicts with the original attribute
         '''
-        temp_hear = []
+        # temp_hear = []
         for qss in new_qss:
             if self.isSelectKey(qss.header()):
-                temp_hear.append(qss.header())
+                for attr,value in self.toDict()[qss.header()].items():
+                    if qss.isAttr(attr) is False:
+                        qss.updateAttr(attr, value)
 
-        for attr,value in self.toDict()[qss.header()].items():
-            if qss.isAttr(attr) is False:
-                qss.updateAttr(attr, value)
-
-        del temp_hear
+        # del temp_hear
 
         old_count = self.count()
         self._qss.extend(new_qss)
 
         # remap
         self.__mappCoordinate(old_count,self.count())
+
 
         if self.__parent:
             self.__updateStyle(self.__parent)
@@ -217,7 +229,7 @@ class QssStyleAnalysis:
             raise TypeError("Parameter error!")
 
     def isSelectKey(self,key):
-        if self._map_qss.get(key):
+        if self._map_qss.get(key,-1)>=0:
             return True
         return False
 
@@ -226,6 +238,9 @@ class QssStyleAnalysis:
         for i in range(self.count()):
             qss_dict.update(self.selectorIndex(i).toDict())
         return qss_dict
+
+    def header(self)->list:
+        return list(self.toDict().keys())
 
     def toStr(self)->str:
         return dictTostr(self.toDict())
