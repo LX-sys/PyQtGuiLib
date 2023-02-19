@@ -18,18 +18,20 @@ from PyQtGuiLib.header import (
     QWidget,
     QPushButton,
     QLabel,
-    QTabWidget,
     QObject,
     qt,
     QGroupBox,
-    QTreeWidget,
-    QTreeWidgetItem,
-    QHBoxLayout
+    QTreeWidgetItem
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.core import PaletteFrame
 
 from PyQtGuiLib.styles.linker.styleLinkerUi import StyleLinkerUI
+from PyQtGuiLib.styles.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
+'''
+    动态样式链接器
+'''
+
 
 class StyleLinker(StyleLinkerUI):
     def __init__(self):
@@ -56,9 +58,12 @@ class StyleLinker(StyleLinkerUI):
         '''
             在添加控件对象的同时,创建该对象QSS解析器对象
             如果该控件有样式,则继承,如果没有则创建出一个默认的空样式,
-            还会创建一个对应的树节点,
+            还会创建一个对应的树节点(父节点+子节点),
                         --- 后期,根据点击树节点,创建一系列tab节点
         '''
+        if obj in self.__objs:  # 如果出现重复对象,直接忽略
+            return
+
         qssaAng = QssStyleAnalysis(obj)
         bool_style = bool(obj.styleSheet())
         q = re.findall("QtWidgets\.(.*)\'", str(type(obj)))[0]
@@ -66,7 +71,7 @@ class StyleLinker(StyleLinkerUI):
         %s{
 
         }
-                                ''' % q
+        ''' % q
         if bool_style:
             qssaAng.setQSS(obj.styleSheet())
             qssaAng.appendQSS(qss)
@@ -90,9 +95,23 @@ class StyleLinker(StyleLinkerUI):
         treeRoot.setText(0,name)
         self.record_tree_root.append({"root":treeRoot,"qss":qssaAng})
 
-        for select in qssaAng.header():
+        '''
+            对样式进行融合,如果该样式没有在QSS解析器中,则添加,
+            最后在创建出子节点,再创建子节点的同时补上样式说明
+        '''
+        child_notes = getMergeStyles(qssaAng.header(),getStyleLists(q))
+        for select in child_notes:
+            if qssaAng.isSelectKey(select) is False:
+                qssaAng.appendQSSDict({
+                    select:{}
+                })
+        # 获取样式的说明
+        comments = getStyleCommentLists(q)
+        child_notes_zip = zip(child_notes,comments)
+        for select,comment in child_notes_zip:
             child_tree = QTreeWidgetItem(treeRoot)
             child_tree.setText(0,select)
+            child_tree.setToolTip(0,comment)
 
         self.__qssAny.append(qssaAng)
         self.__objs.append(obj)
@@ -116,17 +135,40 @@ class StyleLinker(StyleLinkerUI):
             双击树,获取根节点,同时设置为全局共享的操作对象,每当获取一个根节点,
             就将这个根节点加入缓冲区,方便下次查找,
             在通过根节点,找到下面的子节点,并创建出tab,
-            在切换根节点时,先清空tab再创建
+            在切换根节点时,先清空tab再创建,
+
+            如果点击的是子节点,
+                如果table存在,则切换换到对应table,如果不存在,则什么都不做
+                这一段是存在BUG的(2023.2.20)
         '''
+
+        child_flag = True
+        for d in self.record_tree_root:
+            if item == d["root"]:
+                child_flag = False
+                break
+
+        if child_flag:
+            child_name = item.text(0)
+            table_count = self.tab().count()
+            for i in range(table_count):
+                if self.tab().tabText(i) == child_name:
+                    self.tab().setCurrentIndex(i)
+                    self.global_select = child_name # 重新设置选择器
+                    break
+            return
+        # ------
+
         tab_count = self.tab().count()
         if tab_count > 1:
             for i in range(tab_count, 0, -1):
                 self.tab().removeTab(i)
 
         root = None  # type:QTreeWidgetItem
-        if item in self.buffer_tree_root:
+
+        if item in self.buffer_tree_root: # 在缓冲区里面查找
             root = item
-            for d in self.record_tree_root:
+            for d in self.buffer_tree_root:
                 if d["root"] == item:
                     self.global_var = d["qss"]
 
@@ -151,7 +193,7 @@ class StyleLinker(StyleLinkerUI):
                 return d["qss"]
 
     # 创建tab
-    def createTab(self,name):
+    def createTab(self, name):
         wid = QWidget()
         # ----
         ''''
