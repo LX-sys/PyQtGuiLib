@@ -121,6 +121,9 @@ class QssStyleAnalysis:
     def setParent(self,parent):
         self.__parent = parent
 
+    def parent(self):
+        return self.__parent
+
     # Decompose multiple groups of QSS
     def groupDecomposition(self,styles):
         re_styles=re.findall(r".*?}", styles, re.DOTALL)

@@ -29,7 +29,10 @@ from PyQtGuiLib.core import PaletteFrame
 from PyQtGuiLib.styles.linker.styleLinkerUi import StyleLinkerUI
 from PyQtGuiLib.styles.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
 from PyQtGuiLib.styles.linker.component import (
-    colorComponent
+    colorComponent,
+    geometryComponent,
+    borderComponent,
+    RegisterComponent
 )
 '''
     动态样式链接器
@@ -145,6 +148,7 @@ class StyleLinker(StyleLinkerUI):
                 这一段是存在BUG的(2023.2.20)
         '''
 
+        # 判断是否点击的子节点
         child_flag = True
         for d in self.record_tree_root:
             if item == d["root"]:
@@ -174,6 +178,8 @@ class StyleLinker(StyleLinkerUI):
             for d in self.buffer_tree_root:
                 if d["root"] == item:
                     self.global_var = d["qss"]
+                    self.showStyleBrowserCode(self.global_var.toStr())
+                    break
 
         if root is None:
             for d in self.record_tree_root:
@@ -181,6 +187,7 @@ class StyleLinker(StyleLinkerUI):
                     root = item
                     self.global_var = d["qss"]
                     self.buffer_tree_root.append(d)
+                    self.showStyleBrowserCode(self.global_var.toStr())
                     break
 
         if root:
@@ -190,15 +197,23 @@ class StyleLinker(StyleLinkerUI):
                 self.createTab(tab_name)
 
     # 通过树的根节点来查找 QSS解析器对象
-    def getObj(self,root:QTreeWidgetItem)->QssStyleAnalysis:
+    def getObj(self,root:QTreeWidgetItem) -> QssStyleAnalysis:
         for d in self.record_tree_root:
             if d["root"] == root:
                 return d["qss"]
 
+    def showStyleBrowserCode(self,style):
+        self.browser().clear()
+        self.browser().append(style)
+
     # 注册组件
     def registerComponent(self,wid):
         # 通用的颜色组件
-        colorComponent(self,wid)
+        # colorComponent(self,wid)
+        # geometryComponent(self,wid)
+        # borderComponent(self,wid)
+        for regF in RegisterComponent.getRegister():
+            regF(self,wid)
 
     # 创建tab
     def createTab(self, name):
