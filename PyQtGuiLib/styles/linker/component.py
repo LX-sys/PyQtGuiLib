@@ -16,13 +16,15 @@ from PyQtGuiLib.header import (
     QSize,
     QLabel,
     QGridLayout,
-    QSpinBox
+    QSpinBox,
+    QComboBox
 )
 from PyQtGuiLib.core import PaletteFrame
 from PyQtGuiLib.styles import QssStyleAnalysis
 
-# 通用 QGroupBox 大小
+# 通用 QGroupBox 大小(最多3排组件)
 PUBLIC_GROUPBOX_SIZE = QSize(150,100)
+PUBLIC_GROUPBOX_SIZE_4 = QSize(150,130)
 
 
 
@@ -81,10 +83,6 @@ def colorComponent(self,parent):
             p.setWindowTitle("前景色")
             p.rgbaChange.connect(lambda rgba:update(rgba, "color", "rgba(%s, %s, %s,%s)" % rgba))
 
-    # groupBox = QGroupBox()
-    # parent.addWidget(groupBox)
-    # groupBox.setTitle("调色区")
-    # groupBox.setFixedSize(PUBLIC_GROUPBOX_SIZE)
     groupBox =__getGroupBox(parent,"调色区")
     fboy = QFormLayout(groupBox)
 
@@ -166,20 +164,51 @@ def borderComponent(self,parent):
     :param browser:  QTextBrowser 对象
     :return:
     '''
-    def border_event(mode,v):
+    def border_event(mode,v,color_btn=None):
         if mode == "radius":
             __updateAttr(self,"border-radius","{}px".format(v))
+        if mode == "width":
+            __updateAttr(self, "border-width", "{}px".format(v))
+        if mode == "style":
+            __updateAttr(self, "border-style", "%s"%v)
+        if mode == "color":
+            p = PaletteFrame()  # 创建颜色版
+            p.show()
 
-    groupBox = __getGroupBox(parent,"边设置")
+            def update(rgba, k, v):
+                __updateAttr(self, k, v)
+                color_btn.setStyleSheet('''background-color:rgba(%s, %s, %s,%s);''' % rgba)
+
+            p.rgbaChange.connect(lambda rgba: update(rgba, "border-color", "rgba(%s, %s, %s,%s)" % rgba))
+
+    groupBox = __getGroupBox(parent,"边设置",PUBLIC_GROUPBOX_SIZE_4)
     gboy = QGridLayout(groupBox)
 
     radius_l = QLabel("圆角")
     radius_spinbox = QSpinBox()
+    width_l = QLabel("边框宽度")
+    width_spinbox = QSpinBox()
+    style_l = QLabel("边框风格")
+    style_combox = QComboBox()
+    style_combox.addItems(["none","solid","outset","inset",
+                           "dashed","dot-dash","dot-dot-dash",
+                           "dotted","double","groove","ridge"])
+    color_l = QLabel("边框颜色")
+    color_btn = QPushButton()
 
     gboy.addWidget(radius_l,0,0)
     gboy.addWidget(radius_spinbox,0,1)
+    gboy.addWidget(width_l,1,0)
+    gboy.addWidget(width_spinbox,1,1)
+    gboy.addWidget(style_l,2,0)
+    gboy.addWidget(style_combox,2,1)
+    gboy.addWidget(color_l,3,0)
+    gboy.addWidget(color_btn,3,1)
 
     radius_spinbox.valueChanged.connect(lambda v:border_event("radius",v))
+    width_spinbox.valueChanged.connect(lambda v:border_event("width",v))
+    style_combox.currentTextChanged.connect(lambda v:border_event("style",v))
+    color_btn.clicked.connect(lambda :border_event("color",0,color_btn))
 
 
 # 小控件注册器
