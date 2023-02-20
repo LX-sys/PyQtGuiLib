@@ -28,6 +28,9 @@ from PyQtGuiLib.core import PaletteFrame
 
 from PyQtGuiLib.styles.linker.styleLinkerUi import StyleLinkerUI
 from PyQtGuiLib.styles.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
+from PyQtGuiLib.styles.linker.component import (
+    colorComponent
+)
 '''
     动态样式链接器
 '''
@@ -192,6 +195,11 @@ class StyleLinker(StyleLinkerUI):
             if d["root"] == root:
                 return d["qss"]
 
+    # 注册组件
+    def registerComponent(self,wid):
+        # 通用的颜色组件
+        colorComponent(self,wid)
+
     # 创建tab
     def createTab(self, name):
         wid = QWidget()
@@ -199,7 +207,8 @@ class StyleLinker(StyleLinkerUI):
         ''''
             在wid上面添加各种组件
         '''
-        self.test_ColorModule(wid)
+        # self.test_ColorModule(wid)
+        self.registerComponent(wid)
         # ----
         self.tab().addTab(wid,name)
 
@@ -228,6 +237,8 @@ class StyleLinker(StyleLinkerUI):
         self.tab().tabBarClicked.connect(self.changeTab_Event)
         self.tree().itemDoubleClicked.connect(self.doubleClickTree_Event)
 
+# =====================================
+# 下面是测试用例
 
 class Test(QWidget):
     def __init__(self,*args,**kwargs):

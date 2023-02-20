@@ -16,7 +16,8 @@ from PyQtGuiLib.header import (
     QGroupBox,
     QTreeWidget,
     QHBoxLayout,
-    QSplitter
+    QSplitter,
+    QTextBrowser
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.core import PaletteFrame
@@ -41,12 +42,15 @@ class StyleLinkerUI(QWidget):
         self.__tree = QTreeWidget()
         self.__tree.header().setVisible(False)
         self.__tab = QTabWidget()
-        self.defaultPage = QWidget()
+        self.defaultPage = QTextBrowser()
         self.__tab.addTab(self.defaultPage,"样式代码")
 
         self.__spliter.addWidget(self.__tree)
         self.__spliter.addWidget(self.__tab)
         self.__spliter.setStretchFactor(1,8)
+
+    def browser(self)->QTextBrowser:
+        return self.defaultPage
 
     def tree(self)->QTreeWidget:
         return self.__tree
