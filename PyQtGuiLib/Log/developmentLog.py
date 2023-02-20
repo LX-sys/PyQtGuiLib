@@ -139,11 +139,14 @@
         在框架中可以嵌入不同的颜色区别,目前支持(Rect,Wheel)
     --- 修复 QSS解析器 已知BUG,
         修复 isSelectKey() 取值成功,但是值为0,导致整个函数返回False的BUG
+        新增 header(),parent()方法
         并新增对 无选择器的QSS语法  
                   color: rgb(0, 255, 127);
                   background-color:rgb(0, 170, 0);
         进行处理,该语法只能用过setQSS方法设置
         新增 QSS解析器例子,位置 PyQtGuiLib -> tests -> test_QssStyleAnalysis -> eg6.py
+    --- 动态样式链接器 from PyQtGuiLib.styles import StyleLinker
+        目前仅支持 QPushButton,QLabel,QLineEdit 控件
 '''
 
 

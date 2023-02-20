@@ -95,6 +95,7 @@ def colorComponent(self,parent):
 
     groupBox =__getGroupBox(parent,"调色区")
     fboy = QFormLayout(groupBox)
+    fboy.setContentsMargins(3, 3, 3, 3)
 
     bgc = QLabel("背景颜色")
     bgc_btn = QPushButton()
@@ -137,6 +138,7 @@ def geometryComponent(self,parent):
 
     groupBox = __getGroupBox(parent,"位置大小")
     gboy = QGridLayout(groupBox)
+    gboy.setContentsMargins(3,3,3,3)
 
     xy_l = QLabel("位置")
     x_spinbox = QSpinBox()
@@ -197,6 +199,7 @@ def borderComponent(self,parent):
 
     groupBox = __getGroupBox(parent,"边设置",PUBLIC_GROUPBOX_SIZE_4)
     gboy = QGridLayout(groupBox)
+    gboy.setContentsMargins(3, 3, 3, 3)
 
     radius_l = QLabel("圆角")
     radius_spinbox = QSpinBox()
@@ -239,6 +242,7 @@ def fontComponent(self,parent):
 
     groupBox = __getGroupBox(parent, "文字操作", PUBLIC_GROUPBOX_SIZE_4)
     gboy = QGridLayout(groupBox)
+    gboy.setContentsMargins(3, 3, 3, 3)
 
     size_l = QLabel("文字大小")
     size_spinbox = QSpinBox()

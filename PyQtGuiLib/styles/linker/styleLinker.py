@@ -21,7 +21,8 @@ from PyQtGuiLib.header import (
     QObject,
     qt,
     QGroupBox,
-    QTreeWidgetItem
+    QTreeWidgetItem,
+    QLineEdit
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.core import PaletteFrame,FlowLayout
@@ -84,18 +85,26 @@ class StyleLinker(StyleLinkerUI):
         else:
             qssaAng.setQSS(qss)
 
+        '''
+            名称标记 获取名称读顺序
+            优先读取 text() 方法,如果没有该方法,或者是该方法返回的数据为空时,
+            读取objectName()方法,如果为空,
+            则读取这个对象实例化的十六进制,但正则匹配出现错误时,
+            直接生成uuid作为名称
+        '''
+        name_flag = False
         # 获取名称
         if hasattr(obj, "text"):
             if obj.text():
                 name = obj.text()
-        elif obj.objectName():
+                name_flag = True
+        if name_flag is False and obj.objectName():
             name = obj.objectName()
-        else:
+        if name_flag is False:
             try:
                 name = re.findall("(0x.*)>", str(obj))[0]
-            except:
+            except Exception as e:
                 name = uuid.uuid4()
-
         # 创建树根节点,以及子节点
         treeRoot = QTreeWidgetItem(self.tree())
         treeRoot.setText(0,name)
@@ -273,9 +282,11 @@ class Test(QWidget):
         self.l2 = QLabel("我是标签",self)
         self.btn.move(10,10)
         self.l2.move(40,40)
+        self.line = QLineEdit(self)
+        self.line.move(10,80)
 
         self.styleLinker = StyleLinker()
-        self.styleLinker.addQObjects([self.btn,self.l2])
+        self.styleLinker.addQObjects([self.btn,self.l2,self.line])
         self.styleLinker.show()
 
 if __name__ == '__main__':
