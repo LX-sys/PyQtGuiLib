@@ -17,14 +17,16 @@ from PyQtGuiLib.header import (
     QLabel,
     QGridLayout,
     QSpinBox,
-    QComboBox
+    QComboBox,
+    QFileDialog,
+    QFontComboBox,
 )
 from PyQtGuiLib.core import PaletteFrame
 from PyQtGuiLib.styles import QssStyleAnalysis
 
 # 通用 QGroupBox 大小(最多3排组件)
-PUBLIC_GROUPBOX_SIZE = QSize(150,100)
-PUBLIC_GROUPBOX_SIZE_4 = QSize(150,130)
+PUBLIC_GROUPBOX_SIZE = QSize(160,100)
+PUBLIC_GROUPBOX_SIZE_4 = QSize(160,130)
 
 
 
@@ -68,8 +70,10 @@ def colorComponent(self,parent):
     '''
 
     def open_PaletteFrame(btn,case:str):
-        p = PaletteFrame()  # 创建颜色版
-        p.show()
+
+        if case in ["bg","c"]:
+            p = PaletteFrame()  # 创建颜色版
+            p.show()
 
         def update(rgba,k,v):
             __updateAttr(self,k,v )
@@ -83,6 +87,12 @@ def colorComponent(self,parent):
             p.setWindowTitle("前景色")
             p.rgbaChange.connect(lambda rgba:update(rgba, "color", "rgba(%s, %s, %s,%s)" % rgba))
 
+        if case == "image":
+            # ;;images(*.png *.jpg *.jpeg *.bmp *.gif)
+            name,ty=QFileDialog.getOpenFileName(self,"选择图片","","images(*.png *.jpg *.jpeg *.bmp *.gif)")
+            if name:
+                __updateAttr(self,"border-image","url(%s)"%name)
+
     groupBox =__getGroupBox(parent,"调色区")
     fboy = QFormLayout(groupBox)
 
@@ -90,12 +100,16 @@ def colorComponent(self,parent):
     bgc_btn = QPushButton()
     color = QLabel("前景色")
     color_btn = QPushButton()
+    image_l = QLabel("背景图片(b)")
+    image_btn = QPushButton("...")
     fboy.addRow(bgc,bgc_btn)
     fboy.addRow(color,color_btn)
+    fboy.addRow(image_l,image_btn)
 
     # event
     bgc_btn.clicked.connect(lambda: open_PaletteFrame(bgc_btn,"bg"))
     color_btn.clicked.connect(lambda: open_PaletteFrame(color_btn,"c"))
+    image_btn.clicked.connect(lambda :open_PaletteFrame(image_btn,"image"))
 
 
 # 通用调节大小位置组件
@@ -165,13 +179,13 @@ def borderComponent(self,parent):
     :return:
     '''
     def border_event(mode,v,color_btn=None):
-        if mode == "radius":
+        if mode == "border_radius":
             __updateAttr(self,"border-radius","{}px".format(v))
-        if mode == "width":
+        if mode == "border_width":
             __updateAttr(self, "border-width", "{}px".format(v))
-        if mode == "style":
+        if mode == "border_style":
             __updateAttr(self, "border-style", "%s"%v)
-        if mode == "color":
+        if mode == "border_color":
             p = PaletteFrame()  # 创建颜色版
             p.show()
 
@@ -205,17 +219,61 @@ def borderComponent(self,parent):
     gboy.addWidget(color_l,3,0)
     gboy.addWidget(color_btn,3,1)
 
-    radius_spinbox.valueChanged.connect(lambda v:border_event("radius",v))
-    width_spinbox.valueChanged.connect(lambda v:border_event("width",v))
-    style_combox.currentTextChanged.connect(lambda v:border_event("style",v))
-    color_btn.clicked.connect(lambda :border_event("color",0,color_btn))
+    radius_spinbox.valueChanged.connect(lambda v:border_event("border_radius",v))
+    width_spinbox.valueChanged.connect(lambda v:border_event("border_width",v))
+    style_combox.currentTextChanged.connect(lambda v:border_event("border_style",v))
+    color_btn.clicked.connect(lambda :border_event("border_color",0,color_btn))
+
+# 字体类组件
+def fontComponent(self,parent):
+
+    def font_event(mode,v):
+        if mode == "font_size":
+            __updateAttr(self,"font-size","{}px".format(v))
+        if mode == "text_decoration":
+            __updateAttr(self,"text-decoration", "%s"%v)
+        if mode == "font_family":
+            __updateAttr(self, "font-family", "\'%s\'" % v)
+        if mode == "font_style":
+            __updateAttr(self, "font-style", "%s" % v)
+
+    groupBox = __getGroupBox(parent, "文字操作", PUBLIC_GROUPBOX_SIZE_4)
+    gboy = QGridLayout(groupBox)
+
+    size_l = QLabel("文字大小")
+    size_spinbox = QSpinBox()
+    size_spinbox.setValue(12)
+    decoration_l = QLabel("文字装饰")
+    decoration_combobox = QComboBox()
+    decoration_combobox.addItems(["none","underline","line-through"])
+    family_l = QLabel("字体")
+    family_fcombobox = QFontComboBox()
+    style_l = QLabel("文字风格")
+    style_combobox = QComboBox()
+    style_combobox.addItems(["none","italic","oblique"])
+
+    gboy.addWidget(size_l,0,0)
+    gboy.addWidget(size_spinbox,0,1)
+    gboy.addWidget(decoration_l,1,0)
+    gboy.addWidget(decoration_combobox,1,1)
+    gboy.addWidget(family_l,2,0)
+    gboy.addWidget(family_fcombobox,2,1)
+    gboy.addWidget(style_l,3,0)
+    gboy.addWidget(style_combobox,3,1)
+
+    size_spinbox.valueChanged.connect(lambda v:font_event("font_size",v))
+    decoration_combobox.currentTextChanged.connect(lambda v:font_event("text_decoration",v))
+    family_fcombobox.currentTextChanged.connect(lambda v:font_event("font_family",v))
+    family_fcombobox.textHighlighted.connect(lambda v:font_event("font_family",v))
+    style_combobox.currentTextChanged.connect(lambda v:font_event("font_style",v))
 
 
 # 小控件注册器
 class RegisterComponent:
     __Reg_Funs = [colorComponent,
                   geometryComponent,
-                  borderComponent
+                  borderComponent,
+                  fontComponent
                          ]
 
     # 返回注册项
