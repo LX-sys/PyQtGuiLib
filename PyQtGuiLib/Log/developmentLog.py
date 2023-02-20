@@ -131,7 +131,7 @@
     --- 新增 功能函数 loadUic 统一四个版本加载 UI文件 的函数,对外提统一的接口
     --- 新增滑块(Slider)
 
-2023.2.18 [2.3.18.10]
+2023.2.18 - 2023.2.20 [2.4.18.11]
     --- 修改原来导入导入颜色板的方式
         原来: from PyQtGuiLib.core import ColorPalette (与这个相关文件已删除)
         现在: from PyQtGuiLib.core import PaletteFrame

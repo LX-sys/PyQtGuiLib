@@ -90,7 +90,7 @@ dumpStructure(widget :QWidget ,spaceCount=0)  # 控件的组成分析函数
 ### QSS 样式解析器(QssStyleAnalysis)
 
 ```python
-QssStyleAnalysis  ---> 99%(测试中) 
+QssStyleAnalysis  ---> 100%  完成 
 
 导入方式 from PyQtGuiLib.styles import QssStyleAnalysis
 
@@ -119,6 +119,28 @@ inherit() # 样式传承 (详细用法查看 eg3案例)
 # ============
 代码案例位置
 PyQtGuiLib -> tests -> test_QssStyleAnalysis 目录下
+```
+
+### 动态样式链接器(StyleLinker)
+
+```python
+QssStyleAnalysis --> 测试版
+
+介绍
+  该链接器 可以在程序运行的过程中,调式控件的样式
+
+
+导入方式 from PyQtGuiLib.styles import StyleLinker
+
+Api ---
+addQObject(控件对象)
+addQObjects([控件对象1,控件对象2])
+
+# ----
+例子
+self.styleLinker = StyleLinker()  # 注意这里创建对象时,不要传递任何参数
+self.styleLinker.addQObjects([控件对象1,控件对象2,...])
+self.styleLinker.show()
 ```
 
 
