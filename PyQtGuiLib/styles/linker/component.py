@@ -25,10 +25,6 @@ from PyQtGuiLib.styles import QssStyleAnalysis
 PUBLIC_GROUPBOX_SIZE = QSize(150,100)
 
 
-# 颜色组件
-# class GroupBox(QGroupBox):
-#     def __init__(self,*args,**kwargs):
-#         super().__init__(*args,**kwargs)
 
 # 通用修改属性的方法
 def __updateAttr(self,key,value):
@@ -46,6 +42,18 @@ def __updateAttr(self,key,value):
     self.global_var.selector(head).updateAttr(key,value)
     self.showStyleBrowserCode(self.global_var.toStr())
 
+# 创建通用 外框
+def __getGroupBox(parent,title:str,size=None):
+    groupBox = QGroupBox()
+    parent.addWidget(groupBox)
+    groupBox.setTitle(title)
+    if size:
+        groupBox.setFixedSize(size)
+    else:
+        groupBox.setFixedSize(PUBLIC_GROUPBOX_SIZE)
+    return groupBox
+
+# -------------------
 
 # 通用的颜色组件
 def colorComponent(self,parent):
@@ -73,9 +81,11 @@ def colorComponent(self,parent):
             p.setWindowTitle("前景色")
             p.rgbaChange.connect(lambda rgba:update(rgba, "color", "rgba(%s, %s, %s,%s)" % rgba))
 
-    groupBox = QGroupBox(parent)
-    groupBox.setTitle("调色区")
-    groupBox.resize(PUBLIC_GROUPBOX_SIZE)
+    # groupBox = QGroupBox()
+    # parent.addWidget(groupBox)
+    # groupBox.setTitle("调色区")
+    # groupBox.setFixedSize(PUBLIC_GROUPBOX_SIZE)
+    groupBox =__getGroupBox(parent,"调色区")
     fboy = QFormLayout(groupBox)
 
     bgc = QLabel("背景颜色")
@@ -113,10 +123,7 @@ def geometryComponent(self,parent):
         if d == "h":
             parent.resize(parent.width(), v)
 
-    groupBox = QGroupBox(parent)
-    groupBox.move(150,parent.y())
-    groupBox.setTitle("位置大小")
-    groupBox.resize(PUBLIC_GROUPBOX_SIZE)
+    groupBox = __getGroupBox(parent,"位置大小")
     gboy = QGridLayout(groupBox)
 
     xy_l = QLabel("位置")
@@ -163,10 +170,7 @@ def borderComponent(self,parent):
         if mode == "radius":
             __updateAttr(self,"border-radius","{}px".format(v))
 
-    groupBox = QGroupBox(parent)
-    groupBox.move(300,parent.y())
-    groupBox.setTitle("边设置")
-    groupBox.resize(PUBLIC_GROUPBOX_SIZE)
+    groupBox = __getGroupBox(parent,"边设置")
     gboy = QGridLayout(groupBox)
 
     radius_l = QLabel("圆角")

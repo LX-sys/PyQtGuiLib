@@ -24,7 +24,7 @@ from PyQtGuiLib.header import (
     QTreeWidgetItem
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
-from PyQtGuiLib.core import PaletteFrame
+from PyQtGuiLib.core import PaletteFrame,FlowLayout
 
 from PyQtGuiLib.styles.linker.styleLinkerUi import StyleLinkerUI
 from PyQtGuiLib.styles.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
@@ -207,23 +207,24 @@ class StyleLinker(StyleLinkerUI):
         self.browser().append(style)
 
     # 注册组件
-    def registerComponent(self,wid):
+    def registerComponent(self,flow):
         # 通用的颜色组件
         # colorComponent(self,wid)
         # geometryComponent(self,wid)
         # borderComponent(self,wid)
         for regF in RegisterComponent.getRegister():
-            regF(self,wid)
+            regF(self,flow)
 
     # 创建tab
     def createTab(self, name):
         wid = QWidget()
+        flow = FlowLayout(wid) # 加入流式布局
         # ----
         ''''
             在wid上面添加各种组件
         '''
         # self.test_ColorModule(wid)
-        self.registerComponent(wid)
+        self.registerComponent(flow)
         # ----
         self.tab().addTab(wid,name)
 
