@@ -112,10 +112,10 @@ STYLE_LIB = {
                       "QTabBar::close-button":"/*关闭按钮的样式(需要将tabsCloseable设置为真才生效)*/",
                       "QTabBar::close-button:hover":"/*鼠标放在关闭按钮上时的样式(需要将tabsCloseable设置为真才生效)*/"
                       },
-        ("QTableView",):{"QTableView":"/*表格视图*/",
+    ("QTableView",):{"QTableView":"/*表格视图*/",
                       "QTableView QTableCornerButton::section":"/*角落部件样式*/"
                       },
-        ("QTreeView",):{"QTreeView":"/*树视图*/",
+    ("QTreeView",):{"QTreeView":"/*树视图*/",
                      "QTreeView::item":"/**/",
                      "QTreeView::item:hover":"/**/",
                      "QTreeView::item:selected":"/**/",

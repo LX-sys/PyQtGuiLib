@@ -22,7 +22,11 @@ from PyQtGuiLib.header import (
     qt,
     QGroupBox,
     QTreeWidgetItem,
-    QLineEdit
+    QLineEdit,
+    Qt,
+    QMenu,
+    QAction,
+    QCursor
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.core import PaletteFrame,FlowLayout
@@ -30,15 +34,59 @@ from PyQtGuiLib.core import PaletteFrame,FlowLayout
 from PyQtGuiLib.styles.linker.styleLinkerUi import StyleLinkerUI
 from PyQtGuiLib.styles.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
 from PyQtGuiLib.styles.linker.component import (
-    colorComponent,
-    geometryComponent,
-    borderComponent,
     RegisterComponent
 )
+
+
+# 改类是TAB上创建的QWidget
+class TWidget(QWidget):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.__flow = FlowLayout(self)
+        self.__Hand_Reg_Funs = []
+
+        # 保存所有创建的菜单项
+        self._acs = []
+
+    def setObj(self,parent):
+        self._parent = parent
+
+    def setHandRegFuns(self,gs):
+        '''
+            保存 需要手动添加的组件,
+            这些设置 完成后, 注册右键菜单,可以通过右键菜单来添加小组件
+        :param gs:
+        :return:
+        '''
+        self.__Hand_Reg_Funs = gs
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menu_event)
+
+    # 添加一个 小组件窗口,并自动布局
+    def addGroupBox(self,widget):
+        self.__flow.addWidget(widget)
+
+    def menu_event(self):
+        self.menu = QMenu(self)
+
+        def p_(obj):
+            obj.module()
+
+        for regClass in self.__Hand_Reg_Funs:
+            reg = regClass(self._parent,self)
+            ac = QAction(reg.title())
+            self._acs.append(ac)
+            self.menu.addAction(ac)
+            ac.triggered.connect(lambda :p_(reg))
+
+        # self.test = QAction("测试")
+        # self.menu.addAction(self.test)
+
+        self.menu.popup(QCursor.pos())
+
 '''
     动态样式链接器
 '''
-
 
 class StyleLinker(StyleLinkerUI):
     def __init__(self):
@@ -216,47 +264,24 @@ class StyleLinker(StyleLinkerUI):
         self.browser().append(style)
 
     # 注册组件
-    def registerComponent(self,flow):
-        # 通用的颜色组件
-        # colorComponent(self,wid)
-        # geometryComponent(self,wid)
-        # borderComponent(self,wid)
-        for regF in RegisterComponent.getRegister():
-            regF(self,flow)
+    def registerComponent(self,wid):
+        for regclass in RegisterComponent.getRegister():
+            regclass(self,wid).module()
+
+        wid.setObj(self)
+        wid.setHandRegFuns(RegisterComponent.getHandRegister())
 
     # 创建tab
     def createTab(self, name):
-        wid = QWidget()
-        flow = FlowLayout(wid) # 加入流式布局
+        wid = TWidget()
+        # flow = FlowLayout(wid) # 加入流式布局
         # ----
         ''''
             在wid上面添加各种组件
         '''
-        # self.test_ColorModule(wid)
-        self.registerComponent(flow)
+        self.registerComponent(wid)
         # ----
         self.tab().addTab(wid,name)
-
-    # 颜色组件,这个函数用于测试
-    def test_ColorModule(self,widget):
-        def open_PaletteFrame():
-            def updateBG(rgba):
-                if self.global_select is None:
-                    head = self.global_var.header()[0]
-                else:
-                    head = self.global_select
-                self.global_var.selector(head).updateAttr("background-color",
-                                                          "rgba(%s, %s, %s,%s)"%rgba)
-            p = PaletteFrame() # 创建颜色版
-            p.rgbaChange.connect(updateBG)
-
-            p.show()
-
-        group_box = QGroupBox("调色区域", widget)
-        group_box.resize(200, 120)
-        bgbtn = QPushButton("背景颜色", group_box)
-        bgbtn.move(10, 20)
-        bgbtn.clicked.connect(open_PaletteFrame)
 
     def myEvent(self):
         self.tab().tabBarClicked.connect(self.changeTab_Event)
