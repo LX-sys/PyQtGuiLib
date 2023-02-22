@@ -7,8 +7,7 @@
     小组件  -- 这个文件不能单独运行
 '''
 from PyQtGuiLib.header import (
-    QApplication,
-    sys,
+    QPoint,
     QGroupBox,
     QFormLayout,
     QPushButton,
@@ -23,7 +22,8 @@ from PyQtGuiLib.header import (
     QFontComboBox,
     QMessageBox,
     QGraphicsDropShadowEffect,
-    QGraphicsBlurEffect
+    QGraphicsBlurEffect,
+    QPropertyAnimation
 )
 from PyQtGuiLib.core import PaletteFrame
 from PyQtGuiLib.core.switchButtons import SwitchButton
@@ -634,6 +634,96 @@ class BlurComponent(GroupBoxABC):
         shadow_btn.clicked.connect(lambda :self.blur_event("click",None))
         blur_radius_spinbox.valueChanged.connect(lambda v:self.blur_event("r",v))
 
+
+# 通用移动动画组件
+class AniComponent(GroupBoxABC):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setTitle("移动动画(非QSS)")
+
+        print(self.controlObj(),self.controlObj().parent())
+
+        self.moveAni = QPropertyAnimation()
+        self.moveAni.setTargetObject(self.controlObj())
+        self.moveAni.setPropertyName(b"pos")
+
+        # 控件原始位置
+        self.original_pos = self.controlObj().pos()
+
+        # 动画事件
+        self.msecs = 2
+
+        self.end = QPoint(0,0)
+
+        self.isAni = True
+
+    def ani_finish_event(self,btn):
+        btn.setDefaultState(False)
+        self.isAni = True
+        self.controlObj().move(self.original_pos)
+
+
+    def start_event(self):
+        if self.isAni:
+            self.isAni = False
+            self.moveAni.start()
+
+
+    def ani_event(self,case:str,v):
+
+        if self.isAni and case == "time":
+            self.msecs = v
+            self.moveAni.setDuration(self.msecs*1000)
+        if self.isAni and case == "ani_x":
+            self.end.setX(v)
+        if self.isAni and case == "ani_y":
+            self.end.setY(v)
+
+        if self.isAni:
+            self.moveAni.setStartValue(self.controlObj().pos())
+            self.moveAni.setEndValue(self.end)
+
+
+    def module(self):
+        groupBox = self.getGroupBox_(PUBLIC_GROUPBOX_SIZE_4)
+        gboy = QGridLayout(groupBox)
+        gboy.setContentsMargins(1, 1, 1, 1)
+
+        # --
+        switch_l = QLabel("动画开关")
+        switch_btn = SwitchButton()
+        time_l = QLabel("动画时长")
+        time_spinbox = QSpinBox()
+        time_spinbox.setValue(self.msecs)
+        pos_s_l = QLabel("起始位置")
+        pos_s_combox = QComboBox()
+        pos_s_combox.addItem("pos")
+        pos_e_l = QLabel("结束位置")
+        pos_e_spinbox_x = QSpinBox()
+        pos_e_spinbox_y = QSpinBox()
+        pos_e_spinbox_x.setMaximum(2000)
+        pos_e_spinbox_y.setMaximum(2000)
+
+        gboy.addWidget(switch_l,0,0,1,2)
+        gboy.addWidget(switch_btn,0,1,1,2)
+        gboy.addWidget(time_l,1,0,1,2)
+        gboy.addWidget(time_spinbox,1,1,1,2)
+        gboy.addWidget(pos_s_l,2,0,1,2)
+        gboy.addWidget(pos_s_combox,2,1,1,2)
+        gboy.addWidget(pos_e_l,3,0)
+        gboy.addWidget(pos_e_spinbox_x,3,1)
+        gboy.addWidget(pos_e_spinbox_y,3,2)
+
+        switch_btn.clicked.connect(self.start_event)
+        time_spinbox.valueChanged.connect(lambda v:self.ani_event("time",v))
+        pos_e_spinbox_x.valueChanged.connect(lambda v:self.ani_event("ani_x",v))
+        pos_e_spinbox_y.valueChanged.connect(lambda v:self.ani_event("ani_y",v))
+
+        self.moveAni.finished.connect(lambda :self.ani_finish_event(switch_btn))
+
+
+
+
 # -----------------------------------
 
 
@@ -656,6 +746,7 @@ class RegisterComponent:
         BorderDetailRadiusComponent,
         ShadowComponent,
         BlurComponent,
+        AniComponent
     ]
 
 

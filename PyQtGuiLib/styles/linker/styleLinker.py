@@ -20,7 +20,6 @@ from PyQtGuiLib.header import (
     QLabel,
     QObject,
     qt,
-    QGroupBox,
     QTreeWidgetItem,
     QLineEdit,
     Qt,
