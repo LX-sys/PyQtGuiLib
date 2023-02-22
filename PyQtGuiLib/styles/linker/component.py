@@ -13,15 +13,20 @@ from PyQtGuiLib.header import (
     QFormLayout,
     QPushButton,
     QSize,
+    QColor,
     QLabel,
     QGridLayout,
     QSpinBox,
+    QDoubleSpinBox,
     QComboBox,
     QFileDialog,
     QFontComboBox,
-    QMessageBox
+    QMessageBox,
+    QGraphicsDropShadowEffect,
+    QGraphicsBlurEffect
 )
 from PyQtGuiLib.core import PaletteFrame
+from PyQtGuiLib.core.switchButtons import SwitchButton
 from PyQtGuiLib.styles import QssStyleAnalysis
 
 # 通用 QGroupBox 大小(最多3排组件)
@@ -46,6 +51,10 @@ class GroupBoxABC:
 
     def parent(self):
         return self.__parent
+
+    # 被操作的控件对象
+    def controlObj(self):
+        return self.styleLinker().global_var.parent()
 
     # 通用打开调色版
     def openPaletteFrame(self, title, callfun, argc=None):
@@ -343,6 +352,7 @@ class FontComponent(GroupBoxABC):
 
 # ---------------------------------------------------
 
+
 # 通用边细节组件(手动加载)
 class BorderDetailComponent(GroupBoxABC):
     def __init__(self,*args,**kwargs):
@@ -460,7 +470,173 @@ class BorderDetailRadiusComponent(GroupBoxABC):
         direction_combobox.currentTextChanged.connect(self.setDir)
         radius_spinbox.valueChanged.connect(self.radius_event)
 
+
+# 通用阴影组件(手动加载)
+class ShadowComponent(GroupBoxABC):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setTitle("阴影(非QSS)")
+
+        self._shawObj = QGraphicsDropShadowEffect()
+        self.offx,self.offy =0,0
+        self.r = 5
+        self.s_color = QColor(0,255,0)
+
+        self._shawObj.setOffset(self.offx,self.offy)
+        self._shawObj.setBlurRadius(self.r)
+        self._shawObj.setColor(self.s_color)
+
+        # 阴影开关
+        self.isShadow = False
+
+    def shadow_event(self,case,v,btn):
+        if case == "click":
+            if self.isShadow is False:
+                self.isShadow = True
+                self.controlObj().setGraphicsEffect(self._shawObj)
+            else:
+                self.isShadow = False
+                self.controlObj().setGraphicsEffect(None)
+                '''
+                    这里情况会和BlurComponent一致
+                '''
+                self._shawObj = QGraphicsDropShadowEffect()
+                self._shawObj.setOffset(self.offx, self.offy)
+                self._shawObj.setBlurRadius(self.r)
+                self._shawObj.setColor(self.s_color)
+            # self._shawObj.setEnabled(self.isShadow)
+            # self._shawObj.clearGraphicsEffect()
+
+            if self.isShadow is False:
+                return
+
+        if self.isShadow and case == "offX":
+            self.offx = v
+        if self.isShadow and case == "offY":
+            self.offy = v
+        if self.isShadow and case == "r":
+            self.r = v
+        if self.isShadow and case == "color":
+            def color_(rgba):
+                r,g,b,a = rgba
+                self.s_color = QColor(int(r),int(g),int(b),int(a))
+                self._shawObj.setColor(self.s_color)
+                btn.setStyleSheet('''background-color:rgba(%s, %s, %s,%s);''' % rgba)
+            self.openPaletteFrame("阴影颜色",color_)
+
+        self._shawObj.setOffset(self.offx,self.offy)
+        self._shawObj.setBlurRadius(self.r)
+        # self._shawObj.setColor(self.s_color)
+
+        # 控件对象
+        self.controlObj().setGraphicsEffect(self._shawObj)
+
+    def module(self):
+        groupBox = self.getGroupBox_(PUBLIC_GROUPBOX_SIZE_4)
+        gboy = QGridLayout(groupBox)
+        gboy.setContentsMargins(3, 3, 3, 3)
+
+        shaow_l = QLabel("阴影开关")
+        shadow_btn = SwitchButton()
+        off_l = QLabel("偏移")
+        off_x = QSpinBox()
+        off_y = QSpinBox()
+        blur_radius_l = QLabel("阴影半径")
+        blur_radius_spinbox = QSpinBox()
+        blur_radius_spinbox.setValue(self.r)
+        color_l = QLabel("阴影颜色")
+        color_btn = QPushButton()
+
+
+        gboy.addWidget(shaow_l,0,0)
+        gboy.addWidget(shadow_btn,0,1,1,2)
+        gboy.addWidget(off_l,1,0)
+        gboy.addWidget(off_x,1,1)
+        gboy.addWidget(off_y,1,2)
+        gboy.addWidget(blur_radius_l,2,0)
+        gboy.addWidget(blur_radius_spinbox,2,1,1,2)
+        gboy.addWidget(color_l,3,0)
+        gboy.addWidget(color_btn,3,1,1,2)
+
+        shadow_btn.clicked.connect(lambda :self.shadow_event("click",None,None))
+        off_x.valueChanged.connect(lambda v:self.shadow_event("offX",v,None))
+        off_y.valueChanged.connect(lambda v:self.shadow_event("offY",v,None))
+        blur_radius_spinbox.valueChanged.connect(lambda v:self.shadow_event("r",v,None))
+        color_btn.clicked.connect(lambda v:self.shadow_event("color",v,color_btn))
+
+
+# 通用模糊组件(手动加载)
+class BlurComponent(GroupBoxABC):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setTitle("模糊(非QSS)")
+
+        self.hints = {
+            "PerformanceHint":QGraphicsBlurEffect.PerformanceHint, # 注重模糊性能
+            "QualityHint":QGraphicsBlurEffect.QualityHint, # 注重模糊质量
+            "AnimationHint":QGraphicsBlurEffect.AnimationHint # 用于动画
+        }
+
+        self._blurObj = QGraphicsBlurEffect()
+        self.blur_r = 5
+        self._blurObj.setBlurRadius(self.blur_r)
+
+        # 阴影开关
+        self.isBlur = False
+
+    def blur_event(self,case,v):
+        if case == "click":
+            if self.isBlur is False:
+                self.isBlur = True
+                self.controlObj().setGraphicsEffect(self._blurObj)
+            else:
+                self.isBlur = False
+                self.controlObj().setGraphicsEffect(None)
+                '''
+                    self.controlObj().setGraphicsEffect(None)
+                    这句执行后,会导致QGraphicsBlurEffect被删除,那么在下面
+                    重新创建一次
+                '''
+                self._blurObj = QGraphicsBlurEffect()
+                self._blurObj.setBlurRadius(self.blur_r)
+            if self.isBlur is False:
+                return
+
+        if self.isBlur and case == "r":
+            self.blur_r = v
+
+        self._blurObj.setBlurRadius(self.blur_r)
+
+        # 控件对象
+        self.controlObj().setGraphicsEffect(self._blurObj)
+
+    def module(self):
+        groupBox = self.getGroupBox_(PUBLIC_GROUPBOX_SIZE)
+        gboy = QGridLayout(groupBox)
+        gboy.setContentsMargins(3, 3, 3, 3)
+
+        shaow_l = QLabel("模糊开关")
+        shadow_btn = SwitchButton()
+        blur_radius_l = QLabel("模糊半径")
+        blur_radius_spinbox = QDoubleSpinBox()
+        blur_radius_spinbox.setValue(self.blur_r)
+        hints_l = QLabel("模糊质量")
+        hints_combobox = QComboBox()
+        hints_combobox.addItems(list(self.hints.keys()))
+
+        gboy.addWidget(shaow_l,0,0)
+        gboy.addWidget(shadow_btn,0,1,1,2)
+        gboy.addWidget(blur_radius_l,2,0)
+        gboy.addWidget(blur_radius_spinbox,2,1,1,2)
+        gboy.addWidget(hints_l,3,0)
+        gboy.addWidget(hints_combobox,3,1,1,2)
+
+        shadow_btn.clicked.connect(lambda :self.blur_event("click",None))
+        blur_radius_spinbox.valueChanged.connect(lambda v:self.blur_event("r",v))
+
 # -----------------------------------
+
+
 # 小控件注册器
 class RegisterComponent:
     '''
@@ -477,7 +653,9 @@ class RegisterComponent:
 
     __Hand_Reg_Funs = [
         BorderDetailComponent,
-        BorderDetailRadiusComponent
+        BorderDetailRadiusComponent,
+        ShadowComponent,
+        BlurComponent,
     ]
 
 

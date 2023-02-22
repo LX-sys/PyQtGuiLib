@@ -12,8 +12,6 @@ from PyQtGuiLib.header import (
     Signal
 )
 
-from PyQtGuiLib.styles import ButtonStyle
-
 '''
     组件轮播
 '''

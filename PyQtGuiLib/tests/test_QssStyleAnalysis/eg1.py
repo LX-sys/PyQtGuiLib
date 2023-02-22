@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # @time:2023/2/914:20
 # @author:LX
-# @file:eg1.py
+# @file:eg1_QPushButton.py
 # @software:PyCharm
 
 

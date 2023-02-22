@@ -28,7 +28,7 @@ class TestNoBorder(BorderlessWidget):
         # self.setEnableGColor(True)
         self.setStyleSheet('''
         WidgetABC{
-        qproperty-radius:50;
+        qproperty-radius:10;
         qproperty-backgroundColor: rgba(240, 240, 240,255);
         /*qproperty-linearDirection:"LR";
         qproperty-linearColor:"rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";

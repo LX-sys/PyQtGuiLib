@@ -4,23 +4,14 @@
 # @file:styleLinkerUi.py
 # @software:PyCharm
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    QApplication,
-    sys,
     QWidget,
-    QPushButton,
-    QLabel,
     QTabWidget,
-    QObject,
     qt,
-    QGroupBox,
     QTreeWidget,
     QHBoxLayout,
     QSplitter,
     QTextBrowser
 )
-from PyQtGuiLib.styles import QssStyleAnalysis
-from PyQtGuiLib.core import PaletteFrame
 
 
 class StyleLinkerUI(QWidget):

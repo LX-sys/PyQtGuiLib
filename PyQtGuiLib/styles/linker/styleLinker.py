@@ -28,14 +28,15 @@ from PyQtGuiLib.header import (
     QAction,
     QCursor,
     QListWidget,
-    QListWidgetItem
+    QListWidgetItem,
+    QMessageBox
 )
-from functools import partial
-
 from PyQtGuiLib.styles import QssStyleAnalysis
-from PyQtGuiLib.core import PaletteFrame,FlowLayout
-
+from functools import partial
+from PyQtGuiLib.core import PaletteFrame
+from PyQtGuiLib.core.flowLayout import FlowLayout
 from PyQtGuiLib.styles.linker.styleLinkerUi import StyleLinkerUI
+
 from PyQtGuiLib.styles.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
 from PyQtGuiLib.styles.linker.component import (
     RegisterComponent
@@ -51,6 +52,8 @@ class TWidget(QWidget):
 
         # 保存所有创建的菜单项
         self._acs = []
+        # 记录已经激活的控件
+        self.activate_control = []
 
     def setObj(self,parent):
         self._parent = parent
@@ -70,11 +73,19 @@ class TWidget(QWidget):
     def addGroupBox(self,widget):
         self.__flow.addWidget(widget)
 
+    def isActivate(self,obj)->bool:
+        if obj.title() in self.activate_control:
+            QMessageBox.warning(self,"警告","{}该组件已激活".format(obj.title()))
+            return True
+        return False
+
     def menu_event(self):
         self.menu = QMenu(self)
 
         def p_(obj):
-            obj.module()
+            if self.isActivate(obj) is False:
+                obj.module()
+                self.activate_control.append(obj.title())
 
         for regClass in self.__Hand_Reg_Funs:
             reg = regClass(self._parent,self)
