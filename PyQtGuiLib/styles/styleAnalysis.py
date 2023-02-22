@@ -106,6 +106,9 @@ class Qss:
             return True
         return False
 
+    def toStr(self)->str:
+        return self._qss_str
+
     def __str__(self):
         return self._qss_str
 

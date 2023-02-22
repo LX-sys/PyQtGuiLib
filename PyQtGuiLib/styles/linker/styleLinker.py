@@ -26,8 +26,12 @@ from PyQtGuiLib.header import (
     Qt,
     QMenu,
     QAction,
-    QCursor
+    QCursor,
+    QListWidget,
+    QListWidgetItem
 )
+from functools import partial
+
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.core import PaletteFrame,FlowLayout
 
@@ -77,10 +81,8 @@ class TWidget(QWidget):
             ac = QAction(reg.title())
             self._acs.append(ac)
             self.menu.addAction(ac)
-            ac.triggered.connect(lambda :p_(reg))
+            ac.triggered.connect(partial(p_,reg))
 
-        # self.test = QAction("测试")
-        # self.menu.addAction(self.test)
 
         self.menu.popup(QCursor.pos())
 
@@ -310,8 +312,19 @@ class Test(QWidget):
         self.line = QLineEdit(self)
         self.line.move(10,80)
 
+        # listwidget
+        self.listw = QListWidget(self)
+        self.listw.setObjectName("listw")
+        self.listw.move(200,30)
+        self.listw.resize(130,230)
+        item1 = QListWidgetItem("test1")
+        item2 = QListWidgetItem("test2")
+        self.listw.addItem(item1)
+        self.listw.addItem(item2)
+
+
         self.styleLinker = StyleLinker()
-        self.styleLinker.addQObjects([self.btn,self.l2,self.line])
+        self.styleLinker.addQObjects([self.btn,self.l2,self.line,self.listw])
         self.styleLinker.show()
 
 if __name__ == '__main__':

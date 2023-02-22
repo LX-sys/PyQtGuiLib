@@ -52,6 +52,13 @@ STYLE_LIB = {
                   "QListView::item:selected:active": "/**/",
                   "QListView::item:hover": "/**/"
                   },
+    ("QListWidget",): {"QListWidget": "/*列表视图*/",
+                       "QListWidget::item:alternate": "/**/",
+                       "QListWidget::item:selected": "/**/",
+                       "QListWidget::item:selected:!active": "/**/",
+                       "QListWidget::item:selected:active": "/**/",
+                       "QListWidget::item:hover": "/**/"
+                       },
     ("QProgressBar",): {"QProgressBar": "/*进度条*/",
                      "QProgressBar::chunk": "进度条中间颜色区域样式"},
     ("QScrollBar",): {"QScrollBar": '''

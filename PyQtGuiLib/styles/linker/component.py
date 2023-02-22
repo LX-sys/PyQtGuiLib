@@ -4,10 +4,9 @@
 # @file:component.py
 # @software:PyCharm
 '''
-    小组件
+    小组件  -- 这个文件不能单独运行
 '''
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
     QApplication,
     sys,
     QGroupBox,
@@ -20,6 +19,7 @@ from PyQtGuiLib.header import (
     QComboBox,
     QFileDialog,
     QFontComboBox,
+    QMessageBox
 )
 from PyQtGuiLib.core import PaletteFrame
 from PyQtGuiLib.styles import QssStyleAnalysis
@@ -47,35 +47,47 @@ class GroupBoxABC:
     def parent(self):
         return self.__parent
 
-    # 返回当前操作的选择器
-    def selector(self):
-        return self.styleLinker().global_var.selector(self.styleLinker().global_select)
-
     # 通用打开调色版
-    def openPaletteFrame(self,title,callfun,argc=None):
+    def openPaletteFrame(self, title, callfun, argc=None):
         p = PaletteFrame()  # 创建颜色版
         p.setWindowTitle(title)
         p.show()
 
         if argc:
-            p.rgbaChange.connect(lambda rgba:callfun(rgba,argc))
+            p.rgbaChange.connect(lambda rgba: callfun(rgba, argc))
         else:
             p.rgbaChange.connect(lambda rgba: callfun(rgba))
 
-    # 通用修改属性的方法
-    def updateAttr_(self, key, value):
-        '''
-
-        :param self: StyleLinker 对象
-        :param key: 样式属性
-        :param value: 样式值
-        :return:
-        '''
+    # 返回当前操作的选择器
+    def selector(self):
         if self.styleLinker().global_select is None:
             head = self.styleLinker().global_var.header()[0]
         else:
             head = self.styleLinker().global_select
-        self.styleLinker().global_var.selector(head).updateAttr(key, value)
+        return self.styleLinker().global_var.selector(head)
+
+    # 通用修改属性的方法
+    def updateAttr_(self, key, value):
+        '''
+        :param key: 样式属性
+        :param value: 样式值
+        :return:
+        '''
+        self.selector().updateAttr(key, value)
+        self.updateStyleCode()
+
+    # 检查属性
+    def isAttr_(self,key)->bool:
+        return self.selector().isAttr(key)
+
+    # 移除属性
+    def removerAttr_(self,key):
+        if self.isAttr_(key):
+            self.selector().removeAttr(key)
+            self.updateStyleCode()
+
+    # 更新样式代码
+    def updateStyleCode(self)->None:
         self.styleLinker().showStyleBrowserCode(self.styleLinker().global_var.toStr())
 
     # 创建通用 外框
@@ -100,6 +112,9 @@ class ColorComponent(GroupBoxABC):
         super().__init__(*args,**kwargs)
         self.setTitle("调色区")
 
+        #  图片设置的标记
+        self.isImage = False
+
     def open_PaletteFrame(self,btn, case: str):
         if case in ["bg", "c"]:
             p = PaletteFrame()  # 创建颜色版
@@ -118,11 +133,26 @@ class ColorComponent(GroupBoxABC):
             p.rgbaChange.connect(lambda rgba: update(rgba, "color", "rgba(%s, %s, %s,%s)" % rgba))
 
         if case == "image":
-            # ;;images(*.png *.jpg *.jpeg *.bmp *.gif)
-            name, ty = QFileDialog.getOpenFileName(self.parent(), "选择图片", "", "images(*.png *.jpg *.jpeg *.bmp *.gif)")
-            if name:
-                self.updateAttr_("border-image", "url(%s)" % name)
-                btn.setStyleSheet("border:2px solid green;")
+            if self.isImage:
+                reply = QMessageBox.critical(btn,"警告","确认删除背景图片",QMessageBox.Yes|QMessageBox.No)
+                if reply == QMessageBox.Yes:
+                    self.removerAttr_("border-image")
+                    self.isImage = False
+                    btn.setText("...")
+                    btn.setStyleSheet("")
+            else:
+                name, ty = QFileDialog.getOpenFileName(self.parent(), "选择图片", "", "images(*.png *.jpg *.jpeg *.bmp *.gif)")
+                if name:
+                    self.updateAttr_("border-image", "url(%s)" % name)
+                    btn.setStyleSheet('''
+QPushButton{
+border:2px solid #fff;
+background-color: rgb(255, 0, 0);
+color: rgb(255, 255, 255);
+}
+                    ''')
+                    btn.setText("移除图片")
+                    self.isImage = True
 
     def module(self):
         groupBox = self.getGroupBox_()
@@ -311,8 +341,9 @@ class FontComponent(GroupBoxABC):
         style_combobox.currentTextChanged.connect(lambda v: self.font_event("font_style", v))
         style_combobox.textHighlighted.connect(lambda v: self.font_event("font_style", v))
 
+# ---------------------------------------------------
 
-# 通用边细节组件
+# 通用边细节组件(手动加载)
 class BorderDetailComponent(GroupBoxABC):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -328,12 +359,10 @@ class BorderDetailComponent(GroupBoxABC):
             '''
             temp_dir = ["top","right","bottom","left"]
             temp_attr = ["width","color","style"]
-            selector = self.selector()
             for d in temp_dir:
                 for a in temp_attr:
                     key = "border-{}-{}".format(d,a)
-                    if selector.isAttr(key):
-                        self.selector().removeAttr(key)
+                    self.removerAttr_(key)
 
             # 这里顺序不能反,必须先重置方向,防止触发事件
             self._dir = None
@@ -343,7 +372,7 @@ class BorderDetailComponent(GroupBoxABC):
             return
         self._dir = dir
 
-    def isDir(self)->bool:
+    def isDir(self) -> bool:
         return bool(self._dir)
 
     def border_event(self,case,v,btn):
@@ -391,7 +420,45 @@ class BorderDetailComponent(GroupBoxABC):
         style_combobox.currentTextChanged.connect(lambda v:self.border_event("b_style",v,None))
         style_combobox.textHighlighted.connect(lambda v:self.border_event("b_style",v,None))
 
-# ---------------------------------------------------
+
+# 通用边细节组件-圆角(手动加载)
+class BorderDetailRadiusComponent(GroupBoxABC):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setTitle("边细节-圆角")
+        self._dir = None # 方向设置
+
+    def isDir(self)->bool:
+        return bool(self._dir)
+
+    def setDir(self,dir):
+        if dir == "none":
+            attr = "border-{}-radius".format(self._dir)
+            self.removerAttr_(attr)
+            return
+        self._dir = dir
+
+    def radius_event(self,v):
+        attr = "border-{}-radius".format(self._dir)
+        if self.isDir():
+            self.updateAttr_(attr,"%s"%v)
+
+    def module(self):
+        groupBox = self.getGroupBox_(PUBLIC_GROUPBOX_SIZE_4)
+        fboy = QFormLayout(groupBox)
+        fboy.setContentsMargins(3, 3, 3, 3)
+
+        direction_l = QLabel("方向")
+        direction_combobox = QComboBox()
+        direction_combobox.addItems(["none", "top-left", "top-right", "bottom-left", "bottom-right"])
+        radius_l = QLabel("圆角大小")
+        radius_spinbox = QSpinBox()
+
+        fboy.addRow(direction_l, direction_combobox)
+        fboy.addRow(radius_l, radius_spinbox)
+
+        direction_combobox.currentTextChanged.connect(self.setDir)
+        radius_spinbox.valueChanged.connect(self.radius_event)
 
 # -----------------------------------
 # 小控件注册器
@@ -409,7 +476,8 @@ class RegisterComponent:
     ]
 
     __Hand_Reg_Funs = [
-        BorderDetailComponent
+        BorderDetailComponent,
+        BorderDetailRadiusComponent
     ]
 
 
