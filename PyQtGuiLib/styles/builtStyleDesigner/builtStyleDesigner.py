@@ -20,6 +20,7 @@ from functools import partial
 from PyQtGuiLib.styles.builtStyleDesigner.controlConfig import StyleConfig
 from PyQtGuiLib.styles.builtStyleDesigner.builtStyleDesignerUI import BuiltStyleDesignerUI
 from PyQtGuiLib.styles import ButtonStyle
+from PyQt5.QtWinExtras import QtWin
 '''
 
     内置-样式设计器
