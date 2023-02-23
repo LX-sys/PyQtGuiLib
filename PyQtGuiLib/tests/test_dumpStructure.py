@@ -8,9 +8,9 @@
 from PyQtGuiLib.core.resolver import dumpStructure
 
 import sys
-from PyQt5.QtWidgets import QApplication,QWidget,QPushButton,QTabWidget,QScrollArea,QCheckBox
+from PyQt5.QtWidgets import QApplication,QWidget,QPushButton,QTabWidget,QScrollArea,QCheckBox,QDialog
 
 
 app = QApplication(sys.argv)
-dumpStructure(QTabWidget())
+dumpStructure(QDialog())
 

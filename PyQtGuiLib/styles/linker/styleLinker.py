@@ -133,7 +133,11 @@ class StyleLinker(StyleLinkerUI):
 
         qssaAng = QssStyleAnalysis(obj)
         bool_style = bool(obj.styleSheet())
-        q = re.findall("QtWidgets\.(.*)\'", str(type(obj)))[0]
+        q = re.findall("QtWidgets\.(.*)\'|__main__\.(.*)\'", str(type(obj)))[0]
+        if q:
+            q = q[0] if q[0] else q[1]
+        else:
+            raise Exception("Match failure!")
         qss = '''
         %s{
 
@@ -160,6 +164,7 @@ class StyleLinker(StyleLinkerUI):
                 name_flag = True
         if name_flag is False and obj.objectName():
             name = obj.objectName()
+            name_flag = True
         if name_flag is False:
             try:
                 name = re.findall("(0x.*)>", str(obj))[0]

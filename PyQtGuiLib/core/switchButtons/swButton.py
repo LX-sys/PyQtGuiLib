@@ -74,8 +74,8 @@ class SwitchButton(QWidget):
 
     # 设置默认状态
     def setDefaultState(self,state:bool):
-        if state:
-            self.is_switch = not state
+        self.is_switch = not state
+        # self.update()
 
     def mousePressEvent(self, e: QMouseEvent) -> None:
         self.is_switch = False if self.is_switch else True
