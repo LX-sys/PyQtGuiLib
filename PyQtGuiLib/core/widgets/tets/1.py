@@ -12,7 +12,8 @@ from PyQtGuiLib.header import (
     QRect,
     QBrush,
     QPen,
-    QPaintEvent
+    QPaintEvent,
+    QGraphicsDropShadowEffect
 )
 
 class Test(QWidget):
@@ -23,35 +24,46 @@ class Test(QWidget):
         self.setAttribute(qt.WA_TranslucentBackground,True)
         self.setWindowFlags(qt.FramelessWindowHint | qt.Widget)
 
-        self.spring = 5
+
+        self.spring = 1
+        self.radius = 150
+
+    def tupleRadius(self)->tuple:
+        return self.radius,self.radius
 
     def drawBorder(self,painter:QPainter,rect:QRect):
-        rect.setWidth(rect.width()-1)
-        rect.setHeight(rect.height()-1)
+        rect.setWidth(rect.width())
+        rect.setHeight(rect.height())
 
         op = QPen()
-        op.setColor(QColor(0, 225, 0))
+        op.setColor(QColor(0, 0, 0))
         op.setWidth(self.spring*2)
         painter.setPen(op)
-        painter.drawRect(rect)
+        # painter.drawRect(rect)
+        painter.drawRoundedRect(rect,*self.tupleRadius())
 
         painter.setPen(qt.NoPen)
 
+
+    # 绘制背景
+    def drawBackground(self,painter:QPainter,rect:QRect):
+        rect.setRect(rect.x() + self.spring,
+                     rect.y() + self.spring,
+                     rect.width() - self.spring * 2,
+                     rect.height() - self.spring * 2)
+
+        painter.setBrush(QColor(255, 0, 100))
+        # painter.drawRect(rect)
+        painter.drawRoundedRect(rect,*self.tupleRadius())
+
     def paintEvent(self, e:QPaintEvent) -> None:
         painter = QPainter(self)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         rect = e.rect()
+
         self.drawBorder(painter,rect)
-        print(rect)
-
-        rect.setRect(rect.x()+self.spring,
-                     rect.y()+self.spring,
-                     rect.width()-self.spring*2,
-                     rect.height()-self.spring*2)
-
-        painter.setBrush(QColor(255,0,100))
-        painter.drawRect(rect)
-        print(rect)
+        self.drawBackground(painter,rect)
 
         painter.end()
 
