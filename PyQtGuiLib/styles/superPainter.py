@@ -22,6 +22,11 @@ from PyQtGuiLib.header import (
     Qt,
     QPushButton,
     QGraphicsDropShadowEffect,
+    QPolygon,
+    QImage,
+    QLine,
+    QPicture,
+    QPixmap
 )
 
 
@@ -72,7 +77,6 @@ class SuperPainter:
     def end(self):
         self.__painter.end()
 
-
     def setPen(self, op:QPen):
         self.__op = op
         self.painter().setPen(op)
@@ -84,6 +88,9 @@ class SuperPainter:
     def setFont(self, font:QFont):
         self.__font = font
         self.painter().setFont(font)
+
+    def setRenderHints(self,*args):
+        self.painter().setRenderHints(*args)
 
     def open(self) -> QPen:
         return self.__op
@@ -185,8 +192,12 @@ class SuperPainter:
             else:
                 self.setBrush(self.brush())
 
-    # 阴影
+    # 阴影(暂时不需要阴影)
     def __shadowRect(self, x,y, w, h,r=10, imageCall=None, shadowAttr:dict = dict()):
+        x+=5
+        y+=5
+        w-=8
+        h-=8
         shadow_color = shadowAttr.get("color") or shadowAttr.get("c")  # 阴影颜色
         shadow_radius = shadowAttr.get("radius", 0) or shadowAttr.get("r", 0)
         shadow_x = shadowAttr.get("offx",0) or shadowAttr.get("x",0)
@@ -197,15 +208,13 @@ class SuperPainter:
             self.painter().setBrush(QBrush(shadow_color, Qt.SolidPattern))
             # imageCall(x,y,w,h,r,r)
         if shadow_radius:
-            for i in range(0, 20):  # 循环绘制多个圆形
+            for i in range(0, r):  # 循环绘制多个圆形
                 opacity = int(255 * pow(0.75, i))  # 计算当前圆形的 alpha 值
                 shadow_color.setAlpha(opacity)  # 设置当前圆形的阴影颜色
                 self.painter().setBrush(QBrush(shadow_color, Qt.SolidPattern))  # 设置当前圆形的画刷
                 # print(x,shadow_x)
                 # imageCall(x+shadow_x-i, y+shadow_y-i,80+i,80+i,r,r)
-                print(x+shadow_x-i, y+shadow_y-i, w + i*2, h + i*2)
-                # imageCall(x+shadow_x-i, y+shadow_y-i, w + i*2, h + i*2,r,r)  # 绘制当前圆形
-
+                imageCall(x+shadow_x-i, y+shadow_y-i, w + i*2, h + i*2,r,r)  # 绘制当前圆形
 
     # 画矩形
     def drawRect(self, x=0,y=0, w=50, h=50, openAttr:dict = dict(), brushAttr:dict = dict(),
@@ -225,15 +234,21 @@ class SuperPainter:
 
         self.__restorePrivateAttr(openAttr,brushAttr)
 
-    def drawRoundedRect(self,x=0,y=0, w=50, h=50,r=3, openAttr:dict = dict(), brushAttr:dict = dict(),shadowAttr:dict = dict()):
+    def drawRoundedRect(self,x=0,y=0, w=50, h=50,r=3,mode=Qt.AbsoluteSize,openAttr:dict = dict(), brushAttr:dict = dict(),shadowAttr:dict = dict()):
+        '''
 
+        :param mode:
+            Qt.AbsoluteSize
+            Qt.RelativeSize
+        :return:
+        '''
         rect = QRect(x, y, w, h)
 
         self.__shadowRect(x,y,w,h,imageCall=self.painter().drawRoundedRect,shadowAttr=shadowAttr)
 
         self.__privateAttr(openAttr, brushAttr)
 
-        self.painter().drawRoundedRect(rect,r,r)
+        self.painter().drawRoundedRect(rect,r,r,mode=mode)
 
         self.__restorePrivateAttr(openAttr, brushAttr)
 
@@ -265,7 +280,6 @@ class SuperPainter:
         else:
             raise ValueError("parameter error!")
 
-
         self.painter().drawLine(x,y,w,h)
 
         self.__restorePrivateAttr(openAttr,brushAttr)
@@ -290,11 +304,193 @@ class SuperPainter:
 
         self.__restorePrivateAttr(openAttr,brushAttr)
 
+    # 画弧
+    def drawArc(self,x=0,y=0, w=100, h=50,startAngle:int=30,spanAngle:int=180,openAttr:dict = dict(), brushAttr:dict = dict()):
+        '''
+            这个两个参数默认都会*16
+        :param startAngle:
+        :param spanAngle:
+
+        :return:
+        '''
+
+        startAngle *= 16
+        spanAngle *= 16
+
+        rect = QRect(x, y, w, h)
+
+        self.__privateAttr(openAttr, brushAttr)
+
+        self.painter().drawArc(rect,spanAngle,spanAngle)
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 画和弦
+    def drawChord(self,x=0,y=0, w=100, h=50,startAngle:int=30,spanAngle:int=180,openAttr:dict = dict(), brushAttr:dict = dict()):
+        '''
+            这个两个参数默认都会*16
+        :param startAngle:
+        :param spanAngle:
+
+        :return:
+        '''
+
+        startAngle *= 16
+        spanAngle *= 16
+
+        rect = QRect(x, y, w, h)
+
+        self.__privateAttr(openAttr, brushAttr)
+
+        self.painter().drawChord(rect,spanAngle,spanAngle)
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 画圆
+    def drawEllipse(self,x=0,y=0, w=None, h=None,rx:int=None,ry:int=None,openAttr:dict = dict(), brushAttr:dict = dict()):
+
+        '''
+            传参方式:
+                x,y,rx=x,ry=x
+                x,y,w,h
+                x,y,w,h,rx,ry
+        '''
+        self.__privateAttr(openAttr, brushAttr)
+        if (ry and ry) is None and (x and y and w and h):
+            self.painter().drawEllipse(x,y,w,h)
+        elif x and y and rx and ry:
+            self.painter().drawEllipse(QPoint(x,y),rx,ry)
+        else:
+            self.painter().drawEllipse(x,y,w,h,rx,rx)
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 画多边形
+    def drawConvexPolygon(self,points:list,openAttr:dict = dict(), brushAttr:dict = dict()):
+
+        self.__privateAttr(openAttr, brushAttr)
+        polygon = QPolygon()
+        for i in points:
+            polygon.append(i)
+        self.painter().drawConvexPolygon(polygon)
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # image
+    def drawImage(self,x=0,y=0, w=100, h=50,path:str=None,openAttr:dict = dict(), brushAttr:dict = dict()):
+
+        if path is None:
+            raise Exception("No image path!")
+
+        rect = QRect(x, y, w, h)
+
+        self.__privateAttr(openAttr, brushAttr)
+
+        self.painter().drawImage(rect,QImage(path))
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    def drawPath(self,ppath:QPainterPath,openAttr:dict = dict(), brushAttr:dict = dict()):
+        self.__privateAttr(openAttr, brushAttr)
+        self.painter().drawPath(ppath)
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    def drawPicture(self,x=0,y=0,picture:QPicture=None,openAttr:dict = dict(), brushAttr:dict = dict()):
+        if picture is None:
+            raise Exception("QPicture cannot be None !")
+
+        self.__privateAttr(openAttr, brushAttr)
+        self.painter().drawPicture(x,y,picture)
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 画扇形
+    def drawPie(self,x=0,y=0, w=100, h=50,startAngle:int=30,spanAngle:int=180,openAttr:dict = dict(), brushAttr:dict = dict()):
+        startAngle *= 16
+        spanAngle *= 16
+
+        rect = QRect(x, y, w, h)
+
+        self.__privateAttr(openAttr, brushAttr)
+
+        self.painter().drawPie(rect, spanAngle, spanAngle)
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    def drawPixmap(self, x=0, y=0, w=100, h=50,pixmap:QPixmap=None, openAttr: dict = dict(),brushAttr: dict = dict()):
+        if pixmap is None:
+            raise Exception("QPixmap cannot be None!")
+
+        self.__privateAttr(openAttr, brushAttr)
+        self.painter().drawPixmap(x, y,w,h,pixmap)
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 画点
+    def drawPoint(self,x=0, y=0, openAttr: dict = dict(),brushAttr: dict = dict()):
+        self.__privateAttr(openAttr, brushAttr)
+        self.painter().drawPoint(x, y)
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    def drawPoints(self,points:list,openAttr:dict = dict(), brushAttr:dict = dict()):
+        self.__privateAttr(openAttr, brushAttr)
+        polygon = QPolygon()
+        for i in points:
+            polygon.append(i)
+        self.painter().drawPoints(polygon)
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 画多边形
+    def drawPolygon(self,points:list,fillRule=Qt.OddEvenFill,openAttr:dict = dict(), brushAttr:dict = dict()):
+        '''
+
+        :param fillRule:
+            Qt.OddEvenFill
+            Qt.WindingFill
+        :return:
+        '''
+        self.__privateAttr(openAttr, brushAttr)
+        polygon = QPolygon()
+        for i in points:
+            polygon.append(i)
+        self.painter().drawPolygon(polygon,fillRule=fillRule)
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    def drawPolyline(self,points:list,openAttr:dict = dict(), brushAttr:dict = dict()):
+        '''
+
+        :param fillRule:
+            Qt.OddEvenFill
+            Qt.WindingFill
+        :return:
+        '''
+        self.__privateAttr(openAttr, brushAttr)
+        polygon = QPolygon()
+        for i in points:
+            polygon.append(i)
+        self.painter().drawPolyline(polygon)
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 擦除区域
+    def eraseRect(self,x=0,y=0,w=50,h=50):
+        self.painter().eraseRect(x,y,w,h)
+
+
+    def fillPath(self,x,y,w,h,ppath:QPainterPath,color):
+        '''
+
+        :param ppath:
+        :param color: QColor or QBrush
+        :return:
+        '''
+        if ppath:
+            self.painter().fillPath(ppath,color)
+        else:
+            self.painter().fillPath(x,y,w,h, color)
+
     # ------下面是自定义图像
 
     def drawRoundedRectText(self,x=0,y=0, w=100, h=50,r=2,text:str="hello wrold", openAttr:dict = dict(), brushAttr:dict = dict()):
-
-        rect = QRect(x, y, w, h)
         self.__privateAttr(openAttr,brushAttr)
 
         self.drawRoundedRect(x,y,w,h,r,openAttr,brushAttr)
@@ -308,34 +504,33 @@ class Test(QWidget):
         super().__init__()
         self.resize(600,600)
         self.setObjectName("win")
-        # self.setStyleSheet('''
-        # #win{
-        # background-color: rgb(0, 0, 0);
-        # }
-        # ''')
+        self.setStyleSheet('''
+        #win{
+        background-color: rgb(0, 0, 0);
+        }
+        ''')
 
         self.btn = QPushButton("",self)
         self.btn.setStyleSheet('''
-        border:1px solid rgb(33,123,200);
-        background-color: rgb(33,120,10);
-        border-radius:10px;
+        background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(198, 152, 11, 255), stop:1 rgba(212, 202, 126, 255));
+        border-radius:40px;
         ''')
         self.btn.resize(80,80)
         self.btn.move(250,150)
 
         self.sh  = QGraphicsDropShadowEffect()
-        self.sh.setOffset(100,0)
-        self.sh.setColor(QColor(33,123,200))
-        self.sh.setBlurRadius(25)
+        self.sh.setOffset(0,0)
+        self.sh.setColor(QColor(252, 252, 126))
+        self.sh.setBlurRadius(100)
 
         self.btn.setGraphicsEffect(self.sh)
 
     def paintEvent(self, event:QPaintEvent) -> None:
-        p = QPainter(self)
-        # p.drawLine()
         # p.end()
         # -------
         painter = SuperPainter(self)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+        painter.drawPolygon([QPoint(10,80),QPoint(20,10),QPoint(80,30),QPoint(90,70)],brushAttr={"c":QColor(0,25,45)})
         # op = QPen()
         # op.setColor(QColor(0,255,0))
         # painter.setPen(op)
@@ -346,18 +541,18 @@ class Test(QWidget):
         # painter.drawRect(20,50,openAttr={"c":QColor(0,0,255)},
         #                  brushAttr={"c":QColor(0,255,0)},
         #                  shadowAttr={"color":QColor(234, 234, 234, 100),"r":10})
-
-        painter.drawRoundedRect(100,300,80,80,r=10,openAttr={"color":QColor(33,123,200),"w":1},
-                                brushAttr={"c":QColor(33,120,10)},
-                                shadowAttr={"c":QColor(33,123,200,100),"r":20,"x":100})
-
+        #
+        # painter.drawRoundedRect(100,300,150,150,r=10,openAttr={"color":QColor(33,123,200),"w":1},
+        #                         brushAttr={"c":QColor(33,120,10)},
+        #                         shadowAttr={"c":QColor(33,123,200,100),"r":30})
+        #
         # painter.drawRect(100, 50, openAttr={"c": QColor(255, 0, 255)})
-
+        #
         # painter.drawRoundedRectText(50,130,openAttr={"c":QColor(111,55,44),"w":3},)
-
-        painter.drawLine(10,110,h=90)
-
-        painter.end()
+        #
+        # painter.drawLine(10,110,h=90)
+        #
+        # painter.end()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
