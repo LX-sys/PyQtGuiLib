@@ -26,9 +26,13 @@ from PyQtGuiLib.header import (
     QImage,
     QLine,
     QPicture,
-    QPixmap
+    QPixmap,
+    QPolygonF,
+    QPointF
 )
 
+
+import math
 
 '''
     超级画师(绘制+交互)
@@ -498,14 +502,32 @@ class SuperPainter:
     # 绘制菱形
     def drawRhombus(self,x=0,y=0, w=100, h=50,openAttr:dict = dict(), brushAttr:dict = dict()):
         self.__privateAttr(openAttr, brushAttr)
-
-        self.painterPath().moveTo(x,y+h//2)
-        self.painterPath().lineTo(x+w//2,y)
-        self.painterPath().lineTo(x+w,y+h//2)
-        self.painterPath().lineTo(x+w//2,y+h)
+        polys = QPolygonF([
+            QPointF(x,y+h//2),QPointF(x+w//2,y),QPointF(x+w,y+h//2),QPointF(x+w//2,y+h)
+        ])
+        self.painterPath().addPolygon(polys)
         self.painterPath().closeSubpath()
 
         self.painter().drawPath(self.painterPath())
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 绘制五角星
+    def drawFiveStar(self,x=0,y=0, w=100, h=50,openAttr:dict = dict(), brushAttr:dict = dict()):
+        self.__privateAttr(openAttr, brushAttr)
+
+        a = 90
+        print(x*math.cos(a)-y*math.sin(a))
+        print((y+h//2)*math.sin(a)+y*math.cos(a))
+        # polys = []
+        # for i in range(5):
+        #     sx = (x+w) * math.cos((2 * math.pi / 5) * i + math.pi / 2)
+        #     sy = (y+h) * math.sin((2 * math.pi / 5) * i + math.pi / 2)
+        #     # sx+=x
+        #     # sy+=y
+        #     polys.append(QPointF(sx,sy))
+        # print(polys)
+        # self.painterPath().addPolygon(QPolygonF(polys))
 
         self.__restorePrivateAttr(openAttr, brushAttr)
 
@@ -515,29 +537,8 @@ class Test(QWidget):
         super().__init__()
         self.resize(600,600)
         self.setObjectName("win")
-        # self.setStyleSheet('''
-        # #win{
-        # background-color: rgb(255, 255, 255);
-        # }
-        # ''')
-        #
-        # self.btn = QPushButton("",self)
-        # self.btn.setStyleSheet('''
-        # background-color: qconicalgradient(cx:0.466, cy:0.420455, angle:0, stop:0 rgba(11, 198, 100, 255), stop:1 rgba(126, 212, 160, 255));
-        # border-radius:40px;
-        # ''')
-        # self.btn.resize(80,80)
-        # self.btn.move(250,150)
-        #
-        # self.sh  = QGraphicsDropShadowEffect()
-        # self.sh.setOffset(0,0)
-        # self.sh.setColor(QColor(159, 0, 238))
-        # self.sh.setBlurRadius(100)
-
-        # self.btn.setGraphicsEffect(self.sh)
 
     def paintEvent(self, event:QPaintEvent) -> None:
-        # p.end()
         # -------
         painter = SuperPainter(self)
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
@@ -549,9 +550,9 @@ class Test(QWidget):
         # bru = QBrush(QColor(0,0,33))
         # painter.setBrush(bru)
 
-        painter.drawRect(20,50,openAttr={"c":QColor(0,0,255)},
-                         brushAttr={"c":QColor(0,255,0)},
-                         shadowAttr={"color":QColor(234, 234, 234, 100),"r":10})
+        # painter.drawRect(20,50,openAttr={"c":QColor(0,0,255)},
+        #                  brushAttr={"c":QColor(0,255,0)},
+        #                  shadowAttr={"color":QColor(234, 234, 234, 100),"r":10})
         #
         # painter.drawRoundedRect(100,300,150,150,r=10,openAttr={"color":QColor(33,123,200),"w":1},
         #                         brushAttr={"c":QColor(33,120,10)},
@@ -563,8 +564,8 @@ class Test(QWidget):
         #
         # painter.drawLine(10,110,h=90)
 
-        painter.drawRhombus(50,50,100,100,openAttr={"color":QColor(33,123,200),"w":3},brushAttr={"c":QColor(33,120,10)})
-
+        # painter.drawRhombus(50,50,100,100,openAttr={"color":QColor(33,123,200),"w":3},brushAttr={"c":QColor(33,120,10)})
+        painter.drawFiveStar(50,50,100,100)
         #
         painter.end()
 
