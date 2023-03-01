@@ -31,7 +31,7 @@ from PyQtGuiLib.header import (
 
 
 '''
-    超级画师
+    超级画师(绘制+交互)
 '''
 
 
@@ -212,8 +212,6 @@ class SuperPainter:
                 opacity = int(255 * pow(0.75, i))  # 计算当前圆形的 alpha 值
                 shadow_color.setAlpha(opacity)  # 设置当前圆形的阴影颜色
                 self.painter().setBrush(QBrush(shadow_color, Qt.SolidPattern))  # 设置当前圆形的画刷
-                # print(x,shadow_x)
-                # imageCall(x+shadow_x-i, y+shadow_y-i,80+i,80+i,r,r)
                 imageCall(x+shadow_x-i, y+shadow_y-i, w + i*2, h + i*2,r,r)  # 绘制当前圆形
 
     # 画矩形
@@ -475,7 +473,6 @@ class SuperPainter:
     def eraseRect(self,x=0,y=0,w=50,h=50):
         self.painter().eraseRect(x,y,w,h)
 
-
     def fillPath(self,x,y,w,h,ppath:QPainterPath,color):
         '''
 
@@ -493,10 +490,24 @@ class SuperPainter:
     def drawRoundedRectText(self,x=0,y=0, w=100, h=50,r=2,text:str="hello wrold", openAttr:dict = dict(), brushAttr:dict = dict()):
         self.__privateAttr(openAttr,brushAttr)
 
-        self.drawRoundedRect(x,y,w,h,r,openAttr,brushAttr)
+        self.drawRoundedRect(x,y,w,h,r,openAttr=openAttr,brushAttr=brushAttr)
         self.drawText(x,y,w,h,text=text,openAttr=openAttr,brushAttr=brushAttr,flags=Qt.AlignCenter)
 
         self.__restorePrivateAttr(openAttr,brushAttr)
+
+    # 绘制菱形
+    def drawRhombus(self,x=0,y=0, w=100, h=50,openAttr:dict = dict(), brushAttr:dict = dict()):
+        self.__privateAttr(openAttr, brushAttr)
+
+        self.painterPath().moveTo(x,y+h//2)
+        self.painterPath().lineTo(x+w//2,y)
+        self.painterPath().lineTo(x+w,y+h//2)
+        self.painterPath().lineTo(x+w//2,y+h)
+        self.painterPath().closeSubpath()
+
+        self.painter().drawPath(self.painterPath())
+
+        self.__restorePrivateAttr(openAttr, brushAttr)
 
 
 class Test(QWidget):
@@ -504,33 +515,33 @@ class Test(QWidget):
         super().__init__()
         self.resize(600,600)
         self.setObjectName("win")
-        self.setStyleSheet('''
-        #win{
-        background-color: rgb(255, 255, 255);
-        }
-        ''')
+        # self.setStyleSheet('''
+        # #win{
+        # background-color: rgb(255, 255, 255);
+        # }
+        # ''')
+        #
+        # self.btn = QPushButton("",self)
+        # self.btn.setStyleSheet('''
+        # background-color: qconicalgradient(cx:0.466, cy:0.420455, angle:0, stop:0 rgba(11, 198, 100, 255), stop:1 rgba(126, 212, 160, 255));
+        # border-radius:40px;
+        # ''')
+        # self.btn.resize(80,80)
+        # self.btn.move(250,150)
+        #
+        # self.sh  = QGraphicsDropShadowEffect()
+        # self.sh.setOffset(0,0)
+        # self.sh.setColor(QColor(159, 0, 238))
+        # self.sh.setBlurRadius(100)
 
-        self.btn = QPushButton("",self)
-        self.btn.setStyleSheet('''
-        background-color: qconicalgradient(cx:0.466, cy:0.420455, angle:0, stop:0 rgba(11, 198, 100, 255), stop:1 rgba(126, 212, 160, 255));
-        border-radius:40px;
-        ''')
-        self.btn.resize(80,80)
-        self.btn.move(250,150)
-
-        self.sh  = QGraphicsDropShadowEffect()
-        self.sh.setOffset(0,0)
-        self.sh.setColor(QColor(159, 0, 238))
-        self.sh.setBlurRadius(100)
-
-        self.btn.setGraphicsEffect(self.sh)
+        # self.btn.setGraphicsEffect(self.sh)
 
     def paintEvent(self, event:QPaintEvent) -> None:
         # p.end()
         # -------
         painter = SuperPainter(self)
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-        painter.drawPolygon([QPoint(10,80),QPoint(20,10),QPoint(80,30),QPoint(90,70)],brushAttr={"c":QColor(0,25,45)})
+        # painter.drawPolygon([QPoint(10,80),QPoint(20,10),QPoint(80,30),QPoint(90,70)],brushAttr={"c":QColor(0,25,45)})
         # op = QPen()
         # op.setColor(QColor(0,255,0))
         # painter.setPen(op)
@@ -538,9 +549,9 @@ class Test(QWidget):
         # bru = QBrush(QColor(0,0,33))
         # painter.setBrush(bru)
 
-        # painter.drawRect(20,50,openAttr={"c":QColor(0,0,255)},
-        #                  brushAttr={"c":QColor(0,255,0)},
-        #                  shadowAttr={"color":QColor(234, 234, 234, 100),"r":10})
+        painter.drawRect(20,50,openAttr={"c":QColor(0,0,255)},
+                         brushAttr={"c":QColor(0,255,0)},
+                         shadowAttr={"color":QColor(234, 234, 234, 100),"r":10})
         #
         # painter.drawRoundedRect(100,300,150,150,r=10,openAttr={"color":QColor(33,123,200),"w":1},
         #                         brushAttr={"c":QColor(33,120,10)},
@@ -548,11 +559,19 @@ class Test(QWidget):
         #
         # painter.drawRect(100, 50, openAttr={"c": QColor(255, 0, 255)})
         #
-        # painter.drawRoundedRectText(50,130,openAttr={"c":QColor(111,55,44),"w":3},)
+        # painter.drawRoundedRectText(50,130,openAttr={"c":QColor(111,55,44),"w":3})
         #
         # painter.drawLine(10,110,h=90)
+
+        painter.drawRhombus(50,50,100,100,openAttr={"color":QColor(33,123,200),"w":3},brushAttr={"c":QColor(33,120,10)})
+
         #
-        # painter.end()
+        painter.end()
+
+
+'''
+drawRect().hover()
+'''
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

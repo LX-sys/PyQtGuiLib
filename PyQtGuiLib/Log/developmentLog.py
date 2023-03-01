@@ -148,7 +148,7 @@
     --- 动态样式链接器 from PyQtGuiLib.styles import StyleLinker
         目前仅支持 QPushButton,QLabel,QLineEdit 控件
         
-2023.2.18 [2.4.18.12]
+2023.2.20 [2.4.18.12]
     
 '''
 
