@@ -506,13 +506,13 @@ class Test(QWidget):
         self.setObjectName("win")
         self.setStyleSheet('''
         #win{
-        background-color: rgb(0, 0, 0);
+        background-color: rgb(255, 255, 255);
         }
         ''')
 
         self.btn = QPushButton("",self)
         self.btn.setStyleSheet('''
-        background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5, fy:0.5, stop:0 rgba(198, 152, 11, 255), stop:1 rgba(212, 202, 126, 255));
+        background-color: qconicalgradient(cx:0.466, cy:0.420455, angle:0, stop:0 rgba(11, 198, 100, 255), stop:1 rgba(126, 212, 160, 255));
         border-radius:40px;
         ''')
         self.btn.resize(80,80)
@@ -520,7 +520,7 @@ class Test(QWidget):
 
         self.sh  = QGraphicsDropShadowEffect()
         self.sh.setOffset(0,0)
-        self.sh.setColor(QColor(252, 252, 126))
+        self.sh.setColor(QColor(159, 0, 238))
         self.sh.setBlurRadius(100)
 
         self.btn.setGraphicsEffect(self.sh)
