@@ -28,12 +28,11 @@ from PyQtGuiLib.header import (
     QPicture,
     QPixmap,
     QPolygonF,
-    QPointF
+    QPointF,
+    QRectF
 )
-
-
 import math
-
+from math import sin,cos
 '''
     超级画师(绘制+交互)
 '''
@@ -512,24 +511,45 @@ class SuperPainter:
 
         self.__restorePrivateAttr(openAttr, brushAttr)
 
-    # 绘制五角星
+    # 绘制五角星(五边形)
     def drawFiveStar(self,x=0,y=0, w=100, h=50,openAttr:dict = dict(), brushAttr:dict = dict()):
         self.__privateAttr(openAttr, brushAttr)
-
-        a = 90
-        print(x*math.cos(a)-y*math.sin(a))
-        print((y+h//2)*math.sin(a)+y*math.cos(a))
-        # polys = []
+        polys = []
+        for i in range(5):
+            angle_deg = 72 * i - 18
+            angle_rad = angle_deg / 180.0 * 3.141592
+            polys.append(QPointF(x + w * 0.5 * round(2 * math.cos(angle_rad), 2),
+                                 y + h * 0.5 * round(2 * math.sin(angle_rad), 2)))
         # for i in range(5):
-        #     sx = (x+w) * math.cos((2 * math.pi / 5) * i + math.pi / 2)
-        #     sy = (y+h) * math.sin((2 * math.pi / 5) * i + math.pi / 2)
-        #     # sx+=x
-        #     # sy+=y
-        #     polys.append(QPointF(sx,sy))
-        # print(polys)
-        # self.painterPath().addPolygon(QPolygonF(polys))
+        #     angle_deg = 72 * i - 90
+        #     angle_rad = angle_deg / 180.0 * 3.141592
+        #     if i % 2 == 0:
+        #         polys.append(QPointF(x + size * round(cos(angle_rad), 2),
+        #                              y + size * round(sin(angle_rad), 2)))
+        #     else:
+        #         polys.append(QPointF(x + size / 2 * round(cos(angle_rad), 2),
+        #                              y + size / 2 * round(sin(angle_rad), 2)))
+        self.painterPath().addPolygon(QPolygonF(polys))
+        self.painterPath().closeSubpath()
+
+        self.painter().drawPath(self.painterPath())
 
         self.__restorePrivateAttr(openAttr, brushAttr)
+
+    # 绘制爱心
+    def drawLove(self,x=0,y=0, w=100, h=50,openAttr:dict = dict(), brushAttr:dict = dict()):
+        self.__privateAttr(openAttr, brushAttr)
+
+        rect = QRect(x,y,w,h)
+
+        self.painter().drawArc(rect, 0, 180 * 16)
+        self.painter().drawArc(rect.translated(50, 0), 0, 180 * 16)
+        # self.painter().drawPolygon(QRectF(100, 90, 50, 50).translated(0, -25), QRectF(100, 90, 50, 50).translated(-25, 0))
+        self.painter().drawPolygon(QPointF(100, 125), QPointF(125, 100),
+                       QPointF(150, 125), QPointF(125, 150),
+                       QPointF(100, 125))
+        self.__restorePrivateAttr(openAttr, brushAttr)
+
 
 
 class Test(QWidget):
@@ -565,7 +585,8 @@ class Test(QWidget):
         # painter.drawLine(10,110,h=90)
 
         # painter.drawRhombus(50,50,100,100,openAttr={"color":QColor(33,123,200),"w":3},brushAttr={"c":QColor(33,120,10)})
-        painter.drawFiveStar(50,50,100,100)
+        painter.drawLove(300,300,50,50,openAttr={"color":QColor(33,123,200),"w":1},
+                            )
         #
         painter.end()
 
