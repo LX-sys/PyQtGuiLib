@@ -27,7 +27,7 @@ from PyQtGuiLib.header import (
     QPixmap,
     QPolygonF,
     QPointF,
-    QRectF
+    QRectF,
 )
 import math
 from math import sin,cos
@@ -460,18 +460,30 @@ class SuperPainter:
 
         self.__restorePrivateAttr(openAttr, brushAttr)
 
-    # 绘制爱心
-    def drawLove(self,x=0,y=0, w=100, h=50,openAttr:dict = dict(), brushAttr:dict = dict()):
+    # 绘制笛卡尔爱心
+    def drawLove(self,x=0,y=0,r=30,openAttr:dict = dict(), brushAttr:dict = dict()):
         self.__privateAttr(openAttr, brushAttr)
 
-        rect = QRect(x,y,w,h)
 
-        self.painter().drawArc(rect, 0, 180 * 16)
-        self.painter().drawArc(rect.translated(50, 0), 0, 180 * 16)
-        # self.painter().drawPolygon(QRectF(100, 90, 50, 50).translated(0, -25), QRectF(100, 90, 50, 50).translated(-25, 0))
-        self.painter().drawPolygon(QPointF(100, 125), QPointF(125, 100),
-                       QPointF(150, 125), QPointF(125, 150),
-                       QPointF(100, 125))
+        x,y = y,x
+        a = r
+        t = 1
+        ts = [i*0.1 for i in range(1000)]
+
+
+        xs = a * (2 * cos(0) + cos(0))+x
+        ys = a * (2 * sin(0) + sin(0))+y
+        self.painterPath().moveTo(ys,xs)
+
+        for i in ts:
+            xs = a * (2*cos(t*i)+cos(2*t*i))+x
+            ys = a * (2*sin(t*i)+sin(2*t*i))+y
+            self.painterPath().lineTo(ys+r//2,xs+r//2)
+            self.painterPath().closeSubpath()
+
+        self.painter().drawPath(self.painterPath())
+
+
         self.__restorePrivateAttr(openAttr, brushAttr)
 
 
@@ -482,26 +494,54 @@ class Test(QWidget):
         self.resize(600,600)
         self.setObjectName("win")
 
+        self.pix = QPixmap(self.size())
+        self.pix.fill(qt.transparent)
+        self.yyy()
+
+    def yyy(self):
+        painter = QPainter(self.pix)
+
+        painter.setPen(QColor(255,0,0))
+
+        ppath = QPainterPath()
+        painter.setRenderHint(qt.Antialiasing)
+
+        r = 20
+        x, y = r, r*2.2
+        a = r
+        t = 1
+        ts = [i * 0.01 for i in range(700)]
+
+        xs = a * (2 * cos(0) + cos(0)) + x
+        ys = a * (2 * sin(0) + sin(0)) + y
+        ppath.moveTo(ys, xs)
+
+        for i in ts:
+            xs = a * (2 * cos(t * i) + cos(2 * t * i)) + x
+            ys = a * (2 * sin(t * i) + sin(2 * t * i)) + y
+            ppath.lineTo(ys + r // 2, xs + r // 2)
+        # ppath.closeSubpath()
+
+        # painter.drawRect(50,50,100,100)
+        # ppath.lineTo(QPoint(50,50))
+        # ppath.lineTo(QPoint(100,100))
+        painter.drawPath(ppath)
+
     def paintEvent(self, event:QPaintEvent) -> None:
         # -------
         painter = SuperPainter(self)
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-        # painter.drawPolygon([QPoint(10,80),QPoint(20,10),QPoint(80,30),QPoint(90,70)],brushAttr={"c":QColor(0,25,45)})
-        # op = QPen()
-        # op.setColor(QColor(0,255,0))
-        # painter.setPen(op)
 
-        # bru = QBrush(QColor(0,0,33))
-        # painter.setBrush(bru)
+        # painter.drawRoundedRect(300,300,100,100,openAttr={"c":QColor(0,0,255)},
+        #                  brushAttr={"c":QColor(0,255,0)})
+        # painter.drawLine(100,50,80)
+        # painter.drawText(50,50)
+        # painter.drawArc()
+        # painter.drawChord()
+        # painter.drawConvexPolygon([QPoint(50,50),QPoint(350,50)],openAttr={"c":QColor(255,60,60)})
 
-        painter.drawRoundedRect(300,300,100,100,openAttr={"c":QColor(0,0,255)},
-                         brushAttr={"c":QColor(0,255,0)})
-        painter.drawLine(100,50,80)
-        painter.drawText(50,50)
-        painter.drawArc()
-        painter.drawChord()
-        painter.drawConvexPolygon([QPoint(50,50),QPoint(350,50)],openAttr={"c":QColor(255,60,60)})
-
+        # painter.drawLove(150,100,openAttr={"c":QColor(255,0,0)},brushAttr={"c":QColor(255,0,0)})
+        painter.painter().drawPixmap(self.rect(),self.pix)
         painter.end()
 
 
