@@ -43,6 +43,10 @@ class SlideShow(QWidget):
         # 窗口索引
         self.index = 0
 
+        # 指向两个当前窗口
+        self.cursor_widget_p = None # type:QWidget
+        self.cursor_widget_p2 = None # type:QWidget
+
         # 创建两侧按钮
         self.createButtons()
 
@@ -57,7 +61,6 @@ class SlideShow(QWidget):
         self.is_auto_slide = b
         self.startTimer(interval)
         self.auto_ani_direction = direction_
-
 
     # 左上方向
     def lu_direction(self) -> str:
@@ -116,7 +119,6 @@ border:2px solid #00557f;
 
     # 移动窗口
     def moveWidget(self,direction_:str):
-
         direction = None
 
         w_1 = self.widgets[self.index]
@@ -136,14 +138,11 @@ border:2px solid #00557f;
             return
 
         w_2 = self.widgets[self.index]
+        self.cursor_widget_p = w_2 # 保存当前窗口
+        self.cursor_widget_p2 = w_1
         self.changeWidget.emit(w_2)# 切换窗口时发送信号
         w_1.show()
         w_2.show()
-
-        # 隐藏其他窗口
-        for w in self.widgets:
-            if w != w_1 and w != w_2:
-                w.hide()
 
         self.ani_(w_1, w_2, direction)
 
@@ -155,6 +154,8 @@ border:2px solid #00557f;
 
         if self.count() > 1:
             widget.hide()
+        else:
+            self.cursor_widget_p = widget
 
     # 设置动作模式
     def setAinDirectionMode(self, mode:tuple):
@@ -174,6 +175,10 @@ border:2px solid #00557f;
 
     # 移除窗口(只会移除,不会消毁)
     def removeWidget(self,widget:QWidget):
+        if widget == self.cursor_widget_p:
+            self.cursor_widget_p = None
+        if widget == self.cursor_widget_p2:
+            self.cursor_widget_p2 = None
         self.widgets.remove(widget)
 
     # 切换到指定窗口
@@ -189,7 +194,6 @@ border:2px solid #00557f;
 
         for _ in range(abs(n)):
             self.moveWidget(direction)
-
 
     def ani_(self,widget_out:QWidget,widget_show:QWidget,direction:str):
         '''
@@ -225,6 +229,9 @@ border:2px solid #00557f;
             s_ani_1,e_ani_1 = QPoint(0,0),QPoint(self.width(),0)
             s_ani_2,e_ani_2 = QPoint(-self.width(),0),QPoint(0,0)
 
+        # 在移出窗口动画完成时,执行隐藏
+        ani_1.finished.connect(lambda :wid1.hide())
+
         ani_1.setStartValue(s_ani_1)
         ani_1.setEndValue(e_ani_1)
 
@@ -233,6 +240,7 @@ border:2px solid #00557f;
 
         ani_1.start()
         ani_2.start()
+
 
     # 通过索引获取窗口
     def getWidget(self,index:int) -> QWidget:
@@ -249,6 +257,16 @@ border:2px solid #00557f;
         if self.is_auto_slide:
             self.moveWidget(self.auto_ani_direction)
 
+    # 返回当前的窗口
+    def getCursorWidget(self)->QWidget:
+        return self.cursor_widget
+
     def resizeEvent(self, event) -> None:
         self.btnPos()
+        if self.cursor_widget_p:
+            self.cursor_widget_p.resize(self.size())
+            # 窗口大小改变时只显示当前窗口,隐藏其他窗口
+            if self.cursor_widget_p2 and self.cursor_widget_p2.isHidden() is False:
+                self.cursor_widget_p2.hide()
+
         super().resizeEvent(event)
