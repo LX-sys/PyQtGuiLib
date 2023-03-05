@@ -30,14 +30,15 @@ pip install PyQtGuiLib
 ### 项目目录说明	
 
 ```python
+Log              # 日志
+tests            # 组件测试文件
+abandonCase      # 存放已经放弃的的案例
 PyQtGuiLib
-|- abandonCase   # 存放已经放弃的的案例
 |- animation     # 动画功能文件
 |- core          # 组件的核心实现文件
 |- styles        # 基础组件皮肤包
 |- header        # 公共模块,函数文件
-|- Log           # 更新日志
-|- tests         # 组件测试文件
+|- layoutDeformation # 影像形变布局(待写)
 ```
 
 ### 其他贡献者
@@ -76,7 +77,7 @@ BuiltStyleDesigner  ---> 30%
 QPushButton  ---> 50%
 ```
 ![](https://github.com/LX-sys/PyQtGuiLib/blob/master/gif/%E5%86%85%E7%BD%AE%E6%A0%B7%E5%BC%8F%E8%AE%BE%E8%AE%A1%E5%99%A8.gif)
-### 解析器
+### 控件的组成分析器
 ```python
 dumpStructure()  --> 100%
 导入方式 from PyQtGuiLib.core.resolver import dumpStructure
@@ -118,7 +119,7 @@ inherit() # 样式传承 (详细用法查看 eg3案例)
 
 # ============
 代码案例位置
-PyQtGuiLib -> tests -> test_QssStyleAnalysis 目录下
+tests -> test_QssStyleAnalysis 目录下
 ```
 
 ### 动态样式链接器(StyleLinker)
@@ -143,13 +144,11 @@ self.styleLinker.addQObjects([控件对象1,控件对象2,...])
 self.styleLinker.show()
 ```
 
-
-
 ## 窗口系列
 
 ```python
 导入方式
-from PyQtGuiLib.abandonCase.widgets import (
+from abandonCase.widgets import (
     BorderlessWidget,  # 无边框QWidget窗口
 )
 
@@ -159,27 +158,40 @@ from PyQtGuiLib.abandonCase.widgets import (
 窗口系列 - --- API介绍
 setEnableGColor()  # 设置是否启用渐变色
 
-自定义QSS  --- 目前支持的
-qproperty-radius  --> 圆角  Eg: 7
-qproperty-backgroundColor  --> 背景颜色 Eg: rgba(165, 138, 255,200)
-qproperty-borderWidth --> 边的宽度 Eg: 1
-qproperty-borderStyle --> 边框的风格 Eg: solid
-qproperty-borderColor --> 边框颜色 Eg: rgba(0,100,255,255)
-qproperty-border   --> 边框样式 Eg: "3 solid rgba(0,100,255,255)"
-qproperty-linearDirection; --> 线性渐变的方向 Eg: "LR"
-    LR: 左->右
-    RL: 右->左
-    UD: 上->下
-    DU: 下->上
-    LRANG: 左上角->右下角
-    RLANG: 右下角->左上角
-    UDANG: 右上角->左下角
-    DUANG: 左下角->右上角
-    自定义: [0,0,100,100]或者[0,0,w,h]  这里的 w,h 代只窗口当前的宽和高
-qproperty-linearColor --> 线性渐变色 Eg: "rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)"
-qproperty-linear --> 线性渐变
-    Eg: "LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
-    Eg: "[0,0,w,h] rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+自定义QSS - -- 目前支持的
+qproperty - radius --> 圆角
+Eg: 7
+qproperty - backgroundColor --> 背景颜色
+Eg: rgba(165, 138, 255, 200)
+qproperty - borderWidth --> 边的宽度
+Eg: 1
+qproperty - borderStyle --> 边框的风格
+Eg: solid
+qproperty - borderColor --> 边框颜色
+Eg: rgba(0, 100, 255, 255)
+qproperty - border --> 边框样式
+Eg: "3 solid rgba(0,100,255,255)"
+qproperty - linearDirection;
+--> 线性渐变的方向
+Eg: "LR"
+LR: 左->右
+RL: 右->左
+UD: 上->下
+DU: 下->上
+LRANG: 左上角->右下角
+RLANG: 右下角->左上角
+UDANG: 右上角->左下角
+DUANG: 左下角->右上角
+自定义: [0, 0, 100, 100]
+或者[0, 0, w, h]
+这里的
+w, h
+代只窗口当前的宽和高
+qproperty - linearColor --> 线性渐变色
+Eg: "rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(255, 255, 255, 255)"
+qproperty - linear --> 线性渐变
+Eg: "LR rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
+Eg: "[0,0,w,h] rgba(142, 144, 69, 255) rgba(176, 184, 130, 255) rgba(130, 184, 130, 255)";
 
 
 ```
@@ -403,9 +415,9 @@ getColors()  # 返回所有的颜色和比重
 ### 标题栏(TitleBar重写中)
 
 ```python
-标题栏 - ---> 99 % 
+标题栏 - ---> 99 %
 导入方式
-from PyQtGuiLib.abandonCase.widgets import TitleBar
+from abandonCase.widgets import TitleBar
 
 标题栏 - - TitleBar
 API介绍
@@ -442,7 +454,7 @@ app.setWindowIcon(QIcon(路径))
 ```python
 状态栏 - ---> 80 % 测试使用中
 导入方式
-from PyQtGuiLib.abandonCase.widgets import StatusBar
+from abandonCase.widgets import StatusBar
 
 状态栏 - - StatusBar
 API介绍

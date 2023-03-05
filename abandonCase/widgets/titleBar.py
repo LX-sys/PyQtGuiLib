@@ -20,7 +20,7 @@ from PyQtGuiLib.header import (
     textSize
 )
 
-from PyQtGuiLib.abandonCase.widgets import BorderlessWidget
+from abandonCase.widgets import BorderlessWidget
 '''
     窗口的标题栏
 '''

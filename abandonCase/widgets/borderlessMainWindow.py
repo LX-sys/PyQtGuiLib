@@ -1,25 +1,45 @@
 # -*- coding:utf-8 -*-
-# @time:2023/1/1322:39
+# @time:2023/1/1322:35
 # @author:LX
-# @file:borderlessFrame.py
+# @file:borderlessMainWindow.py
 # @software:PyCharm
 
-from PyQtGuiLib.abandonCase.widgets.borderlessWidgetABC import (
+from abandonCase.widgets.borderlessWidgetABC import (
     PYQT_VERSIONS,
     QApplication,
     sys,
     Public,
-    QFrame,
+    QMainWindow,
     QMouseEvent,
     QPaintEvent,
 )
+from abandonCase.widgets.titleBar import TitleBar
+from abandonCase.widgets.statusBar import StatusBar
 
-# 无边框的QFrame
-class BorderlessFrame(QFrame,Public):
+# 无边框的主窗口
+class BorderlessMainWindow(QMainWindow,Public):
     def __init__(self,*args,**kwargs):
         self.child_win = True if args else False
         super().__init__(parent_=self,*args,**kwargs)
         self.resize(800, 500)
+
+        # 默认 创建
+        self.createTitleBar()
+        self.createStatusBar()
+
+    def createTitleBar(self):
+        self.tbar = TitleBar(self)
+
+    def createStatusBar(self):
+        self.status = StatusBar(self)
+
+    def titleBar(self)->TitleBar:
+        if hasattr(self,"tbar"):
+            return self.tbar
+
+    def statusBar(self)->StatusBar:
+        if hasattr(self, "status"):
+            return self.status
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
         if not self.child_win:
@@ -42,7 +62,7 @@ class BorderlessFrame(QFrame,Public):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = BorderlessFrame()
+    win = BorderlessMainWindow()
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:

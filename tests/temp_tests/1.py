@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 
-from PyQtGuiLib.abandonCase.widgets import BorderlessWidget
+from abandonCase.widgets import BorderlessWidget
 
 class RoundShadow(BorderlessWidget):
     """圆角边框类"""

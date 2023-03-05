@@ -4,7 +4,7 @@
 # @file:borderlessStackedWidget.py
 # @software:PyCharm
 
-from PyQtGuiLib.abandonCase.widgets.borderlessWidgetABC import (
+from abandonCase.widgets.borderlessWidgetABC import (
     PYQT_VERSIONS,
     QApplication,
     sys,

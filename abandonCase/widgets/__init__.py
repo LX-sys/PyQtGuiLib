@@ -4,4 +4,3 @@
 # @file:__init__.py.py
 # @software:PyCharm
 
-from PyQtGuiLib.abandonCase.widgets.statusBar import StatusBar

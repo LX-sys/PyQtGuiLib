@@ -9,11 +9,11 @@ from PyQtGuiLib.header import (
     QApplication,
 )
 
-from PyQtGuiLib.abandonCase.widgets import (
+from abandonCase.widgets import (
     BorderlessWidget,     # 无边框矩形QWidget窗口
     )
 
-from PyQtGuiLib.abandonCase.widgets import StatusBar
+from abandonCase.widgets import StatusBar
 from PyQtGuiLib.core.progressBar import GradientBar
 
 '''
