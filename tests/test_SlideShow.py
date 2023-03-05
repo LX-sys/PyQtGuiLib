@@ -11,6 +11,7 @@ from PyQtGuiLib.header import (
     QLabel,
     qt,
     QHBoxLayout,
+    QPushButton
 )
 
 from PyQtGuiLib.core import SlideShow
@@ -43,12 +44,18 @@ class Test(QWidget):
     def my_event(self,index:int):
         print("当前索引:",index)
 
+    def change(self):
+        self.ss.removeWidget(self.ss.getWidget(1))
+
     def test(self):
         t = QWidget()
         tl = QLabel("1")
         tl.setAlignment(qt.AlignCenter)
         lh = QHBoxLayout(t)
+        btn1 = QPushButton("删除")
+        btn1.clicked.connect(self.change)
         lh.addWidget(tl)
+        lh.addWidget(btn1)
         tl.setStyleSheet('font: 60pt "微软雅黑";')
         t.setStyleSheet("background-color:#00aa7f;")
         t2 = QWidget()

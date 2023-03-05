@@ -28,9 +28,6 @@ class BubbleWidget(WidgetABC):
         super().__init__(*args,**kwargs)
         self.resize(100,60)
 
-        # self.setAttribute(qt.WA_StyledBackground, True)
-        # self.setWindowFlags(qt.FramelessWindowHint | qt.Widget)
-
         # 箭头高度(三角形)
         self._arrows_h = 16
 

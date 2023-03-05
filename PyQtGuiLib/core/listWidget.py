@@ -12,6 +12,37 @@ from PyQtGuiLib.header import (
     QListWidget 增强版本 - ListWidget
 '''
 
+class ListStyle:
+    # 风格
+    @staticmethod
+    def style(objname:str,style_name):
+        if style_name == "melanism":  # 黑色主义
+            style = '''
+#{0}{{
+border:none;
+background-color: rgb(32, 32, 32);
+color: rgb(143, 142, 144);
+font-size:18px;
+}}
+#{0}:item:selected{{
+/*background-color: rgb(223, 223, 223);*/
+color: rgb(223, 223, 223);
+border-left:6px solid rgb(82, 134, 201);
+padding: 8px;
+}}
+#{0}:item:hover{{
+background-color: rgb(223, 223, 223);
+color: rgb(0, 0, 0);
+border-left:6px solid rgb(82, 134, 201);
+padding: 8px;
+}}
+'''
+            return style.format(objname)
+        elif style_name == "whitefeast": # 白色盛宴
+            style ='''
+            
+'''
+
 class ListWidgetItem(QListWidgetItem):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -38,7 +69,9 @@ class ListWidget(QListWidget):
         self.ani_duration = 300
         self.ani_special = ListWidget.OutBounce
 
-        self.defaultStyle()
+        # self.defaultStyle()
+        self.setObjectName("bb")
+        self.setStyleSheet(ListStyle.style(self.objectName(),"melanism"))
 
     # 设置动画是否启用
     def setAniEnabled(self,b:bool):

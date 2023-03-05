@@ -31,7 +31,7 @@ class SlideShow(QWidget):
         #
         self.widgets = []
 
-        self.animation_time = 1000 # 毫秒
+        self.animation_time = 800 # 毫秒
 
         # 动画运行方向,当前动作
         self.ani_direction = (SlideShow.Ani_Left, SlideShow.Ani_Right)
@@ -173,13 +173,22 @@ border:2px solid #00557f;
     def aniDirection(self) -> tuple:
         return self.ani_direction
 
-    # 移除窗口(只会移除,不会消毁)
+    # 移除窗口
     def removeWidget(self,widget:QWidget):
+        widget.hide()
         if widget == self.cursor_widget_p:
-            self.cursor_widget_p = None
+            index = self.widgets.index(widget)
+            if index == 0 and self.count() >=1:
+                wid = self.widgets[index+1]
+                wid.resize(self.size())
+                wid.show()
+                self.cursor_widget_p = wid
+            else:
+                self.cursor_widget_p = None
         if widget == self.cursor_widget_p2:
             self.cursor_widget_p2 = None
         self.widgets.remove(widget)
+        del widget
 
     # 切换到指定窗口
     def setCurrentIndex(self,index:int=0):
@@ -240,7 +249,6 @@ border:2px solid #00557f;
 
         ani_1.start()
         ani_2.start()
-
 
     # 通过索引获取窗口
     def getWidget(self,index:int) -> QWidget:

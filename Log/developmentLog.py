@@ -149,7 +149,7 @@
         目前仅支持 QPushButton,QLabel,QLineEdit 控件
         
 2023.2.20 - 2023.3.5
-    调整结构 将 Log目录和tests目录移出项目
+    调整结构 将 abandonCasem目录,Log目录和tests目录移出项目
     
 '''
 
