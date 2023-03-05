@@ -43,13 +43,6 @@ class Test(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
 
-        self.btnGroup = QButtonGroup(self)
-        self.move(50,50)
-
-        for b in range(1,4):
-            btn =QPushButton("test_{}".format(b))
-            self.btnGroup.addButton(btn)
-
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
