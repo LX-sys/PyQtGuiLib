@@ -23,6 +23,7 @@ from PyQtGuiLib.header import (
     QFontMetricsF,
     Qt,
     QMouseEvent,
+    QVBoxLayout
 )
 
 import time
@@ -35,7 +36,7 @@ from PyQt5.QtGui import QFontMetrics,QFocusEvent
     测试用例的标准模板,该代码用于复制
 '''
 from PyQtGuiLib.core.resolver import dumpStructure
-
+from functools import partial
 
 
 class Test(QWidget):
