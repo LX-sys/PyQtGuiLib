@@ -13,7 +13,8 @@ from PyQtGuiLib.header import (
 )
 
 '''
-    组件轮播
+    组件轮播 2023.3.7 当前控件的所有功能均处于稳定状态
+    SlideShow 独立版本 3.0
 '''
 class SlideShow(QWidget):
     # 切换窗口事件
