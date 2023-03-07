@@ -98,6 +98,27 @@ class Animation:
     def aniObj(self) -> QParallelAnimationGroup:
         return self.ani_group_obj
 
+    def __customPropertyAnimation(self,propertyName,ani_,ani_data,targetObj):
+        selector = ani_data.get("selector", None)
+        # 创建一个临时的QSS解析对象
+        temp_qss = QssStyleAnalysis(targetObj)
+        temp_qss.setQSS(targetObj.styleSheet())
+        call_f = None
+
+        if propertyName == b"backgroundColor":
+            if selector:
+                def __backgroundColor(color):
+                    temp_qss.selector(selector).updateAttr("background-color", color.name())
+                call_f = __backgroundColor
+        elif propertyName == b"fontSize":
+            if selector:
+                def __fontSize(size):
+                    temp_qss.selector(selector).updateAttr("font-size", "{}px".format(size))
+                call_f = __fontSize
+
+        if call_f:
+            ani_.valueChanged.connect(call_f)
+
     def addAni(self,ani_data:dict):
         '''
         {
@@ -165,26 +186,8 @@ class Animation:
             else:
                 ani_.finished.connect(lambda :call(targetObj))
 
-        # --------特殊动画
-        if propertyName == b"backgroundColor":
-            selector = ani_data.get("selector",None)
-            if selector:
-                # 创建一个临时的QSS解析对象
-                temp_qss = QssStyleAnalysis(targetObj)
-                temp_qss.setQSS(targetObj.styleSheet())
-                def __backgroundColor(color):
-                    temp_qss.selector(selector).updateAttr("background-color",color.name())
-                ani_.valueChanged.connect(__backgroundColor)
-        elif propertyName == b"fontSize":
-            selector = ani_data.get("selector", None)
-            if selector:
-                # 创建一个临时的QSS解析对象
-                temp_qss = QssStyleAnalysis(targetObj)
-                temp_qss.setQSS(targetObj.styleSheet())
-                def __fontSize(size):
-                    temp_qss.selector(selector).updateAttr("font-size", "{}px".format(size))
-                ani_.valueChanged.connect(__fontSize)
-
+        # --------自定义动画
+        self.__customPropertyAnimation(propertyName,ani_,ani_data,targetObj)
 
         self.ani_list.append(ani_)
 
