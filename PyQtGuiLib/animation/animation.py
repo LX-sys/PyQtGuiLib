@@ -19,7 +19,7 @@ from PyQtGuiLib.header import (
 '''
     封装动画类
 '''
-
+from PyQtGuiLib.styles import QssStyleAnalysis
 
 class Animation:
     Parallel = 1
@@ -31,7 +31,19 @@ class Animation:
     CosineCurve = qt.CosineCurve
     SineCurve = qt.SineCurve
 
+    # 信号
+
     def __init__(self,parent=None):
+        '''
+            目前动画支持的属性
+            geometry
+            pos
+            size
+            windowOpacity
+            backgroundColor
+
+        :param parent:
+        '''
 
         if parent:
             self.__parent = parent  # type:QObject
@@ -56,10 +68,25 @@ class Animation:
     def setParent(self,parent):
         self.__parent = parent
 
+    def setAniMode(self,mode):
+        self.ani_mode = mode
+
+    # 设置全局的动画时长
+    def setDuration(self,duration):
+        self.ani_duration = duration
+
+    # 设置全局的动效
+    def setSpecial(self,special):
+        self.ani_special = special
+
+    # 设置全局的动画循环次数
+    def setLoopCount(self,count):
+        self.ani_loopCount = count
+
     def parent(self) -> QObject:
         return self.__parent
 
-    def isParent(self)->bool:
+    def isParent(self) -> bool:
         return bool(self.__parent)
 
     def special(self):
@@ -67,6 +94,9 @@ class Animation:
 
     def loopCount(self)->int:
         return self.ani_loopCount
+
+    def aniObj(self) -> QParallelAnimationGroup:
+        return self.ani_group_obj
 
     def addAni(self,ani_data:dict):
         '''
@@ -79,8 +109,9 @@ class Animation:
             "call":fun  回调函数  # 可不传该参数
             "argc":tuple    回调函数的参数  # 可不传该参数
             "sv":xx
-            "atv":[]          # 可不传该参数
+            "atv":[()] 或者 []          # 可不传该参数
             "ev":xx
+            "selector":""  选择器,这个参数一般配合修改样式时使用 eg:backgroundColor   # 可不传该参数
         }
         最简化版
         {
@@ -116,8 +147,16 @@ class Animation:
 
         ani_.setStartValue(sv)
         if atv:
-            for step,value in atv:
-                ani_.setKeyValueAt(step,value)
+            one_e = self.ani_list[0]
+            if isinstance(one_e,tuple) or isinstance(one_e,list):
+                for step, value in atv:
+                    ani_.setKeyValueAt(step, value)
+            else:
+                mean_time = 1/len(atv)  # 平均时间
+                step = 0.0
+                for value in atv:
+                    mean_time += mean_time
+                    ani_.setKeyValueAt(step, value)
         ani_.setEndValue(ev)
 
         if call:
@@ -125,6 +164,27 @@ class Animation:
                 ani_.finished.connect(lambda :call(targetObj,*call_argc))
             else:
                 ani_.finished.connect(lambda :call(targetObj))
+
+        # --------特殊动画
+        if propertyName == b"backgroundColor":
+            selector = ani_data.get("selector",None)
+            if selector:
+                # 创建一个临时的QSS解析对象
+                temp_qss = QssStyleAnalysis(targetObj)
+                temp_qss.setQSS(targetObj.styleSheet())
+                def __backgroundColor(color):
+                    temp_qss.selector(selector).updateAttr("background-color",color.name())
+                ani_.valueChanged.connect(__backgroundColor)
+        elif propertyName == b"fontSize":
+            selector = ani_data.get("selector", None)
+            if selector:
+                # 创建一个临时的QSS解析对象
+                temp_qss = QssStyleAnalysis(targetObj)
+                temp_qss.setQSS(targetObj.styleSheet())
+                def __fontSize(size):
+                    temp_qss.selector(selector).updateAttr("font-size", "{}px".format(size))
+                ani_.valueChanged.connect(__fontSize)
+
 
         self.ani_list.append(ani_)
 
@@ -138,18 +198,70 @@ class Animation:
         :return:
         '''
 
-    def pause(self):
-        if self.ani_group_obj:
-            self.ani_group_obj.pause()
+    def pause(self,call=None,argc=None):
+        if self.aniObj():
+            self.aniObj().pause()
+
+            if call:
+                if argc:
+                    call(*argc)
+                else:
+                    call()
+
+    def resume(self,call=None,argc=None):
+        if self.aniObj():
+            self.aniObj().resume()
+
+            if call:
+                if argc:
+                    call(*argc)
+                else:
+                    call()
+
+    def state(self):
+        if self.aniObj():
+            if self.aniObj().state() == self.ani_group_obj.Running:
+                return self.aniObj().Running
+            if self.aniObj() == self.ani_group_obj.Paused:
+                return self.aniObj().Paused
+        else:
+            return None
+
+    # 开关
+    def aniSwitch(self,btn:QPushButton=None,texts:dict=dict()):
+        '''
+            动画开关
+            如果动画当前状态是运行,则暂停,反之,运行
+            __________________________________
+            btn: 给定一个按钮(可选)
+            texts:{
+                "pause":"xxx",
+                "resume":"xx"
+            }
+        :return:
+        '''
+        if self.aniObj():
+            pause_ = texts.get("pause", "pause")
+            resume_ = texts.get("resume", "resume")
+
+            if self.aniObj().state() == self.aniObj().Running:
+                self.pause()
+                if btn:
+                    btn.setText(resume_)
+            elif self.aniObj().state() == self.aniObj().Paused:
+                self.resume()
+                if btn:
+                    btn.setText(pause_)
+
 
     def start(self):
-
         if self.ani_mode == Animation.Parallel:
             self.ani_group_obj = QParallelAnimationGroup(self.parent())
         if self.ani_mode == Animation.Sequential:
             self.ani_group_obj = QSequentialAnimationGroup(self.parent())
 
         for ani in self.ani_list:
-            self.ani_group_obj.addAnimation(ani)
-        self.ani_group_obj.start()
+            self.aniObj().addAnimation(ani)
+
+        self.aniObj().start()
 
