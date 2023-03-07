@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # @time:2023/3/411:37
 # @author:LX
-# @file:test.py
+# @file:eg1.py
 # @software:PyCharm
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
