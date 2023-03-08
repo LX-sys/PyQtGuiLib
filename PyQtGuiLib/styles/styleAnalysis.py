@@ -10,7 +10,8 @@
 '''
 from PyQtGuiLib.header import (
     SyntaxError,
-    KeyError
+    KeyError,
+    QMutex
 )
 import re
 
@@ -121,6 +122,8 @@ class QssStyleAnalysis:
         self._map_qss = dict()
         self._reverse_map_qss = dict()
 
+        self.__mutex = QMutex()  # Thread lock
+
     def setParent(self,parent):
         self.__parent = parent
 
@@ -184,13 +187,11 @@ class QssStyleAnalysis:
                         qss.updateAttr(attr, value)
 
         # del temp_hear
-
         old_count = self.count()
         self._qss.extend(new_qss)
 
         # remap
         self.__mappCoordinate(old_count,self.count())
-
 
         if self.__parent:
             self.__updateStyle(self.__parent)
@@ -252,9 +253,11 @@ class QssStyleAnalysis:
         return dictTostr(self.toDict())
 
     def __updateStyle(self, parent):
+        self.__mutex.lock()
         parent.setStyleSheet("")
         parent.setStyleSheet(self.toStr())
         parent.update()
+        self.__mutex.unlock()
 
     # 更新样式
     def updateStyleSheet(self,ang=None,parent=None):
