@@ -70,14 +70,14 @@ font-size:18px;
         self.btn_pause.resize(130,30)
 
         self.ani = Animation(self)
-        self.ani.setDuration(5000)
+        self.ani.setDuration(1000)
 
         self.ani.addAni({
             "targetObj":self.btn,
             "propertyName":b"geometry",
             "sv":self.btn.rect(),
             "special":Animation.InCurve,
-            "ev":QRect(150,150,300,300),
+            "ev":QRect(150,150,150,150),
             "call":self.test,
             "argc":(234,"hello")
         })
@@ -91,8 +91,17 @@ font-size:18px;
         self.ani.addAni({
             "targetObj":self.btn,
             "propertyName":b"fontSize",
-            "sv":18,
-            "ev":50,
+            "sv":50,
+            "atv":[(0.2,40),(0.4,30),(0.6,35),(0.8,40)],
+            # "atv":[30,20,30], # 这个还需要优化
+            "ev":30,
+            "selector":"QPushButton"
+        })
+        self.ani.addAni({
+            "targetObj":self.btn,
+            "propertyName":b"borderRadius",
+            "sv":0,
+            "ev":75,
             "selector":"QPushButton"
         })
         self.ani.start()
