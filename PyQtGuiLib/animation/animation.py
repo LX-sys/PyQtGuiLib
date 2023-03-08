@@ -24,8 +24,16 @@ from PyQtGuiLib.styles import QssStyleAnalysis
 
 # 动画元素类(是一个完整独立的动画对象)
 class AnimationElement(QPropertyAnimation):
-    def __init__(self,parent:QObject,ani_data:dict):
+    # 动画对象模式
+    Control = "control"  # 动画作用在普通控件上面
+    Draw = "draw"        # 动画作用在绘制的图形上面
+
+    def __init__(self,parent:QObject,ani_data:dict,qss:QssStyleAnalysis=None,ani_obj_mode="control"):
+        self.__parent = parent
         super().__init__(parent)
+        print(self.__parent)
+        # 动画对象模式
+        self.__ani_obj_mode = ani_obj_mode
 
         # --
         self.createAni(ani_data)
@@ -33,9 +41,19 @@ class AnimationElement(QPropertyAnimation):
         # 信息
         self.__ani_all_info = None
 
-        # 创建一个QSS解析对象
-        self.__qss = QssStyleAnalysis(self.targetObject())
-        self.__qss.setQSS(self.targetObject().styleSheet())
+        '''
+            如果当多个动画同时作用在一个目标上,
+            则共享一个qss对象
+        '''
+        if self.__ani_obj_mode == "control":
+            if qss is None:
+                self.__qss = QssStyleAnalysis(self.targetObject())
+                self.__qss.setQSS(self.targetObject().styleSheet())
+            else:
+                self.__qss = qss
+
+    def aniObjMode(self)->str:
+        return self.__ani_obj_mode
 
     # 设置动效
     def setSpecial(self,special):
@@ -58,9 +76,23 @@ class AnimationElement(QPropertyAnimation):
             def __fontSize(size):
                 self.qss().selector(selector).updateAttr("font-size", "{}px".format(size))
             call_f = __fontSize
+        elif propertyName == b"borderRadius":
+            def __radius(r):
+                self.qss().selector(selector).updateAttr("border-radius", "{}px".format(r))
+            call_f = __radius
 
         if call_f:
             self.valueChanged.connect(call_f)
+
+    def __customPropertyAnimationDraw(self,propertyName):
+        sv = self.allInfo()["sv"] # 这一步获取绘制图形的开始数据
+        if propertyName == b"size":
+            def __drawPos(pos):
+                sv.setWidth(pos.width())
+                sv.setHeight(pos.height())
+                self.__parent.repaint()
+
+            self.valueChanged.connect(__drawPos)
 
     def allInfo(self) -> dict:
         return self.__ani_all_info
@@ -127,8 +159,10 @@ class AnimationElement(QPropertyAnimation):
         self.setEndValue(ev)
 
         # --------自定义动画
-        if selector:
+        if self.aniObjMode() == AnimationElement.Control and selector:
             self.__customPropertyAnimation(propertyName,selector)
+        elif self.aniObjMode() == AnimationElement.Draw:
+            self.__customPropertyAnimationDraw(propertyName)
 
         if call:
             if call_argc:
@@ -141,15 +175,17 @@ class Animation:
     Parallel = 1
     Sequential = 2
 
+    # 动画对象模式
+    Control = "control"  # 动画作用在普通控件上面
+    Draw = "draw"        # 动画作用在绘制的图形上面
+
     # 动效
     InCurve = qt.InCurve
     OutBounce = qt.OutBounce
     CosineCurve = qt.CosineCurve
     SineCurve = qt.SineCurve
 
-    # 信号
-
-    def __init__(self,parent=None):
+    def __init__(self,parent:QObject=None,ani_obj_mode="control"):
         '''
             目前动画支持的属性
             geometry
@@ -157,17 +193,28 @@ class Animation:
             size
             windowOpacity
             backgroundColor
+            fontSize
+            borderRadius
 
-        :param parent:
+        :param parent: 如果这个参数不传递,则默认绘图动画模式
+        :param mode
         '''
 
         if parent:
             self.__parent = parent  # type:QObject
         else:
-            self.__parent = None # type:QObject
+            if ani_obj_mode == Animation.Draw:
+                self.__parent = QObject()
+            else:
+                self.__parent = None # type:QObject
+
+        # 动画对象模式
+        self.__ani_obj_mode = ani_obj_mode
 
         # 动画列表(里面每一个元素都是一个完整的动画对象)
         self.ani_list = []
+        # 目标对象列表
+        self.targetObject_list = []
 
         # 默认动画模式(并行)
         self.ani_mode = Animation.Parallel
@@ -180,6 +227,9 @@ class Animation:
 
         # 当前动画组对象
         self.ani_group_obj = None  # type:QParallelAnimationGroup
+
+    def aniObjMode(self)->str:
+        return self.__ani_obj_mode
 
     def setParent(self,parent):
         self.__parent = parent
@@ -196,7 +246,7 @@ class Animation:
         self.ani_special = special
 
     # 设置全局的动画循环次数
-    def setLoopCount(self,count):
+    def setLoopCount(self, count):
         self.ani_loopCount = count
 
     def parent(self) -> QObject:
@@ -205,13 +255,13 @@ class Animation:
     def isParent(self) -> bool:
         return bool(self.__parent)
 
-    def duration(self)->int:
+    def duration(self) -> int:
         return self.ani_duration
 
     def special(self):
         return self.ani_special
 
-    def loopCount(self)->int:
+    def loopCount(self) -> int:
         return self.ani_loopCount
 
     def aniObj(self) -> QParallelAnimationGroup:
@@ -242,7 +292,11 @@ class Animation:
         :param ani_data:
         :return:
         '''
-        if self.isParent():
+        targetObject = ani_data.get("targetObj", None)
+        if self.aniObj() == Animation.Control and targetObject is None:
+            raise Exception("No target object!")
+
+        if self.aniObjMode() == Animation.Control and self.isParent():
             duration = ani_data.get("duration", None)
             special = ani_data.get("special", None)
             loopCount = ani_data.get("loop", None)
@@ -254,13 +308,39 @@ class Animation:
             if loopCount is None:
                 ani_data["loopCount"] = self.loopCount()
 
-            ani_ = AnimationElement(self.parent(),ani_data)
-            self.ani_list.append(ani_)
+            one_ani = self.getOneAni(targetObject)
+
+            if one_ani:
+                ani_ = AnimationElement(self.parent(), ani_data,one_ani.qss())
+            else:
+                ani_ = AnimationElement(self.parent(),ani_data)
+
+        elif self.aniObjMode() == Animation.Draw:
+            ani_data["targetObj"] = QObject()
+            ani_ = AnimationElement(self.parent(), ani_data,None,self.aniObjMode())
         else:
             raise Exception("There is no parent object.")
 
+        self.ani_list.append(ani_)
+        self.targetObject_list.append(ani_.targetObject())
+
     def count(self) -> int:
         return len(self.ani_list)
+
+    # 根据目标对象来返回与这个对象相关的第一个动画
+    def getOneAni(self, targetObject:QObject) -> AnimationElement:
+        for obj in self.ani_list:
+            if obj.targetObject() == targetObject:
+                return obj
+        return None
+
+    # 根据目标对象来获取于这个目标相关的所有动画
+    def getAllAni(self,targetObject:QObject) -> [AnimationElement]:
+        obj_list = []
+        for obj in self.ani_list:
+            if obj.targetObject() == targetObject:
+                obj_list.append(obj)
+        return obj_list if obj_list else None
 
     def removeAni(self,obj:QObject):
         '''
