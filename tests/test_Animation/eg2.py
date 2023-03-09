@@ -66,12 +66,17 @@ class Test(QWidget):
 
         self.ani.addAni({
             # "targetObj": QObject(),
-            "propertyName": b"size",
+            "propertyName": b"turn",
             "duration":3000,
             "sv": self.rect_,
-            "ev": QRect(50,50,300,300),
+            "ev": QRect(300,50,100,100),
+            "call":self.test_call,
+            "argc":(1,2)
         })
         self.ani.start()
+
+    def test_call(self,obj,a,b):
+        print("绘图动画完成",obj,a,b)
 
     def paintEvent(self, e) -> None:
         painter = QPainter(self)

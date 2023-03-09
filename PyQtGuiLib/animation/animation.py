@@ -13,7 +13,8 @@ from PyQtGuiLib.header import (
     QWidget,
     QPushButton,
     QObject,
-    qt
+    qt,
+    Signal
 )
 
 '''
@@ -28,24 +29,27 @@ class AnimationElement(QPropertyAnimation):
     Control = "control"  # 动画作用在普通控件上面
     Draw = "draw"        # 动画作用在绘制的图形上面
 
+    # 绘图动画执行完成的信号
+    drawfinished = Signal()
+
     def __init__(self,parent:QObject,ani_data:dict,qss:QssStyleAnalysis=None,ani_obj_mode="control"):
         self.__parent = parent
         super().__init__(parent)
-        print(self.__parent)
+
         # 动画对象模式
         self.__ani_obj_mode = ani_obj_mode
 
-        # --
-        self.createAni(ani_data)
-
         # 信息
-        self.__ani_all_info = None
+        self.__ani_all_info = ani_data
+
+        # 创建动画
+        self.createAni(ani_data)
 
         '''
             如果当多个动画同时作用在一个目标上,
             则共享一个qss对象
         '''
-        if self.__ani_obj_mode == "control":
+        if self.__ani_obj_mode == AnimationElement.Control:
             if qss is None:
                 self.__qss = QssStyleAnalysis(self.targetObject())
                 self.__qss.setQSS(self.targetObject().styleSheet())
@@ -86,13 +90,28 @@ class AnimationElement(QPropertyAnimation):
 
     def __customPropertyAnimationDraw(self,propertyName):
         sv = self.allInfo()["sv"] # 这一步获取绘制图形的开始数据
+        ev = self.allInfo()["ev"] # 获取结束值,作为发射信号的时机
+        call_f = None
         if propertyName == b"size":
-            def __drawPos(pos):
-                sv.setWidth(pos.width())
-                sv.setHeight(pos.height())
+            def __drawSize(size):
+                sv.setWidth(size.width())
+                sv.setHeight(size.height())
+                # 这块每一个绘图动画都必须有
                 self.__parent.repaint()
+                if ev == size:
+                    self.drawfinished.emit()
+            call_f = __drawSize
+        elif propertyName == b"turn":
+            def __drawTurn(turn):
+                sv.setX(turn.x())
+                sv.setY(turn.y())
+                # 这块每一个绘图动画都必须有
+                self.__parent.repaint()
+                if ev == turn:
+                    self.drawfinished.emit()
+            call_f = __drawTurn
 
-            self.valueChanged.connect(__drawPos)
+        self.valueChanged.connect(call_f)
 
     def allInfo(self) -> dict:
         return self.__ani_all_info
@@ -100,8 +119,6 @@ class AnimationElement(QPropertyAnimation):
     def createAni(self,ani_data:dict):
         if not ani_data:
             return
-        else:
-            self.__ani_all_info = ani_data
         '''
         {
             "targetObj":xx
@@ -109,12 +126,12 @@ class AnimationElement(QPropertyAnimation):
             "duration":1000,  # 可不传该参数
             "special":        # 可不传该参数
             "loop":1          # 可不传该参数
-            "call":fun  回调函数  # 可不传该参数
+            "call":fun  回调函数,这个回调函数必须有一个参数来接收系统的  # 可不传该参数
             "argc":tuple    回调函数的参数  # 可不传该参数
             "sv":xx
             "atv":[()] 或者 []          # 可不传该参数
             "ev":xx
-            "selector":""  选择器,这个参数一般配合修改样式时使用 eg:backgroundColor   # 可不传该参数
+            "selector":""  选择器,这个参数一般配合样式修改时使用 eg:backgroundColor # 可不传该参数
         }
         最简化版
         {
@@ -165,10 +182,16 @@ class AnimationElement(QPropertyAnimation):
             self.__customPropertyAnimationDraw(propertyName)
 
         if call:
-            if call_argc:
-                self.finished.connect(lambda :call(targetObj,*call_argc))
-            else:
-                self.finished.connect(lambda :call(targetObj))
+            if self.aniObjMode() == AnimationElement.Control:
+                if call_argc:
+                    self.finished.connect(lambda :call(targetObj,*call_argc))
+                else:
+                    self.finished.connect(lambda :call(targetObj))
+            elif self.aniObjMode() == AnimationElement.Draw:
+                if call_argc:
+                    self.drawfinished.connect(lambda :call(targetObj,*call_argc))
+                else:
+                    self.drawfinished.connect(lambda :call(targetObj))
 
 
 class Animation:
@@ -187,14 +210,23 @@ class Animation:
 
     def __init__(self,parent:QObject=None,ani_obj_mode="control"):
         '''
+        控件动画
             目前动画支持的属性
             geometry
             pos
             size
             windowOpacity
-            backgroundColor
-            fontSize
-            borderRadius
+
+            ---下面是对QSS属性的动画,使用动画的前提是qss里面必须有该属性
+            backgroundColor ---> background-color  动画参数类型是 QColor
+            fontSize  --> font-size                动画参数类型是 int
+            borderRadius  --> border-radius        动画参数类型是 int
+            -----end QSS
+
+        绘图动画
+            size
+            turn  -->  图形翻转
+            pos
 
         :param parent: 如果这个参数不传递,则默认绘图动画模式
         :param mode
@@ -296,7 +328,11 @@ class Animation:
         if self.aniObj() == Animation.Control and targetObject is None:
             raise Exception("No target object!")
 
-        if self.aniObjMode() == Animation.Control and self.isParent():
+        if self.aniObjMode() == Animation.Draw:
+            ani_data["targetObj"] = QObject()
+            # 绘图动画时,self.parent() 返回值一定 QObject()
+            ani_ = AnimationElement(self.parent(), ani_data, None, self.aniObjMode())
+        elif self.isParent():
             duration = ani_data.get("duration", None)
             special = ani_data.get("special", None)
             loopCount = ani_data.get("loop", None)
@@ -314,10 +350,6 @@ class Animation:
                 ani_ = AnimationElement(self.parent(), ani_data,one_ani.qss())
             else:
                 ani_ = AnimationElement(self.parent(),ani_data)
-
-        elif self.aniObjMode() == Animation.Draw:
-            ani_data["targetObj"] = QObject()
-            ani_ = AnimationElement(self.parent(), ani_data,None,self.aniObjMode())
         else:
             raise Exception("There is no parent object.")
 
