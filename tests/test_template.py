@@ -23,7 +23,7 @@ from PyQtGuiLib.header import (
     QFontMetricsF,
     Qt,
     QMouseEvent,
-    QVBoxLayout
+    QVBoxLayout,
 )
 
 import time

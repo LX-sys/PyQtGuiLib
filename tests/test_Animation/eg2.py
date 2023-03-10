@@ -56,26 +56,54 @@ class Test(QWidget):
         self.resize(600,600)
         self.r = 0
 
-        self.rect_ = QRect(50,50,100,100)
+        self.rect_ = QRect(50,50,200,100)
+        # self.rect_ = QRect(300,200,50,200)
         self.rect_.height()
         self.rect_.width()
 
         # 将动画框架的作用对象设置在 绘图上
         self.ani = Animation(self,ani_obj_mode=Animation.Draw)
         self.ani.setDuration(5000)
+        self.ani.setAniMode(Animation.Sequential)
 
-        self.ani.addAni({
-            # "targetObj": QObject(),
-            "propertyName": b"turn",
-            "duration":3000,
-            "sv": self.rect_,
-            "ev": QRect(300,50,100,100),
-            "call":self.test_call,
-            "argc":(1,2)
-        })
+        # self.ani.addAni({
+        #     # "targetObj": QObject(),
+        #     "propertyName": b"geometry",
+        #     "duration":3000,
+        #     "sv": self.rect_,
+        #     "ev": QRect(300,200,50,200),
+        #     "call":self.test_call,
+        #     "argc":(1,2)
+        # })
+        # self.ani.addAni({
+        #     # "targetObj": QObject(),
+        #     "propertyName": b"geometry",
+        #     "duration":3000,
+        #     "sv": QRect(300,200,50,200),
+        #     "ev": QRect(50,200,200,100),
+        #     "call":self.test_call,
+        #     "argc":(1,2)
+        # })
+        self.ani.addSeriesAni(
+            {
+                # "targetObj": QObject(),
+                "propertyName": b"geometry",
+                "duration": 3000,
+                "sv": self.rect_,
+                "ev": QRect(300, 200, 50, 200),
+                # "call": self.test_call,
+                # "argc": (1, 2)
+            },
+            # []
+            [QRect(50, 200, 100, 100),
+             # QRect(150, 50, 100, 100)
+             ]
+        )
         self.ani.start()
 
     def test_call(self,obj,a,b):
+        print("===============")
+        print(self.rect_)
         print("绘图动画完成",obj,a,b)
 
     def paintEvent(self, e) -> None:

@@ -14,14 +14,18 @@ from PyQtGuiLib.header import (
     QPushButton,
     QObject,
     qt,
-    Signal
+    Signal,
+    QRect
 )
 
 '''
     封装动画类
 '''
+from _ctypes import PyObj_FromPtr
+import copy
 from PyQtGuiLib.styles import QssStyleAnalysis
 
+EA = 1
 
 # 动画元素类(是一个完整独立的动画对象)
 class AnimationElement(QPropertyAnimation):
@@ -39,6 +43,7 @@ class AnimationElement(QPropertyAnimation):
         # 动画对象模式
         self.__ani_obj_mode = ani_obj_mode
 
+        print("AnimationElement --> ani_data:",id(ani_data),id(ani_data["sv"]))
         # 信息
         self.__ani_all_info = ani_data
 
@@ -90,26 +95,23 @@ class AnimationElement(QPropertyAnimation):
 
     def __customPropertyAnimationDraw(self,propertyName):
         sv = self.allInfo()["sv"] # 这一步获取绘制图形的开始数据
+        self.setStartValue(sv)
         ev = self.allInfo()["ev"] # 获取结束值,作为发射信号的时机
         call_f = None
-        if propertyName == b"size":
-            def __drawSize(size):
-                sv.setWidth(size.width())
-                sv.setHeight(size.height())
-                # 这块每一个绘图动画都必须有
+
+        if propertyName == b"geometry":
+            def __drawGeometry(geometry):
+                # print(geometry)
+                sv.setX(geometry.x())
+                sv.setY(geometry.y())
+                sv.setWidth(geometry.width())
+                sv.setHeight(geometry.height())
                 self.__parent.repaint()
-                if ev == size:
+                if ev == geometry:
+                    self.setStartValue(self.allInfo()["sv"])
+                    print("结束sv:",)
                     self.drawfinished.emit()
-            call_f = __drawSize
-        elif propertyName == b"turn":
-            def __drawTurn(turn):
-                sv.setX(turn.x())
-                sv.setY(turn.y())
-                # 这块每一个绘图动画都必须有
-                self.__parent.repaint()
-                if ev == turn:
-                    self.drawfinished.emit()
-            call_f = __drawTurn
+            call_f = __drawGeometry
 
         self.valueChanged.connect(call_f)
 
@@ -146,6 +148,13 @@ class AnimationElement(QPropertyAnimation):
         targetObj = ani_data.get("targetObj", None)
         propertyName = ani_data.get("propertyName", None)
         sv = ani_data.get("sv", None)
+        # 假设法
+        global EA
+        if EA == 0:
+            print("dsa")
+            sv.setRect(300, 200, 50, 200)
+        else:
+            EA= 0
         atv = ani_data.get("atv", None)
         ev = ani_data.get("ev", None)
         call = ani_data.get("call", None)
@@ -224,9 +233,8 @@ class Animation:
             -----end QSS
 
         绘图动画
-            size
-            turn  -->  图形翻转
-            pos
+            geometry 数类型 QRect 注意参数是QRect时
+
 
         :param parent: 如果这个参数不传递,则默认绘图动画模式
         :param mode
@@ -299,7 +307,9 @@ class Animation:
     def aniObj(self) -> QParallelAnimationGroup:
         return self.ani_group_obj
 
+    # 添加独立动画
     def addAni(self,ani_data:dict):
+
         '''
         {
             "targetObj":xx
@@ -314,6 +324,8 @@ class Animation:
             "ev":xx
             "selector":""  选择器,这个参数一般配合修改样式时使用 eg:backgroundColor   # 可不传该参数
         }
+        注意 sv,atv,ev 中的值的参数类型必须一致
+        这里的每一个动画都是独立的,不会在并联动画连续播放
         最简化版
         {
             "targetObj":xx,
@@ -355,6 +367,49 @@ class Animation:
 
         self.ani_list.append(ani_)
         self.targetObject_list.append(ani_.targetObject())
+
+    # 添加连续动画(运动必须是相同的)
+    def addSeriesAni(self,ani_data:dict,variation:list):
+        '''
+
+        :param ani_data:
+        :return:
+        '''
+        if self.ani_mode != Animation.Sequential:
+            raise Exception("Current animation mode is not Animation.Sequential")
+
+        first_ani = ani_data
+        first_ev = first_ani["ev"] # 第一个动画的结尾作为下一个动画的开始
+        # 获取回调函数
+        call = first_ani.get("call",None)
+        argc = first_ani.get("argc",None)
+        if call:
+            del first_ani["call"]
+            first_ani["argc"] = None
+
+        ani_list = [first_ani]
+        for ev in variation:
+            if self.aniObjMode() == Animation.Control:
+                # 复制动画
+                copy_ani = copy.copy(first_ani)
+                copy_ani["sv"] = copy.deepcopy(first_ev)
+                copy_ani["ev"] = copy.deepcopy(ev)
+                first_ev = ev
+            elif self.aniObjMode() == Animation.Draw:
+                copy_ani = copy.deepcopy(first_ani)
+                copy_ani["sv"] = ani_data["sv"]
+                copy_ani["ev"] = ev
+            ani_list.append(copy_ani)
+
+        if call:
+            end_ani = ani_list[-1]
+            if argc:
+                end_ani["call"] = call
+                end_ani["argc"] = argc
+
+        for ani in ani_list:
+            self.addAni(ani)
+
 
     def count(self) -> int:
         return len(self.ani_list)
