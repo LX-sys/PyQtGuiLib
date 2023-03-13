@@ -19,6 +19,9 @@ STYLE_LIB = {
         "QLineEdit":"/**/",
         "QLineEdit:read-only":"/*只读时读样式*/"
     },
+    ("QWidget",):{
+        "QWidget":"/**/"
+    },
     ("QComboBox",): {"QComboBox": "/*下拉框*/",
                   "QComboBox:!editable": "/*编辑框样式*/",
                   "QComboBox:editable": "/*编辑框样式(需要将editable设置为真才生效,内容可编辑)*/",
