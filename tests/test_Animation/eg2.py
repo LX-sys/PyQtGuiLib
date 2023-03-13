@@ -64,41 +64,41 @@ class Test(QWidget):
         # 将动画框架的作用对象设置在 绘图上
         self.ani = Animation(self,ani_obj_mode=Animation.Draw)
         self.ani.setDuration(5000)
-        self.ani.setAniMode(Animation.Sequential)
+        # self.ani.setAniMode(Animation.Sequential)
 
-        # self.ani.addAni({
-        #     # "targetObj": QObject(),
-        #     "propertyName": b"geometry",
-        #     "duration":3000,
-        #     "sv": self.rect_,
-        #     "ev": QRect(300,200,50,200),
-        #     "call":self.test_call,
-        #     "argc":(1,2)
-        # })
+        self.ani.addAni({
+            # "targetObj": QObject(),
+            "propertyName": b"geometry",
+            "duration":3000,
+            "sv": self.rect_,
+            "ev": QRect(300,200,100,100),
+            "call":self.test_call,
+            "argc":(1,2)
+        })
         # self.ani.addAni({
         #     # "targetObj": QObject(),
         #     "propertyName": b"geometry",
         #     "duration":3000,
         #     "sv": QRect(300,200,50,200),
-        #     "ev": QRect(50,200,200,100),
+        #     "ev": QRect(50,200,200,200),
         #     "call":self.test_call,
         #     "argc":(1,2)
         # })
-        self.ani.addSeriesAni(
-            {
-                # "targetObj": QObject(),
-                "propertyName": b"geometry",
-                "duration": 3000,
-                "sv": self.rect_,
-                "ev": QRect(300, 200, 50, 200),
-                # "call": self.test_call,
-                # "argc": (1, 2)
-            },
-            # []
-            [QRect(50, 200, 100, 100),
-             # QRect(150, 50, 100, 100)
-             ]
-        )
+        # self.ani.addSeriesAni(
+        #     {
+        #         # "targetObj": QObject(),
+        #         "propertyName": b"geometry",
+        #         "duration": 3000,
+        #         "sv": self.rect_,
+        #         "ev": QRect(300, 200, 50, 200),
+        #         # "call": self.test_call,
+        #         # "argc": (1, 2)
+        #     },
+        #     # []
+        #     [QRect(50, 200, 100, 100),
+        #      # QRect(150, 50, 100, 100)
+        #      ]
+        # )
         self.ani.start()
 
     def test_call(self,obj,a,b):
