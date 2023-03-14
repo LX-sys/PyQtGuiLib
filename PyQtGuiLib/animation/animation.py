@@ -25,8 +25,8 @@ from PyQtGuiLib.styles import QssStyleAnalysis
 
 # 对值传递对象进行包装
 class ObjPack(QPoint):
-    def __init__(self,value):
-        super(ObjPack, self).__init__(value,0)
+    def __init__(self,value,_=0):
+        super(ObjPack, self).__init__(value,_)
         self.__v = value
 
     def setValue(self,v):

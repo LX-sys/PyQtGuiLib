@@ -43,11 +43,9 @@ class MyAnimation(QAbstractAnimation):
 
     def start(self, policy=QAbstractAnimation.DeleteWhenStopped):
         super().start(policy)
-        self.widget.animation_started()
 
     def stop(self):
         super().stop()
-        self.widget.animation_stopped()
 
     def duration(self) -> int:
         return self._duration
@@ -69,12 +67,6 @@ class MyWidget(QWidget):
     def set_value(self, value):
         self.value = value
         self.update()
-
-    def animation_started(self):
-        pass
-
-    def animation_stopped(self):
-        pass
 
 
 if __name__ == '__main__':
