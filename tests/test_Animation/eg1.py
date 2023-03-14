@@ -66,45 +66,46 @@ font-size:18px;
         # 标记
         self.p = True
         self.btn_pause = QPushButton("暂停动画",self)
-        self.btn_pause.move(150,50)
+        self.btn_pause.move(200,50)
         self.btn_pause.resize(130,30)
 
         self.ani = Animation(self)
         self.ani.setDuration(2000)
-        # self.ani.setAniMode(Animation.Sequential)
+        self.ani.setAniMode(Animation.Sequential)
 
-        self.ani.addAni({
-            "targetObj":self.btn,
-            "propertyName":b"geometry",
-            "sv":self.btn.rect(),
-            "ev":QRect(300,150,150,150),
-            "call":self.test,
-            "argc":(234,"hello")
-        })
-        self.ani.addAni({
-            "targetObj":self.btn,
-            "propertyName":b"backgroundColor",
-            "sv":QColor(255, 0, 0),
-            "ev":QColor(0, 255, 0),
-            "selector":"QPushButton"
-        })
-        self.ani.addAni({
-            "targetObj":self.btn,
-            "propertyName":b"fontSize",
-            "sv":50,
-            # "atv":[(0.2,40),(0.4,30),(0.6,35),(0.8,40)],
-            "atv":[20,30,40,50,40,30,20,30,40], # 这个还需要优化
-            "ev":30,
-            "selector":"QPushButton"
-        })
-        self.ani.addAni({
-            "targetObj":self.btn,
-            "propertyName":b"borderRadius",
-            "sv":0,
-            "ev":30,
-            "selector":"QPushButton"
-        })
+        # self.ani.addAni({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"geometry",
+        #     "sv":self.btn.rect(),
+        #     "ev":QRect(300,150,150,150),
+        #     "call":self.test,
+        #     "argc":(234,"hello")
+        # })
+        # self.ani.addAni({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"backgroundColor",
+        #     "sv":QColor(255, 0, 0),
+        #     "ev":QColor(0, 255, 0),
+        #     "selector":"QPushButton"
+        # })
+        # self.ani.addAni({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"fontSize",
+        #     "sv":50,
+        #     # "atv":[(0.2,40),(0.4,30),(0.6,35),(0.8,40)],
+        #     "atv":[20,30,40,50,40,30,20,30,40], # 这个还需要优化
+        #     "ev":30,
+        #     "selector":"QPushButton"
+        # })
+        # self.ani.addAni({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"borderRadius",
+        #     "sv":0,
+        #     "ev":30,
+        #     "selector":"QPushButton"
+        # })
 
+        # -----------------------------------------------------------
         # 连续动画测试
         # 普通控件的连续动画
         # self.ani.addSeriesAni(
@@ -118,6 +119,18 @@ font-size:18px;
         #     },
         #     [QRect(100, 150, 100, 100),QRect(400, 200, 50, 100)]
         # )
+        # 普通控件的连续动画 - 颜色
+        self.ani.addSeriesAni({
+            "targetObj":self.btn,
+            "propertyName":b"backgroundColor",
+            "sv": QColor(255, 0, 0),
+            "ev": QColor(0, 255, 0),
+            "selector": "QPushButton"
+        },
+            [QColor(76, 51, 0),QColor(123,123,123),
+             QColor(234,234,234),QColor(0, 170, 255),QColor(0, 255, 0)]
+        )
+
         self.ani.start()
 
         self.btn_pause.clicked.connect(lambda :self.ani.aniSwitch(self.btn_pause))

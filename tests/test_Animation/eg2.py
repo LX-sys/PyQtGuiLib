@@ -32,7 +32,9 @@ from PyQtGuiLib.header import (
     QVBoxLayout,
     QPropertyAnimation,
     QRect,
-    QObject
+    QObject,
+    QPoint,
+    QPolygon,
 )
 
 import time
@@ -40,7 +42,7 @@ from PyQt5.QtWidgets import QSplashScreen,QDialog,QProxyStyle,QButtonGroup
 from PyQt5.QtCore import QThread,QRunnable,QThreadPool
 from PyQt5.QtGui import QFontMetrics,QFocusEvent
 
-# QSplashScreen
+
 '''
     动画框架测试
 '''
@@ -56,34 +58,51 @@ class Test(QWidget):
         self.resize(600,600)
         self.r = 0
 
-        self.rect_ = QRect(50,50,200,100)
-        # self.rect_ = QRect(300,200,50,200)
-        self.rect_.height()
-        self.rect_.width()
+        self.rect_ = QRect(200,250,200,100)
+
 
         # 将动画框架的作用对象设置在 绘图上
         self.ani = Animation(self,ani_obj_mode=Animation.Draw)
         self.ani.setDuration(5000)
         # self.ani.setAniMode(Animation.Sequential)
 
-        self.ani.addAni({
-            # "targetObj": QObject(),
-            "propertyName": b"geometry",
-            "duration":3000,
-            "sv": self.rect_,
-            "ev": QRect(300,200,100,100),
-            "call":self.test_call,
-            "argc":(1,2)
-        })
         # self.ani.addAni({
         #     # "targetObj": QObject(),
         #     "propertyName": b"geometry",
         #     "duration":3000,
-        #     "sv": QRect(300,200,50,200),
-        #     "ev": QRect(50,200,200,200),
+        #     "sv": self.rect_,
+        #     "ev": QRect(300,200,100,100),
+        #     # "call":self.test_call,
+        #     # "argc":(1,2)
+        # })
+        # self.ani.addAni({
+        #     # "targetObj": QObject(),
+        #     "propertyName": b"size",
+        #     "duration":3000,
+        #     "sv": self.rect_,
+        #     "ev": QRect(0,0,300,300),
         #     "call":self.test_call,
         #     "argc":(1,2)
         # })
+        # self.ani.addAni({
+        #     # "targetObj": QObject(),
+        #     "propertyName": b"pos",
+        #     "duration":3000,
+        #     "sv": self.rect_,
+        #     "ev": QRect(300,300,0,0),
+        #     "call":self.test_call,
+        #     "argc":(1,2)
+        # })
+        self.rotate_a = self.ani.objPack(0)
+        self.ani.addAni({
+            # "targetObj": QObject(),
+            "propertyName": b"rotate",
+            "duration": 3000,
+            "sv": self.rotate_a,
+            "ev": self.ani.objPack(360),
+            "call": self.test_call,
+            "argc": (1, 2)
+        })
         # self.ani.addSeriesAni(
         #     {
         #         # "targetObj": QObject(),
@@ -99,6 +118,7 @@ class Test(QWidget):
         #      # QRect(150, 50, 100, 100)
         #      ]
         # )
+
         self.ani.start()
 
     def test_call(self,obj,a,b):
@@ -109,6 +129,8 @@ class Test(QWidget):
     def paintEvent(self, e) -> None:
         painter = QPainter(self)
         painter.setBrush(QColor(0,255,0))
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+        painter.rotate(self.rotate_a.valve())
         painter.drawRoundedRect(self.rect_,self.r,self.r)
         painter.end()
 
