@@ -12,7 +12,8 @@ from PyQtGuiLib.header import (
     QObject,
     qt,
     Signal,
-    QRect
+    QRect,
+    QPoint
 )
 
 '''
@@ -22,8 +23,23 @@ import copy
 from PyQtGuiLib.styles import QssStyleAnalysis
 
 
+# 对值传递对象进行包装
+class ObjPack(QPoint):
+    def __init__(self,value):
+        super(ObjPack, self).__init__(value,0)
+        self.__v = value
+
+    def setValue(self,v):
+        self.setX(v)
+
+    def valve(self):
+        return self.x()
+
+
 # 动画元素类(是一个完整独立的动画对象)
 class AnimationElement(QPropertyAnimation):
+    Parallel = 1
+    Sequential = 2
     # 动画对象模式
     Control = "control"  # 动画作用在普通控件上面
     Draw = "draw"        # 动画作用在绘制的图形上面
@@ -55,7 +71,7 @@ class AnimationElement(QPropertyAnimation):
             else:
                 self.__qss = qss
 
-    def aniObjMode(self)->str:
+    def aniObjMode(self) -> str:
         return self.__ani_obj_mode
 
     # 设置动效
@@ -89,23 +105,56 @@ class AnimationElement(QPropertyAnimation):
 
     def __customPropertyAnimationDraw(self,propertyName):
         sv = self.allInfo()["sv"] # 这一步获取绘制图形的开始数据
-        self.setStartValue(sv)
         ev = self.allInfo()["ev"] # 获取结束值,作为发射信号的时机
         call_f = None
+        if isinstance(sv,ObjPack):
+            print(sv.valve(),ev.valve())
+        else:
+            print(sv,ev)
 
         if propertyName == b"geometry":
             def __drawGeometry(geometry):
-                sv.setX(geometry.x())
-                sv.setY(geometry.y())
-                sv.setWidth(geometry.width())
-                sv.setHeight(geometry.height())
+                sv.setRect(*geometry.getRect())
+                # sv.setX(geometry.x())
+                # sv.setY(geometry.y())
+                # sv.setWidth(geometry.width())
+                # sv.setHeight(geometry.height())
                 self.__parent.repaint()
                 if ev == geometry:
-                    self.setStartValue(self.allInfo()["sv"])
                     self.drawfinished.emit()
             call_f = __drawGeometry
-
+        elif propertyName == b"size":
+            def __drawSize(size):
+                sv.setSize(size.size())
+                self.__parent.repaint()
+                if ev == size:
+                    self.drawfinished.emit()
+            call_f = __drawSize
+        elif propertyName == b"pos":
+            def __drawPos(pos):
+                sv.setRect(pos.x(),pos.y(),sv.width(),sv.height())
+                self.__parent.repaint()
+                if ev == pos:
+                    self.drawfinished.emit()
+            call_f = __drawPos
+        elif propertyName == b"point":
+            def __drawPoint(point):
+                sv.setY(point.y())
+                self.__parent.repaint()
+                if ev == point:
+                    self.drawfinished.emit()
+            call_f = __drawPoint
+        elif propertyName == b"rotate":
+            print("rotate")
+            def __drawRotate(rotate):
+                print("rotate:",rotate)
+                sv.setValue(rotate.value())
+                self.__parent.repaint()
+                if ev == rotate:
+                    self.drawfinished.emit()
+            call_f = __drawRotate
         self.valueChanged.connect(call_f)
+        print("运行")
 
     def allInfo(self) -> dict:
         return self.__ani_all_info
@@ -155,22 +204,22 @@ class AnimationElement(QPropertyAnimation):
         self.setSpecial(special)
         self.setLoopCount(loopCount)
 
-        if self.aniObjMode() == AnimationElement.Control:
-            self.setStartValue(sv)
-            if atv:
-                one_e = atv[0]
-                if isinstance(one_e,tuple) or isinstance(one_e,list):
-                    for step, value in atv:
-                        self.setKeyValueAt(step, value)
-                else:
-                    mean_time = 1/len(atv)  # 平均时间
-                    step = 0.0
-                    for value in atv:
-                        step += mean_time
-                        self.setKeyValueAt(step, value)
-            self.setEndValue(ev)
-            if selector:
-                self.__customPropertyAnimation(propertyName, selector)
+        self.setStartValue(sv)
+        if atv:
+            one_e = atv[0]
+            if isinstance(one_e, tuple) or isinstance(one_e, list):
+                for step, value in atv:
+                    self.setKeyValueAt(step, value)
+            else:
+                mean_time = 1 / len(atv)  # 平均时间
+                step = 0.0
+                for value in atv:
+                    step += mean_time
+                    self.setKeyValueAt(step, value)
+        self.setEndValue(ev)
+
+        if self.aniObjMode() == AnimationElement.Control and selector:
+            self.__customPropertyAnimation(propertyName, selector)
         elif self.aniObjMode() == AnimationElement.Draw:
             self.__customPropertyAnimationDraw(propertyName)
 
@@ -294,9 +343,7 @@ class Animation:
 
     # 添加独立动画
     def addAni(self,ani_data:dict):
-
         '''
-        该类只支持普通的控件动画
         {
             "targetObj":xx
             "propertyName":""
@@ -326,32 +373,36 @@ class Animation:
         if self.aniObjMode() == Animation.Control and targetObject is None:
             raise Exception("No target object!")
 
+        duration = ani_data.get("duration", None)
+        special = ani_data.get("special", None)
+        loopCount = ani_data.get("loop", None)
+
+        if duration is None:
+            ani_data["duration"] = self.duration()
+        if special is None:
+            ani_data["special"] = self.special()
+        if loopCount is None:
+            ani_data["loopCount"] = self.loopCount()
+
+        # ====
         if self.aniObjMode() == Animation.Draw:
             '''
                 绘图动画
             '''
+            ani_data["targetObj"] = QObject()
+            ani_ = AnimationElement(self.parent(),ani_data,None,AnimationElement.Draw)
         elif self.isParent():
-            duration = ani_data.get("duration", None)
-            special = ani_data.get("special", None)
-            loopCount = ani_data.get("loop", None)
-
-            if duration is None:
-                ani_data["duration"] = self.duration()
-            if special is None:
-                ani_data["special"] = self.special()
-            if loopCount is None:
-                ani_data["loopCount"] = self.loopCount()
-
             one_ani = self.getOneAni(targetObject)
 
             if one_ani:
                 ani_ = AnimationElement(self.parent(), ani_data,one_ani.qss())
             else:
                 ani_ = AnimationElement(self.parent(),ani_data)
-            self.ani_list.append(ani_)
-            self.targetObject_list.append(ani_.targetObject())
         else:
             raise Exception("There is no parent object.")
+
+        self.ani_list.append(ani_)
+        self.targetObject_list.append(ani_.targetObject())
 
     # 添加连续动画(运动必须是相同的)
     def addSeriesAni(self,ani_data:dict, variation:list):
@@ -487,3 +538,6 @@ class Animation:
 
         self.aniObj().start()
 
+    # 生成包装
+    def objPack(self,value)->ObjPack:
+        return ObjPack(value)
