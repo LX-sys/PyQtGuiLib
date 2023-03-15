@@ -21,6 +21,7 @@ AniMode = int
 ObjMode = str
 
 
+# 动画属性类
 class AnimationAttr:
     Parallel = 1
     Sequential = 2
@@ -38,6 +39,7 @@ class AnimationAttr:
     def __init__(self,parent:QObject=None,ani_obj_mode="control"):
         self.__parent = None
         self.__ani_obj_mode = ani_obj_mode
+        self.__ani_group_obj = None # 动画组对象
 
         # 默认动画模式(并行)
         self.__ani_mode = AnimationAttr.Parallel
@@ -66,6 +68,12 @@ class AnimationAttr:
     def setLoopCount(self,count:int):
         self.__ani_loopCount = count
 
+    def setAniGroupObj(self,obj:QParallelAnimationGroup):
+        if isinstance(obj,QParallelAnimationGroup) or isinstance(obj,QSequentialAnimationGroup):
+            self.__ani_group_obj = obj
+        else:
+            raise Exception("Attribute error!")
+
     def parent(self) -> QObject:
         return self.__parent
 
@@ -84,6 +92,12 @@ class AnimationAttr:
     def aniObjMode(self) -> ObjMode:
         return self.__ani_obj_mode
 
+    def aniGroupObj(self)->QParallelAnimationGroup:
+        return self.__ani_group_obj
+
+    def isAniGroupObj(self)->bool:
+        return True if self.aniGroupObj() else False
+
     def isControlMode(self)->bool:
         return True if self.aniObjMode() == AnimationAttr.Control else False
 
@@ -91,7 +105,7 @@ class AnimationAttr:
         return True if self.aniObjMode() == AnimationAttr.Draw else False
 
 
-
+# 动画类
 class Animation(AnimationAttr):
     def __init__(self, parent: QObject = None, ani_obj_mode="control"):
         super(Animation, self).__init__(parent,ani_obj_mode)
@@ -145,23 +159,84 @@ class Animation(AnimationAttr):
         if self.isControlMode() and self.parent():
             ani = AnimationFactory(self.parent(),ani_data,self.aniObjMode()).createAni()
         elif self.isDrawMode():
-            pass
+            ani_data["targetObj"] = QObject()
         else:
             raise Exception("Pattern error,Only Animation.Control or Animation.Draw is supported!")
 
         self.ani_list.append(ani)
 
+    # 添加连续动画(运动必须是相同的)
+    def addSeriesAni(self, ani_data: dict, variation: list):
+        pass
+
+    def pause(self,call=None,argc=None):
+        if self.isAniGroupObj():
+            self.aniGroupObj().pause()
+
+            if call:
+                if argc:
+                    call(*argc)
+                else:
+                    call()
+
+    def resume(self,call=None,argc=None):
+        if self.isAniGroupObj():
+            self.aniGroupObj().resume()
+
+            if call:
+                if argc:
+                    call(*argc)
+                else:
+                    call()
+
+    def state(self):
+        if self.isAniGroupObj():
+            if self.aniGroupObj().state() == self.aniGroupObj().Running:
+                return self.aniGroupObj().Running
+            if self.aniGroupObj() == self.aniGroupObj().Paused:
+                return self.aniGroupObj().Paused
+        else:
+            return None
 
     def start(self):
         if self.aniMode() == Animation.Parallel:
-            self.ani_group_obj = QParallelAnimationGroup(self.parent())
+            self.setAniGroupObj(QParallelAnimationGroup(self.parent()))
         if self.aniMode() == Animation.Sequential:
-            self.ani_group_obj = QSequentialAnimationGroup(self.parent())
+            self.setAniGroupObj(QSequentialAnimationGroup(self.parent()))
 
         for ani in self.ani_list:
-            self.ani_group_obj.addAnimation(ani)
+            self.aniGroupObj().addAnimation(ani)
 
-        self.ani_group_obj.start()
+        self.aniGroupObj().start()
+
+    # 开关
+    def aniSwitch(self,btn:QPushButton=None,texts:dict=dict()):
+        '''
+            动画开关
+            如果动画当前状态是运行,则暂停,反之,运行
+            __________________________________
+            btn: 给定一个按钮(可选)
+            texts:{
+                "pause":"xxx",
+                "resume":"xx"
+            }
+        :return:
+        '''
+        if self.isAniGroupObj():
+            pause_ = texts.get("pause", "pause")
+            resume_ = texts.get("resume", "resume")
+
+            if self.aniGroupObj().state() == self.aniGroupObj().Running:
+                self.pause()
+                if btn:
+                    btn.setText(resume_)
+            elif self.aniGroupObj().state() == self.aniGroupObj().Paused:
+                self.resume()
+                if btn:
+                    btn.setText(pause_)
+
+# 测试用例
+# ----------------------------
 
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
@@ -171,12 +246,18 @@ from PyQtGuiLib.header import (
     QPoint,
     qt,
     QPushButton,
+    QSize,
+    QPainter,
+    QColor
 )
 
 class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(600,600)
+
+        self.swBtn = QPushButton("开关",self)
+        self.swBtn.move(150,50)
 
         self.btn = QPushButton("测试",self)
         self.btn.setStyleSheet('''
@@ -191,17 +272,54 @@ font-size:18px;
         self.ani = Animation(self)
         self.ani.setDuration(3000)
 
+        self.swBtn.clicked.connect(lambda :self.ani.aniSwitch(self.swBtn))
+
+        # self.ani.addAni({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"geometry",
+        #     "sv":self.btn.rect(),
+        #     "ev":QRect(300,150,150,150),
+        #     "call":self.test
+        # })
+        # self.ani.addAni({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"size",
+        #     "sv":self.btn.size(),
+        #     "ev":QSize(200,100),
+        #     "call":self.test
+        # })
+        # self.ani.addAni({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"pos",
+        #     "sv":self.btn.pos(),
+        #     "ev":QPoint(200,100),
+        #     "call":self.test
+        # })
         self.ani.addAni({
-            "targetObj":self.btn,
-            "propertyName":b"geometry",
-            "sv":self.btn.rect(),
-            # "duration":1000,
-            "ev":QRect(300,150,150,150),
-            # "call":self.test,
-            # "argc":(234,"hello")
+            "targetObj": self.btn,
+            "propertyName": b"backgroundColor",
+            "sv": "red",# QColor(0,255,255)
+            "ev": "green",# QColor(255,0,0)
+            "call": self.test,
+            "selector":"QPushButton"
         })
 
+
         self.ani.start()
+
+        self.myrect = QRect(100,100,60,60)
+        self.r = 0
+
+    def test(self,obj):
+        print("obj:",obj)
+
+    def paintEvent(self, e) -> None:
+        painter = QPainter(self)
+        painter.setBrush(QColor(0,255,0))
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+        # painter.rotate(self.rotate_a.valve())
+        painter.drawRoundedRect(self.myrect,self.r,self.r)
+        painter.end()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

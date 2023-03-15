@@ -138,14 +138,15 @@ class AnimationElement(QPropertyAnimation):
                     self.drawfinished.emit()
             call_f = __drawPos
         elif propertyName == b"point":
+            print("point")
             def __drawPoint(point):
+                sv.setX(point.x())
                 sv.setY(point.y())
                 self.__parent.repaint()
                 if ev == point:
                     self.drawfinished.emit()
             call_f = __drawPoint
         elif propertyName == b"rotate":
-            print("rotate")
             def __drawRotate(rotate):
                 print("rotate:",rotate)
                 sv.setValue(rotate.value())

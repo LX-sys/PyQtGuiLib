@@ -60,31 +60,37 @@ class Test(QWidget):
 
         self.rect_ = QRect(50,50,200,100)
 
-
         # 将动画框架的作用对象设置在 绘图上
         self.ani = Animation(self,ani_obj_mode=Animation.Draw)
         self.ani.setDuration(5000)
 
-        self.poly = QPolygon([QPoint(50,50),
-                   QPoint(200,50),
-                   QPoint(200,150),
-                   QPoint(50,150)])
+        # 左测图
+        self.poly = QPolygon([QPoint(50+300,50+10),
+                   QPoint(200+300,50),
+                   QPoint(200+300,150+10),
+                   QPoint(50+300,150)])
+        # 中间图
+        self.mid_ply = QPolygon([QPoint(50+200,50),
+                   QPoint(200+200,50),
+                   QPoint(200+200,150),
+                   QPoint(50+200,150)])
 
         self.image = QPixmap(r'D:\code\PyQtGuiLib\tests\temp_image\python1.png')
+        self.mid_image = QPixmap(r'D:\code\PyQtGuiLib\tests\temp_image\python1.png')
+
         self.ani.addAni({
             "propertyName": b"point",
             "duration": 3000,
-            "sv": self.poly[1],
-            "ev": QPoint(50,70),
-            "call": self.test_call,
-            "argc": (1, 2)
+            "sv": self.poly[0],
+            "ev": QPoint(50+300,50),
         })
         self.ani.addAni({
             "propertyName": b"point",
             "duration": 3000,
-            "sv": self.poly[3],
-            "ev": QPoint(50,170),
+            "sv": self.poly[2],
+            "ev": QPoint(200+300,150),
         })
+
         self.ani.start()
 
     def test_call(self,obj,a,b):
@@ -94,12 +100,23 @@ class Test(QWidget):
 
     def paintEvent(self, e) -> None:
         painter = QPainter(self)
-        painter.setBrush(QColor(0,255,0))
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
-        painter.drawPolygon(self.poly)
         scaled_image = self.image.scaled(QSize(150, 150))
+        scaled_image_mid = self.mid_image.scaled(QSize(150, 150))
+
+        # 绘制中间图
+        # painter.setBrush(QColor(255, 0, 0))
+        painter.drawPolygon(self.mid_ply)
+        painter.drawPixmap(self.mid_ply.boundingRect(), scaled_image_mid)
+
+        # 绘制左侧图
+        # painter.setBrush(QColor(0, 255, 0))
+        painter.drawPolygon(self.poly)
         painter.drawPixmap(self.poly.boundingRect(), scaled_image)
+
+
+        # 绘制
         painter.end()
 
 
