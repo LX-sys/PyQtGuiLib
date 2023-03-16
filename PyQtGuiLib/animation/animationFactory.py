@@ -11,7 +11,8 @@ from PyQtGuiLib.header import (
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 
-# 公用动画实例类
+
+# 公用动画基类
 class PropertyAnimation(QPropertyAnimation):
     Parallel = 1
     Sequential = 2
@@ -67,9 +68,9 @@ class PropertyAnimation(QPropertyAnimation):
                 for step, value in atv:
                     self.setKeyValueAt(step, value)
             else:
-                mean_time = 1 / len(atv)  # 平均时间
+                mean_time = 1 / len(self.atv)  # 平均时间
                 step = 0.0
-                for value in atv:
+                for value in self.atv:
                     step += mean_time
                     self.setKeyValueAt(step, value)
         self.setEndValue(self.ev)
@@ -91,35 +92,8 @@ class PropertyAnimation(QPropertyAnimation):
                     self.drawfinished.connect(lambda: self.call(self.targetObj))
 
 
-# 普通控件 Geometry
-class AnimationGeometry(PropertyAnimation):
-    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
-        super().__init__(parent,ani_data,ani_obj_mode)
-
-        self.setPropertyName(b"geometry")
-        self.createAni()
-
-
-# 普通控件 size
-class AnimationSize(PropertyAnimation):
-    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
-        super().__init__(parent,ani_data,ani_obj_mode)
-
-        self.setPropertyName(b"size")
-        self.createAni()
-
-
-# 普通控件 pos
-class AnimationPos(PropertyAnimation):
-    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
-        super().__init__(parent,ani_data,ani_obj_mode)
-
-        self.setPropertyName(b"pos")
-        self.createAni()
-
-
-# 普通控件 backgroundColor
-class AnimationBackgroundColor(PropertyAnimation):
+# 与QSS属性动画相关的基类
+class QSSPropertyAnimation(PropertyAnimation):
     def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
         super().__init__(parent,ani_data,ani_obj_mode)
 
@@ -129,16 +103,99 @@ class AnimationBackgroundColor(PropertyAnimation):
         self.qss = QssStyleAnalysis(self.targetObj)
         self.qss.setQSS(self.targetObj.styleSheet())
 
+    def updateState(self, newState, oldState) -> None:
+        super().updateState(newState,oldState)
+
+    def updateCurrentValue(self, value) -> None:
+        super().updateCurrentValue(value)
+
+# --------------
+
+# 普通控件动画 Geometry
+class AnimationGeometry(PropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        self.setPropertyName(b"geometry")
+        self.createAni()
+
+
+# 普通控件动画 size
+class AnimationSize(PropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        self.setPropertyName(b"size")
+        self.createAni()
+
+
+# 普通控件动画 pos
+class AnimationPos(PropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        self.setPropertyName(b"pos")
+        self.createAni()
+
+
+# 控件属性动画 -qss - backgroundColor
+class AnimationBackgroundColor(QSSPropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
         self.setPropertyName(b"backgroundColor")
         self.createAni()
-        self.re
-
-    # def updateState(self, newState, oldState) -> None:
-    #     super().updateState(newState,oldState)
 
     def updateCurrentValue(self, value) -> None:
         self.qss.selector(self.selector).updateAttr("background-color",value.name())
 
+
+# 控件属性动画 -qss - borderRadius
+class AnimationBorderRadius(QSSPropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        self.setPropertyName(b"borderRadius")
+        self.createAni()
+
+    def updateCurrentValue(self, value) -> None:
+        self.qss.selector(self.selector).updateAttr("border-radius","{}px".format(value))
+
+
+# 控件属性动画 -qss - borderWidth
+class AnimationBorderWidth(QSSPropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        self.setPropertyName(b"borderWidth")
+        self.createAni()
+
+    def updateCurrentValue(self, value) -> None:
+        self.qss.selector(self.selector).updateAttr("border-width","{}px".format(value))
+
+
+# 控件属性动画 -qss - borderColor
+class AnimationBorderColor(QSSPropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        self.setPropertyName(b"borderColor")
+        self.createAni()
+
+    def updateCurrentValue(self, value) -> None:
+        self.qss.selector(self.selector).updateAttr("border-color",value.name())
+
+
+# 控件属性动画 -qss - fontSize
+class AnimationFontSize(QSSPropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        self.setPropertyName(b"fontSize")
+        self.createAni()
+
+    def updateCurrentValue(self, value) -> None:
+        self.qss.selector(self.selector).updateAttr("font-size","{}px".format(value))
 
 '''
 
@@ -177,6 +234,14 @@ class AnimationFactory:
                 ani = AnimationPos(self.parent(),self.aniData(),self.aniObjMode())
             elif self.propertyName() == b"backgroundColor":
                 ani = AnimationBackgroundColor(self.parent(),self.aniData(),self.aniObjMode())
+            elif self.propertyName() == b"borderRadius":
+                ani = AnimationBorderRadius(self.parent(),self.aniData(),self.aniObjMode())
+            elif self.propertyName() == b"fontSize":
+                ani = AnimationFontSize(self.parent(),self.aniData(),self.aniObjMode())
+            elif self.propertyName() == b"borderWidth":
+                ani = AnimationBorderWidth(self.parent(), self.aniData(), self.aniObjMode())
+            elif self.propertyName() == b"borderColor":
+                ani = AnimationBorderColor(self.parent(), self.aniData(), self.aniObjMode())
             else:
                 raise Exception("There is no animation property,{}!".format(self.propertyName()))
 
