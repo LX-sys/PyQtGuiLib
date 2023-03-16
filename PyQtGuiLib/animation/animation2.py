@@ -313,6 +313,7 @@ font-size:18px;
 border-width:1px;
 border-color:rgb(85, 255, 0);
 border-style:solid;
+
 }
         ''')
         self.btn.move(50,50)
@@ -377,14 +378,43 @@ border-style:solid;
         #     "call":self.test
         # },
         # [QSize(50,50),QSize(30,30),QSize(200,200)])
-        self.ani.addAni({
-            "targetObj": self.btn,
-            "propertyName": b"borderColor",
-            "sv": QColor(0,255,0),#
-            "ev": QColor(20,88,152),#
-            "call": self.test,
-            "selector":"QPushButton"
-        })
+        # self.ani.addAnis({
+        #     "targetObj": self.btn,
+        #     "propertyName": b"pos",
+        #     "sv": self.btn.pos(),#
+        #     "ev": QPoint(300,300),#
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # },{
+        #     "targetObj": self.btn,
+        #     "propertyName": b"fontSize",
+        #     "sv": 18,#
+        #     "ev": 28,#
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # },{
+        #     "targetObj": self.btn,
+        #     "propertyName": b"borderWidth",
+        #     "sv": 1,#
+        #     "ev": 5,#
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # },{
+        #     "targetObj": self.btn,
+        #     "propertyName": b"borderColor",
+        #     "sv": QColor(0,255,0),#
+        #     "ev": QColor(0,0,255),#
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # },{
+        #     "targetObj": self.btn,
+        #     "propertyName": b"borderRadius",
+        #     "sv": 1,#
+        #     "ev": 6,#
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # })
+
         self.ani.start()
 
         self.myrect = QRect(100,100,60,60)

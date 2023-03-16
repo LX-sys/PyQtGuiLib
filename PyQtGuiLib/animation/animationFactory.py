@@ -65,7 +65,7 @@ class PropertyAnimation(QPropertyAnimation):
         if self.atv:
             one_e = self.atv[0]
             if isinstance(one_e, tuple) or isinstance(one_e, list):
-                for step, value in atv:
+                for step, value in self.atv:
                     self.setKeyValueAt(step, value)
             else:
                 mean_time = 1 / len(self.atv)  # 平均时间
@@ -107,6 +107,7 @@ class QSSPropertyAnimation(PropertyAnimation):
         super().updateState(newState,oldState)
 
     def updateCurrentValue(self, value) -> None:
+        self.qss.appendQSS(self.targetObj.styleSheet())
         super().updateCurrentValue(value)
 
 # --------------
@@ -147,6 +148,7 @@ class AnimationBackgroundColor(QSSPropertyAnimation):
         self.createAni()
 
     def updateCurrentValue(self, value) -> None:
+        super().updateCurrentValue(value)
         self.qss.selector(self.selector).updateAttr("background-color",value.name())
 
 
@@ -159,6 +161,7 @@ class AnimationBorderRadius(QSSPropertyAnimation):
         self.createAni()
 
     def updateCurrentValue(self, value) -> None:
+        super().updateCurrentValue(value)
         self.qss.selector(self.selector).updateAttr("border-radius","{}px".format(value))
 
 
@@ -170,7 +173,9 @@ class AnimationBorderWidth(QSSPropertyAnimation):
         self.setPropertyName(b"borderWidth")
         self.createAni()
 
+
     def updateCurrentValue(self, value) -> None:
+        super().updateCurrentValue(value)
         self.qss.selector(self.selector).updateAttr("border-width","{}px".format(value))
 
 
@@ -183,6 +188,7 @@ class AnimationBorderColor(QSSPropertyAnimation):
         self.createAni()
 
     def updateCurrentValue(self, value) -> None:
+        super().updateCurrentValue(value)
         self.qss.selector(self.selector).updateAttr("border-color",value.name())
 
 
@@ -195,6 +201,7 @@ class AnimationFontSize(QSSPropertyAnimation):
         self.createAni()
 
     def updateCurrentValue(self, value) -> None:
+        super().updateCurrentValue(value)
         self.qss.selector(self.selector).updateAttr("font-size","{}px".format(value))
 
 '''
