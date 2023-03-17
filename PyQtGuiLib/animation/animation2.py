@@ -16,10 +16,10 @@ from PyQtGuiLib.header import (
 '''
 
 from PyQtGuiLib.animation.animationFactory import AnimationFactory
+from PyQtGuiLib.animation.animationDrawType import AniNumber
 
 AniMode = int
 ObjMode = str
-
 
 # 动画属性类
 class AnimationAttr:
@@ -48,7 +48,7 @@ class AnimationAttr:
         # 默认动效
         self.__ani_special = AnimationAttr.InCurve
         # 默认动画循环次数
-        self.__ani_loopCount = 1
+        self.__ani_loopCount = AniNumber(0)
 
         if parent:
             self.setParent(parent)
@@ -104,6 +104,9 @@ class AnimationAttr:
     def isDrawMode(self)->bool:
         return True if self.aniObjMode() == AnimationAttr.Draw else False
 
+    # 给绘图动画的 单值封装
+    def aniNumber(self,value)->AniNumber:
+        return AniNumber(value)
 
 # 动画类
 class Animation(AnimationAttr):
@@ -131,15 +134,16 @@ class Animation(AnimationAttr):
         {
             "targetObj":xx
             "propertyName":""
-            "duration":1000,  # 可不传该参数
-            "special":        # 可不传该参数
-            "loop":1          # 可不传该参数
-            "call":fun  回调函数  # 可不传该参数
-            "argc":tuple    回调函数的参数  # 可不传该参数
+            "duration":1000,  # 可选参数
+            "special":        # 可选参数
+            "loop":1          # 可选参数
+            "call":fun  回调函数  # 可选参数
+            "argc":tuple    # 回调函数的参数  可选参数
             "sv":xx
-            "atv":[()] 或者 []          # 可不传该参数
+            "atv":[()] 或者 []          # 可选参数
             "ev":xx
-            "selector":""  选择器,这个参数一般配合修改样式时使用 eg:backgroundColor   # 可不传该参数
+            "selector":""  # 选择器,这个参数一般配合修改样式时使用 eg:backgroundColor  可选参数
+            "qss-suffix":"px"  # qss属性单位 如果: 写宽度时单位是px,表示文字大小时,有时候会用到pt
         }
         注意 sv,atv,ev 中的值的参数类型必须一致
         这里的每一个动画都是独立的,不会在并联动画连续播放
@@ -162,6 +166,7 @@ class Animation(AnimationAttr):
             ani = AnimationFactory(self.parent(),ani_data,self.aniObjMode()).createAni()
         elif self.isDrawMode():
             ani_data["targetObj"] = QObject()
+            ani = AnimationFactory(self.parent(), ani_data, self.aniObjMode()).createAni()
         else:
             raise Exception("Pattern error,Only Animation.Control or Animation.Draw is supported!")
 
@@ -179,41 +184,49 @@ class Animation(AnimationAttr):
         :param variation:
         :return:
         '''
-        if self.aniMode() != Animation.Sequential:
-            raise Exception("Current animation mode is not Animation.Sequential")
-
         if not ani_data:
             return
 
+        if self.aniMode() != Animation.Sequential:
+            raise Exception("Current animation mode is not Animation.Sequential")
+
+        if not self.isDrawMode() and not self.isControlMode():
+            raise Exception("Pattern error,Only Animation.Control or Animation.Draw is supported!")
+
+        if not self.parent():
+            raise Exception("No superclass")
+
         self.__setGeneralAttr(ani_data)
 
-        if self.isControlMode() and self.parent():
-            '''
-                如果有回调函数,保存之后,先移除掉,最后添加在末尾
-            '''
-            Call = ani_data.get("call",None)
-            CallAgrc = ani_data.get("argc",None)
-            if Call:del ani_data["call"]
-            if CallAgrc:del ani_data["argc"]
+        '''
+                      如果有回调函数,保存之后,先移除掉,最后添加在末尾
+                  '''
+        Call = ani_data.get("call", None)
+        CallAgrc = ani_data.get("argc", None)
+        if Call: del ani_data["call"]
+        if CallAgrc: del ani_data["argc"]
 
-            # 首先创建出 初始动画
-            ani = AnimationFactory(self.parent(),ani_data,self.aniObjMode()).createAni()
-            self.ani_list.append(ani)
-            sv = ani.endValue()
-            # 在创建出后续的连续动画
-            for ev in variation:
-                if ev == variation[-1]: # 这里判断是否是最后一项数值
-                    if Call:ani_data["call"] = Call
-                    if CallAgrc:ani_data["argc"] = CallAgrc
-                e_ani = AnimationFactory(self.parent(),ani_data,self.aniObjMode()).createAni()
-                e_ani.setStartValue(sv)
-                e_ani.setEndValue(ev)
-                sv = ev
-                self.ani_list.append(e_ani)
-        elif self.isDrawMode():
+        # 首先创建出 初始动画
+        ani = AnimationFactory(self.parent(), ani_data, self.aniObjMode()).createAni()
+        self.ani_list.append(ani)
+        sv = ani.endValue()
+
+        if self.isDrawMode():
             ani_data["targetObj"] = QObject()
-        else:
-            raise Exception("Pattern error,Only Animation.Control or Animation.Draw is supported!")
+
+        # 在创建出后续的连续动画
+        variation_len = len(variation)
+        for i,ev in enumerate(variation):
+            ev = variation[i]
+            if i == variation_len-1:  # 这里判断是否是最后一项数值
+                if Call: ani_data["call"] = Call
+                if CallAgrc: ani_data["argc"] = CallAgrc
+            ani_data["ev"] = ev
+            e_ani = AnimationFactory(self.parent(), ani_data, self.aniObjMode()).createAni()
+            e_ani.setStartValue(sv)
+            e_ani.setEndValue(ev)
+            sv = ev
+            self.ani_list.append(e_ani)
 
     def pause(self,call=None,argc=None):
         if self.isAniGroupObj():
@@ -309,18 +322,24 @@ class Test(QWidget):
         self.btn.setStyleSheet('''
 QPushButton{
 background-color: red;
+color:rgb(0,0,0);
 font-size:18px;
-border-width:1px;
-border-color:rgb(85, 255, 0);
+border-width:3px;
+border-color:rgb(255, 0, 0);
 border-style:solid;
-
+border-left-width:2px;
+border-left-color:rgb(255, 170, 0);
+border-top-color:rgb(255, 170, 0);
+border-bottom-color:rgb(255, 170, 0);
+font-family:"华文新魏";
 }
         ''')
         self.btn.move(50,50)
         self.btn.resize(130,60)
 
-        self.ani = Animation(self)
-        self.ani.setDuration(3000)
+        self.ani = Animation(self,Animation.Draw)
+        self.ani.setDuration(1000)
+        self.ani.setAniMode(Animation.Sequential)
 
         self.swBtn.clicked.connect(lambda :self.ani.aniSwitch(self.swBtn))
 
@@ -353,20 +372,6 @@ border-style:solid;
         #     "call": self.test,
         #     "selector":"QPushButton"
         # })
-        # self.ani.addAnis({
-        #     "targetObj":self.btn,
-        #     "propertyName":b"geometry",
-        #     "sv":self.btn.rect(),
-        #     "ev":QRect(300,150,150,150),
-        #     "call":self.test
-        # },{
-        #     "targetObj": self.btn,
-        #     "propertyName": b"backgroundColor",
-        #     "sv": QColor(0,255,255),#
-        #     "ev": QColor(255,0,0),#
-        #     "call": self.test,
-        #     "selector":"QPushButton"
-        # })
 
         # 连续动画测试
         # self.ani.setAniMode(Animation.Sequential)
@@ -377,7 +382,7 @@ border-style:solid;
         #     "ev":QSize(200,100),
         #     "call":self.test
         # },
-        # [QSize(50,50),QSize(30,30),QSize(200,200)])
+        # [QSize(50,50),QSize(30,30),QSize(200,200),QSize(30,30)])
         # self.ani.addAnis({
         #     "targetObj": self.btn,
         #     "propertyName": b"pos",
@@ -415,20 +420,77 @@ border-style:solid;
         #     "selector":"QPushButton"
         # })
 
+        # self.ani.addAnis({
+        #     "targetObj":self.btn,
+        #     "propertyName":b"border-left-color",
+        #     "sv":QColor(255,0,0),
+        #     "ev":QColor(0,255,0),
+        #     "selector": "QPushButton",
+        # },{
+        #     "targetObj":self.btn,
+        #     "propertyName":b"border-left-width",
+        #     "sv":1,
+        #     "ev":10,
+        #     "selector": "QPushButton",
+        # },{
+        #     "targetObj":self.btn,
+        #     "propertyName":b"border-top-color",
+        #     "sv":QColor(255,0,0),
+        #     "ev":QColor(0,255,0),
+        #     "selector": "QPushButton",
+        # },{
+        #     "targetObj":self.btn,
+        #     "propertyName":b"border-bottom-color",
+        #     "sv":QColor(255,0,0),
+        #     "ev":QColor(0,255,0),
+        #     "selector": "QPushButton",
+        # })
+        # self.ani.addAni({
+        #     "targetObj": self.btn,
+        #     "propertyName": b"font-size",
+        #     "sv": 18,
+        #     "ev": 30,
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # })
+        # self.ani.addAni({
+        #     "targetObj": self.btn,
+        #     "propertyName": b"color",
+        #     "sv": QColor(0,0,0),
+        #     "atv":[QColor(255,0,0),QColor(255,0,0)],
+        #     "ev": QColor(0,255,0),
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # })
+
+
+        self.r = self.ani.aniNumber(0)
+        self.myrect = QRect(100, 100, 60, 60)
+        # self.ani.addAni({
+        #     "propertyName":b"value",
+        #     "sv":self.r,
+        #     "ev":10,
+        #     "call":self.test
+        # })
+        self.ani.addSeriesAni({
+            "propertyName":b"value",
+            "sv":self.r,
+            "ev":10,
+            "call":self.test
+        },[0,8,8])
         self.ani.start()
 
-        self.myrect = QRect(100,100,60,60)
-        self.r = 0
 
     def test(self,obj):
-        print("obj:",obj)
+        # pass
+        print("obj:",obj,123)
 
     def paintEvent(self, e) -> None:
         painter = QPainter(self)
         painter.setBrush(QColor(0,255,0))
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
         # painter.rotate(self.rotate_a.valve())
-        painter.drawRoundedRect(self.myrect,self.r,self.r)
+        painter.drawRoundedRect(self.myrect,self.r.number(),self.r.number())
         painter.end()
 
 if __name__ == '__main__':
