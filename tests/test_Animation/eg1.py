@@ -31,7 +31,7 @@ class Test(QWidget):
         self.btn = QPushButton("测试",self)
         self.btn.setStyleSheet('''
 QPushButton{
-background-color: red;
+background-color: rgb(75, 153, 0);
 color:rgb(0,0,0);
 font-size:18px;
 border-width:3px;
@@ -51,7 +51,6 @@ font-family:"华文新魏";
 
         self.btn.move(50,50)
         self.btn.resize(130,60)
-
         self.ani = Animation(self,Animation.Draw)
         self.ani.setDuration(1000)
         # self.ani.setAniMode(Animation.Sequential)
@@ -81,9 +80,9 @@ font-family:"华文新魏";
         # })
         # self.ani.addAni({
         #     "targetObj": self.btn,
-        #     "propertyName": b"backgroundColor",
-        #     "sv": QColor(0,255,255),#
-        #     "ev": QColor(255,0,0),#
+        #     "propertyName": b"background-color",
+        #     "sv": "this",#
+        #     "ev": QColor(75,153,255),#
         #     "call": self.test,
         #     "selector":"QPushButton"
         # })
@@ -177,14 +176,26 @@ font-family:"华文新魏";
         #     "call": self.test,
         #     "selector":"QPushButton"
         # })
-
-
+        # self.ani.addAni({
+        #     "targetObj": self.btn,
+        #     "propertyName": b"font-size",
+        #     "sv": "this",#
+        #     "ev": 38,#
+        #     "call": self.test,
+        #     "selector":"QPushButton"
+        # })
+        # self.ani.addAni({
+        #     "targetObj": self,
+        #     "propertyName": b"windowOpacity",
+        #     "sv": 1,
+        #     "ev": 0.5,
+        #     "call": self.test,
+        #     # "selector":"QPushButton"
+        # })
         self.r = self.ani.aniNumber(0)
         self.myrect = QRect(100, 100, 60, 60)
-        self.x = self.ani.aniNumber(400)
-        self.y = self.ani.aniNumber(400)
-        self.w = self.ani.aniNumber(300)
-        self.h = self.ani.aniNumber(100)
+        self.rect_ = self.ani.aniNumbers(400,400,300,100)
+        self.rgb = self.ani.aniNumbers(0,255,0)
         # self.ani.addAni({
         #     "propertyName":b"value",
         #     "sv":self.r,
@@ -197,6 +208,7 @@ font-family:"华文新魏";
         #     "ev":10,
         #     "call":self.test
         # },[0,8,8])
+        # ---
         self.ani.addAni({
             "propertyName": b"value",
             "sv": self.r,
@@ -205,23 +217,26 @@ font-family:"华文新魏";
         })
         self.ani.addValuesAni({
             "propertyName": b"value",
-        },[self.x,self.y,self.w],
-        [200,300,80,50])
+        },self.rect_.numberObjs(),
+        [10,300,80,80])
+        self.ani.addValuesAni({
+            "propertyName": b"value",
+        },self.rgb.numberObjs(),
+        [255,0,0])
         self.ani.start()
 
-
     def test(self,obj):
-        # pass
         print("obj:",obj,123)
 
     def paintEvent(self, e) -> None:
         painter = QPainter(self)
-        painter.setBrush(QColor(0,255,0))
+        painter.setBrush(QColor(*self.rgb.numbers()))
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
         # painter.rotate(self.rotate_a.valve())
-        print(self.x.number(),self.y.number(),self.w.number(),self.h.number())
-        painter.drawRoundedRect(self.x.number(),self.y.number(),self.w.number(),self.h.number(),self.r.number(),self.r.number())
+        # print(self.r.number())
+        painter.drawRoundedRect(*self.rect_.numbers(),self.r.number(),self.r.number())
         painter.end()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

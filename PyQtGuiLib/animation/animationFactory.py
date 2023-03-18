@@ -1,4 +1,4 @@
-
+import re
 from PyQtGuiLib.header import (
     QPropertyAnimation,
     QObject,
@@ -26,6 +26,7 @@ class PropertyAnimation(QPropertyAnimation):
 
     def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
         self.__parent = parent
+        self.attr = ani_data["propertyName"].decode()
         super().__init__(parent)
 
         # 动画对象模式
@@ -70,6 +71,13 @@ class PropertyAnimation(QPropertyAnimation):
 
     def special(self):
         return self.easingCurve()
+
+    # 判断sv是不是this
+    def isThis(self):
+        if isinstance(self.sv,str) and self.sv.lower() == "this":
+            return True
+        return False
+
 
     # 刷新绘图动画
     def updateDraw(self):
@@ -116,6 +124,33 @@ class QSSPropertyAnimation(PropertyAnimation):
         self.qss.setQSS(self.targetObj.styleSheet())
         self.createAni()
 
+    def setStartValue(self, value) -> None:
+        '''
+            当这个值是 this 的时候,指向自己已经编写的属性值,
+            如果没有这个属性值,将报错,
+            如果这个属性中包含 color 则判定为颜色属性,否则判断为数值形
+            如果这个属性值中包含px,pt 这里的,直接返回数值形
+        :param value:
+        :return:
+        '''
+        if self.isThis():
+            attr = self.attr.lower()
+            if self.qss.selector(self.selector).isAttr(attr):
+                attrValue = self.qss.selector(self.selector).attr(self.attr) # Gets the value of the property
+                if "color" in attr:
+                    color = attrValue
+                    if "rgb" in color.lower() or "rgba" in color.lower():
+                        color_list=[int(i) for i in re.findall(r"[0-9]{1,3}",color)]
+                        value = QColor(*color_list)
+                    else:
+                        value = QColor(color)
+                elif "px" in attrValue or "pt" in attrValue:
+                    value = int(re.findall(r"[0-9]+",attrValue)[0])
+            else:
+                raise Exception("The sv attribute is this, but QSS does not have this attribute!,{}".format(self.attr))
+
+        super().setStartValue(value)
+
     def updateState(self, newState, oldState) -> None:
         super().updateState(newState,oldState)
 
@@ -126,7 +161,8 @@ class QSSPropertyAnimation(PropertyAnimation):
         if isinstance(value, int):
             value = "{}{}".format(value,self.qssSuffix)
         elif isinstance(value, QColor):
-            value = value.name()
+            value = "rgba({},{},{},{})".format(*value.getRgb())
+
         else:
             raise Exception("This type is not supported yet.{}".format(value))
         return value
@@ -146,6 +182,21 @@ class AnimationControl(PropertyAnimation):
 
         self.setPropertyName(self.propertyName)
         self.createAni()
+
+    def setStartValue(self, value) -> None:
+        if self.propertyName == b"geometry":
+            value = self.targetObject().rect()
+        elif self.propertyName == b"size":
+            value = self.targetObject().size()
+        elif self.propertyName == b"pos":
+            value = self.targetObject().pos()
+        elif self.propertyName == b"windowOpacity":
+            value = self.targetObject().windowOpacity()
+        super().setStartValue(value)
+
+    def updateCurrentValue(self, value) -> None:
+        if value is not None:
+            self.targetObject().setWindowOpacity(value)
 
 
 # 普通绘图 - 单值动画

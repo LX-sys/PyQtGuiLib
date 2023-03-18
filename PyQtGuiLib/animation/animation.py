@@ -18,7 +18,7 @@ import copy
 '''
 
 from PyQtGuiLib.animation.animationFactory import AnimationFactory
-from PyQtGuiLib.animation.animationDrawType import AniNumber
+from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers
 
 AniMode = int
 ObjMode = str
@@ -107,9 +107,12 @@ class AnimationAttr:
     def isDrawMode(self)->bool:
         return True if self.aniObjMode() == AnimationAttr.Draw else False
 
-    # 绘图动画的 单值封装
+    # 绘图动画的 值封装
     def aniNumber(self,value)->AniNumber:
         return AniNumber(value)
+
+    def aniNumbers(self,*args)->AniNumbers:
+        return AniNumbers(*args)
 
 
 # 动画类
@@ -143,7 +146,7 @@ class Animation(AnimationAttr):
             "loop":1          # 可选参数
             "call":fun  回调函数  # 可选参数
             "argc":tuple    # 回调函数的参数  可选参数
-            "sv":xx
+            "sv":xx  # 该参数在控件模式下,可以写 this 指向自己的属性
             "atv":[()] 或者 []          # 可选参数
             "ev":xx
             "selector":""  # 选择器,这个参数一般配合修改样式时使用 eg:backgroundColor  可选参数
