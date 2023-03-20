@@ -7,7 +7,8 @@ from PyQtGuiLib.header import (
     qt,
     Signal,
     QRect,
-    QPoint
+    QPoint,
+    QColor
 )
 
 import copy
@@ -18,7 +19,7 @@ import copy
 '''
 
 from PyQtGuiLib.animation.animationFactory import AnimationFactory
-from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers
+from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers,AniColor,AniRect
 
 AniMode = int
 ObjMode = str
@@ -108,11 +109,24 @@ class AnimationAttr:
         return True if self.aniObjMode() == AnimationAttr.Draw else False
 
     # 绘图动画的 值封装
-    def aniNumber(self,value)->AniNumber:
+    @staticmethod
+    def createAniNumber(value) -> AniNumber:
         return AniNumber(value)
 
-    def aniNumbers(self,*args)->AniNumbers:
+    # 绘图动画的 多值封装
+    @staticmethod
+    def createAniNumbers(*args) -> AniNumbers:
         return AniNumbers(*args)
+
+    # 绘图动画的 颜色值封装
+    @staticmethod
+    def createAniColor(*args) -> AniColor:
+        return AniColor(*args)
+
+    # 绘图动画的 矩形值封装
+    @staticmethod
+    def createAniRect(*args) -> AniRect:
+        return AniRect(*args)
 
 
 # 动画类
@@ -236,7 +250,15 @@ class Animation(AnimationAttr):
             self.ani_list.append(e_ani)
 
     # 绘图-多值动画
-    def addValuesAni(self,ani_data: dict,starts:list,ends:list):
+    def addValuesAni(self,ani_data: dict,startObj,ends:list):
+        '''
+
+
+        :param ani_data:
+        :param startObj: 参数类型 AniColor,AniNumbers
+        :param ends:
+        :return:
+        '''
         if self.isDrawMode():
             # 先移除属性
             TargetObj = ani_data.get("targetObj")
@@ -248,7 +270,13 @@ class Animation(AnimationAttr):
             if Ev:del ani_data["ev"]
             if Call:del ani_data["call"]
 
-            for sv,ev in zip(starts,ends):
+            # 类型检测,并转换
+            if isinstance(ends,QColor):
+                ends = ends.getRgb()
+            elif isinstance(ends,QRect):
+                ends = ends.getRect()
+
+            for sv,ev in zip(startObj.numberObjs(),ends):
                 copy_ani_data = copy.deepcopy(ani_data)
                 copy_ani_data["targetObj"] = QObject()
                 copy_ani_data["sv"] = sv

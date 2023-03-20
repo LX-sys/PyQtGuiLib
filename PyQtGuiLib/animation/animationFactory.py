@@ -211,7 +211,7 @@ class AnimationDrawValue(PropertyAnimation):
         if isinstance(value,int):
             super().setStartValue(value)
         elif isinstance(value,AniNumber):
-            super().setStartValue(value.number())
+            super().setStartValue(value.value())
 
     def updateState(self, newState, oldState) -> None:
         super().updateState(newState, oldState)
