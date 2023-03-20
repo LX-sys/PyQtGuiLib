@@ -7,7 +7,15 @@
 '''
     这个类为绘图动画的封装类型
 '''
+from PyQtGuiLib.header import (
+    QColor,
+    QRect
+)
 
+'''
+
+后续这里的值需要改成float类型
+'''
 
 # 值类型
 class AniNumber:
@@ -17,8 +25,12 @@ class AniNumber:
     def setNumber(self,n):
         self.__n = n
 
-    def number(self)->int:
+    def value(self)->int:
         return self.__n
+
+    # 这里表示任意类型
+    def type(self)->str:
+        return "ang"
 
 
 # 多值类型
@@ -32,8 +44,38 @@ class AniNumbers:
         for an in args:
             self.__an.append(AniNumber(an))
 
-    def numberObjs(self)->list:
+    def type(self) -> list:
+        return list
+
+    def numberObjs(self) -> list:
         return [n for n in self.__an]
 
-    def numbers(self)->tuple:
-        return [n.number() for n in self.__an]
+    def values(self) -> list:
+        return [n.value() for n in self.__an]
+
+
+# 颜色类型
+class AniColor(AniNumbers):
+    def __init__(self,r,g,b,a=255):
+        if r < 0 or r >255 or g <0 or g>255 or b <0 or b>255 or b <0 or b >255\
+            or a <0 or a > 255:
+            raise Exception("The value ranges from 0 to 255!")
+        super().__init__(r,g,b,a)
+
+    def type(self) -> QColor:
+        return QColor
+
+    def values(self) -> QColor:
+        return QColor(*super().values())
+
+
+# 矩形类型
+class AniRect(AniNumbers):
+    def __init__(self,x,y,w,h):
+        super().__init__(x,y,w,h)
+
+    def type(self) -> QRect:
+        return QRect
+
+    def values(self) -> QRect:
+        return QRect(*super().values())
