@@ -17,7 +17,7 @@ from PyQtGuiLib.header import (
     QLinearGradient,
     QRect
 )
-# animationLayout
+
 from PyQtGuiLib.animation import Animation
 from PyQtGuiLib.animation.animationLayout import AnimationLayout
 
@@ -198,21 +198,21 @@ font-family:"华文新魏";
         self.rgb = self.ani.createAniColor(0,255,0)
         self.aotate_a = self.ani.createAniNumbers(0)
         # ---
-        self.ani.addValuesAni({
-            "propertyName": b"value",
-        },self.rect_r,
-        [10,300,80,80,5,5])
-        self.ani.addValuesAni({
-            "propertyName": b"value",
-        },self.rgb,
-        QColor(255,0,0)
-        )
+        # self.ani.addValuesAni({
+        #     "propertyName": b"value",
+        # },self.rect_r,
+        # [10,300,80,80,5,5])
+        # self.ani.addValuesAni({
+        #     "propertyName": b"value",
+        # },self.rgb,
+        # QColor(255,0,0)
+        # )
         self.ani.addValuesAni({
             "propertyName": b"value",
         },self.aotate_a,
         [360])
 
-        # self.ani.start()
+        self.ani.start()
 
     def test(self,obj):
         print("obj:",obj,123)
@@ -222,12 +222,12 @@ font-family:"华文新魏";
         painter.setBrush(self.rgb.values())
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
-        # painter.translate(self.width() // 2, self.height() // 2)
-        # painter.scale(0.5, 0.5)
-        # painter.rotate(*self.aotate_a.values())
-        #
-        # painter.drawRoundedRect(*self.rect_r.values())
-        lay = AnimationLayout(e)
+        painter.translate(self.width() // 2, self.height() // 2)
+        painter.scale(0.5, 0.5)
+        painter.rotate(*self.aotate_a.values())
+
+        painter.drawRoundedRect(*self.rect_r.values())
+        # lay = AnimationLayout(e)
 
 
 

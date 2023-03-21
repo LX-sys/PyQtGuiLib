@@ -7,11 +7,13 @@
 '''
     这个类为绘图动画的封装类型
 '''
+import typing
 from PyQtGuiLib.header import (
     QColor,
     QRect
 )
 
+Any = typing.Any
 '''
 
 后续这里的值需要改成float类型
@@ -29,8 +31,8 @@ class AniNumber:
         return self.__n
 
     # 这里表示任意类型
-    def type(self)->str:
-        return "ang"
+    def type(self) -> Any:
+        return type(self.value())
 
 
 # 多值类型
@@ -56,7 +58,7 @@ class AniNumbers:
 
 # 颜色类型
 class AniColor(AniNumbers):
-    def __init__(self,r,g,b,a=255):
+    def __init__(self,r:int,g:int,b:int,a:int=255):
         if r < 0 or r >255 or g <0 or g>255 or b <0 or b>255 or b <0 or b >255\
             or a <0 or a > 255:
             raise Exception("The value ranges from 0 to 255!")
@@ -71,7 +73,7 @@ class AniColor(AniNumbers):
 
 # 矩形类型
 class AniRect(AniNumbers):
-    def __init__(self,x,y,w,h):
+    def __init__(self,x:int,y:int,w:int,h:int):
         super().__init__(x,y,w,h)
 
     def type(self) -> QRect:

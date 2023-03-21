@@ -1,18 +1,15 @@
 from PyQtGuiLib.header import (
-    QPropertyAnimation,
     QParallelAnimationGroup,
     QSequentialAnimationGroup,
     QPushButton,
     QObject,
     qt,
-    Signal,
     QRect,
-    QPoint,
     QColor
 )
-
+from typing import TypeVar
+from collections.abc import Callable
 import copy
-
 '''
     重构动画框架
     Animation 仅创建,管理,播放动画
@@ -23,6 +20,9 @@ from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers,AniColor
 
 AniMode = int
 ObjMode = str
+AniStartType = TypeVar("AniStartType",AniNumber,AniNumbers,AniColor,AniRect)
+AniEndType = TypeVar("AniEndType",list,QColor,QRect)
+AnimationModeType = TypeVar("AnimationModeType",QParallelAnimationGroup,QSequentialAnimationGroup)
 
 
 # 动画属性类
@@ -52,7 +52,7 @@ class AnimationAttr:
         # 默认动效
         self.__ani_special = AnimationAttr.InCurve
         # 默认动画循环次数
-        self.__ani_loopCount = AniNumber(0)
+        self.__ani_loopCount = 0
 
         if parent:
             self.setParent(parent)
@@ -66,13 +66,13 @@ class AnimationAttr:
     def setDuration(self,duration:int):
         self.__ani_duration = duration
 
-    def setSpecial(self,special):
+    def setSpecial(self, special):
         self.__ani_special = special
 
-    def setLoopCount(self,count:int):
+    def setLoopCount(self, count:int):
         self.__ani_loopCount = count
 
-    def setAniGroupObj(self,obj:QParallelAnimationGroup):
+    def setAniGroupObj(self,obj:AnimationModeType):
         if isinstance(obj,QParallelAnimationGroup) or isinstance(obj,QSequentialAnimationGroup):
             self.__ani_group_obj = obj
         else:
@@ -84,28 +84,28 @@ class AnimationAttr:
     def aniMode(self) -> AniMode:
         return self.__ani_mode
 
-    def duration(self)->int:
+    def duration(self) -> int:
         return self.__ani_duration
 
     def special(self):
         return self.__ani_special
 
-    def loopCount(self)->int:
+    def loopCount(self) -> int:
         return self.__ani_loopCount
 
     def aniObjMode(self) -> ObjMode:
         return self.__ani_obj_mode
 
-    def aniGroupObj(self)->QParallelAnimationGroup:
+    def aniGroupObj(self) -> AnimationModeType:
         return self.__ani_group_obj
 
-    def isAniGroupObj(self)->bool:
+    def isAniGroupObj(self) -> bool:
         return True if self.aniGroupObj() else False
 
-    def isControlMode(self)->bool:
+    def isControlMode(self) -> bool:
         return True if self.aniObjMode() == AnimationAttr.Control else False
 
-    def isDrawMode(self)->bool:
+    def isDrawMode(self) -> bool:
         return True if self.aniObjMode() == AnimationAttr.Draw else False
 
     # 绘图动画的 值封装
@@ -138,7 +138,7 @@ class Animation(AnimationAttr):
         self.ani_list = []
 
     # 设置通用属性
-    def __setGeneralAttr(self,ani_data):
+    def __setGeneralAttr(self,ani_data:dict):
         duration = ani_data.get("duration", None)
         special = ani_data.get("special", None)
         loopCount = ani_data.get("loop", None)
@@ -163,14 +163,20 @@ class Animation(AnimationAttr):
             "sv":xx  # 该参数在控件模式下,可以写 this 指向自己的属性
             "atv":[()] 或者 []          # 可选参数
             "ev":xx
-            "selector":""  # 选择器,这个参数一般配合修改样式时使用 eg:backgroundColor  可选参数
-            "qss-suffix":"px"  # qss属性单位 如果: 写宽度时单位是px,表示文字大小时,有时候会用到pt
+            "selector":""  # 选择器,这个参数qss样式动画时使用 eg:backgroundColor  可选参数
+            "qss-suffix":"px"  # qss属性单位 如果: 写宽度时单位是px,表示文字大小时,有时候会用到pt  可选参数
         }
         注意 sv,atv,ev 中的值的参数类型必须一致
         这里的每一个动画都是独立的,不会在并联动画连续播放
-        最简化版
+        普通控件动画最简化版
         {
             "targetObj":xx,
+            "propertyName":"",
+            "sv":xx,
+            "ev":xx
+        }
+        QSS样式动画最简化版
+        {
             "propertyName":"",
             "sv":xx,
             "ev":xx
@@ -250,7 +256,7 @@ class Animation(AnimationAttr):
             self.ani_list.append(e_ani)
 
     # 绘图-多值动画
-    def addValuesAni(self,ani_data: dict,startObj,ends:list):
+    def addValuesAni(self,ani_data: dict,startObj:AniStartType,ends:AniEndType):
         '''
 
 
@@ -285,25 +291,23 @@ class Animation(AnimationAttr):
         else:
             raise Exception("addValuesAni() This method supports only the Animation.Draw mode!")
 
-    def pause(self,call=None,argc=None):
+    # Executive function
+    def __exeCall(self,call:Callable, argc=None):
+        if call:
+            if argc:
+                call(*argc)
+            else:
+                call()
+
+    def pause(self,call:Callable=None, argc=None):
         if self.isAniGroupObj():
             self.aniGroupObj().pause()
+            self.__exeCall(call,argc)
 
-            if call:
-                if argc:
-                    call(*argc)
-                else:
-                    call()
-
-    def resume(self,call=None,argc=None):
+    def resume(self,call:Callable=None,argc=None):
         if self.isAniGroupObj():
             self.aniGroupObj().resume()
-
-            if call:
-                if argc:
-                    call(*argc)
-                else:
-                    call()
+            self.__exeCall(call,argc)
 
     def state(self):
         if self.isAniGroupObj():
@@ -326,7 +330,7 @@ class Animation(AnimationAttr):
         self.aniGroupObj().start()
 
     # 开关
-    def aniSwitch(self,btn:QPushButton=None,texts:dict=dict()):
+    def aniSwitch(self,btn:QPushButton=None,texts:dict=None):
         '''
             动画开关
             如果动画当前状态是运行,则暂停,反之,运行
@@ -338,6 +342,9 @@ class Animation(AnimationAttr):
             }
         :return:
         '''
+        if texts is None:
+            texts = dict()
+
         if self.isAniGroupObj():
             pause_ = texts.get("pause", "pause")
             resume_ = texts.get("resume", "resume")

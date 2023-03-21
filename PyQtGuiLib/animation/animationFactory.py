@@ -1,4 +1,5 @@
 import re
+import typing
 from PyQtGuiLib.header import (
     QPropertyAnimation,
     QObject,
@@ -12,7 +13,10 @@ from PyQtGuiLib.header import (
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.animation.animationDrawType import AniNumber
-
+'''
+    QPropertyAnimation: you're trying to animate a non-existing property value of your QObject
+    该警告出现mac下,部分win可能也会出现,可以忽略该警告
+'''
 
 # 公用动画基类
 class PropertyAnimation(QPropertyAnimation):
@@ -77,7 +81,6 @@ class PropertyAnimation(QPropertyAnimation):
         if isinstance(self.sv,str) and self.sv.lower() == "this":
             return True
         return False
-
 
     # 刷新绘图动画
     def updateDraw(self):
@@ -223,6 +226,10 @@ class AnimationDrawValue(PropertyAnimation):
 
 
 
+# 返回动画类型
+CreateAni = [AnimationControl,QSSPropertyAnimation,AnimationDrawValue]
+
+
 '''
     动画工厂
 '''
@@ -252,7 +259,7 @@ class AnimationFactory:
         return self.parent(),self.aniData(),self.aniObjMode()
 
     # 返回动画的实例
-    def createAni(self) -> QPropertyAnimation:
+    def createAni(self) -> CreateAni:
         if self.aniObjMode() == AnimationFactory.Control:
             if self.propertyName() in [b"geometry",b"size",b"pos",b"windowOpacity"]:
                 ani = AnimationControl(*self.argc())
@@ -261,9 +268,7 @@ class AnimationFactory:
             else:
                 raise Exception("There is no animation property,{}!".format(self.propertyName()))
         elif self.aniObjMode() == AnimationFactory.Draw:
-            if self.propertyName() == b"geometry":
-                pass
-            elif self.propertyName() == b"value":
+            if self.propertyName() == b"value":
                 ani = AnimationDrawValue(*self.argc())
             else:
                 raise Exception("There is no animation property!")
