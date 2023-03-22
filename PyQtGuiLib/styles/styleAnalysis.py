@@ -41,7 +41,7 @@ class Qss:
     def Init(self):
         header = re.findall(".*{", self._qss_str, re.DOTALL)
         if header:
-            self._qss_header = header[0].replace("\n", "").replace("{", "")
+            self._qss_header = header[0].replace("\n", "").replace("{", "").strip()
         else:
             raise SyntaxError("Syntax error, missing {")
 
@@ -49,7 +49,6 @@ class Qss:
         body = re.findall(r"{(.*)}", self._qss_str, re.DOTALL)
         if body:
             self._qss_body = body[0].strip()
-
         self._qss_dict = {self.header(): self.bodyToDict()}
 
     def header(self)->str:
