@@ -3,7 +3,12 @@
 # @author:LX
 # @file:1.py
 # @software:PyCharm
+'''
+    项目打包 python3 -m build
+    twine upload dist/*
 
+
+'''
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
