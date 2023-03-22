@@ -191,13 +191,11 @@ class QssStyleAnalysis:
 
         # remap
         self.__mappCoordinate(old_count,self.count())
-
         if self.__parent:
             self.__updateStyle(self.__parent)
 
     def appendQSSDict(self,qss_dict:dict):
         self.appendQSS(dictTostr(qss_dict))
-
 
     def selectorKey(self,key)->Qss:
         return self.selectorIndex(self._map_qss[key])
