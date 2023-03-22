@@ -9,7 +9,7 @@ Welcome to PyQtGuiLib's documentation!
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-   test.md
+   test
 
 Indices and tables
 ==================
