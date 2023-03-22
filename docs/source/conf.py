@@ -6,6 +6,7 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+
 project = 'PyQtGuiLib'
 copyright = '2023, LX'
 author = 'LX'
@@ -26,3 +27,9 @@ language = 'zh_CN'
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+source_parsers = {'.md': 'recommonmark.parser.CommonMarkParser'}
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
