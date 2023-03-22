@@ -8,8 +8,7 @@ from PyQtGuiLib.header import (
     QPoint,
     QSize,
     pyqtProperty,
-    Signal
-
+    Signal,
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.animation.animationDrawType import AniNumber
@@ -173,7 +172,6 @@ class QSSPropertyAnimation(PropertyAnimation):
     def updateCurrentValue(self, value) -> None:
         self.qss.appendQSS(self.targetObj.styleSheet())
         self.qss.selector(self.selector).updateAttr(self.propertyName.decode(), self.__toValue(value))
-        super().updateCurrentValue(value)
 
 # --------------
 
@@ -197,9 +195,6 @@ class AnimationControl(PropertyAnimation):
             value = self.targetObject().windowOpacity()
         super().setStartValue(value)
 
-    def updateCurrentValue(self, value) -> None:
-        if value is not None:
-            self.targetObject().setWindowOpacity(value)
 
 
 # 普通绘图 - 单值动画

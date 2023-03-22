@@ -175,7 +175,7 @@ class Animation(AnimationAttr):
             "sv":xx,
             "ev":xx
         }
-        QSS样式动画最简化版
+       绘图动画最简化版
         {
             "propertyName":"",
             "sv":xx,

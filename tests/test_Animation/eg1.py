@@ -207,10 +207,10 @@ font-family:"华文新魏";
         # },self.rgb,
         # QColor(255,0,0)
         # )
-        self.ani.addValuesAni({
-            "propertyName": b"value",
-        },self.aotate_a,
-        [360])
+        # self.ani.addValuesAni({
+        #     "propertyName": b"value",
+        # },self.aotate_a,
+        # [360])
 
         self.ani.start()
 
