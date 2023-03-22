@@ -28,10 +28,6 @@ class Test(QWidget):
              
              QSS属性动画,暂时不支持渐变
         '''
-        '''
-            出现BUG,当动画同时操作一个控件,不同样式状态下相同属性时出现BUG
-        
-        '''
         self.btn = QPushButton("按钮",self)
         self.btn.move(50,50)
         self.btn.resize(100,60)
@@ -40,20 +36,6 @@ class Test(QWidget):
         QPushButton{
             background-color:rgb(50,100,200);
             color:rgb(255,0,0);
-        }
-        QPushButton:hover{
-        background-color:rgb(100,150,150);
-        color:rgb(0,0,255)
-        }
-        QPushButton:pressed{
-            background-color:rgb(100,150,150);
-        }
-        ''')
-
-        self.label = QLabel("标签",self)
-        self.label.setStyleSheet('''
-        QLabel{
-            background-color:rgb(50,200,200);
         }
         ''')
 
@@ -66,17 +48,17 @@ class Test(QWidget):
         self.ani.addAni({
             "targetObj":self.btn,
             "propertyName": b"background-color", # 这里的动作名称与你的样式中必须一致
-            "sv": QColor(50,100,200),
+            "sv": "this",
             "ev": QColor(200,200,100),
             "selector":"QPushButton"  # 对于属性动画来说,这个参数是必须的,参数内容就对应者选择器名称
         })
-        # <PyQtGuiLib.animation.animationFactory.QSSPropertyAnimation object at 0x00000262F0221160> QPushButton --> background-color rgba(50,100,200,255)
+        # 前景色,也跟着一起变
         self.ani.addAni({
             "targetObj":self.btn,
-            "propertyName": b"background-color", # 这里的动作名称与你的样式中必须一致
+            "propertyName": b"color",
             "sv": "this",
-            "ev": QColor(20,200,30),
-            "selector":"QPushButton:hover"  # 对于属性动画来说,这个参数是必须的,参数内容就对应者选择器名称
+            "ev": QColor(0,200,0),
+            "selector":"QPushButton"
         })
         # 开始动画
         self.ani.start()
