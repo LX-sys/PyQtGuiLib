@@ -22,7 +22,8 @@ class Test(QWidget):
         self.resize(600,600)
         '''
              Animation 动画框架 案例七,
-             从这个案例开始讲解 QSS属性动画
+             从这个案例开始讲解 QSS属性动画,
+             背景和前景色动画
              
              注意:使用这一类动画时,你的控件必须有qss样式
              
@@ -42,7 +43,7 @@ class Test(QWidget):
         # 实例化动画类
         self.ani = Animation(self)
         # 设置动画时长
-        self.ani.setDuration(3000) # 2秒
+        self.ani.setDuration(3000) # 3秒
 
         # 添加一个QSS属性动画
         self.ani.addAni({

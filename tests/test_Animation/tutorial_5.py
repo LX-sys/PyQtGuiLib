@@ -34,7 +34,7 @@ class Test(QWidget):
 
         # 实例化动画类
         self.ani = Animation(self)
-        # 关键设置
+        # 关键设置(Animation.Sequential 表示串行动画)
         self.ani.setAniMode(Animation.Sequential) # Animation.Parallel 这个是默认设置,也就是并行动画
         # 设置动画时长
         self.ani.setDuration(2000) # 2秒
