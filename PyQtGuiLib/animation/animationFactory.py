@@ -192,14 +192,15 @@ class AnimationControl(PropertyAnimation):
         self.createAni()
 
     def setStartValue(self, value) -> None:
-        if self.propertyName == b"geometry":
-            value = self.targetObject().rect()
-        elif self.propertyName == b"size":
-            value = self.targetObject().size()
-        elif self.propertyName == b"pos":
-            value = self.targetObject().pos()
-        elif self.propertyName == b"windowOpacity":
-            value = self.targetObject().windowOpacity()
+        if self.isThis():
+            if self.propertyName == b"geometry":
+                value = self.targetObject().rect()
+            elif self.propertyName == b"size":
+                value = self.targetObject().size()
+            elif self.propertyName == b"pos":
+                value = self.targetObject().pos()
+            elif self.propertyName == b"windowOpacity":
+                value = self.targetObject().windowOpacity()
         super().setStartValue(value)
 
 

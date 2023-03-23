@@ -246,18 +246,18 @@ class Animation(AnimationAttr):
 
         if self.isDrawMode():
             ani_data["targetObj"] = QObject()
-
         # 在创建出后续的连续动画
         variation_len = len(variation)
         for i,ev in enumerate(variation):
-            ev = variation[i]
+            # ev = variation[i]
             if i == variation_len-1:  # 这里判断是否是最后一项数值
                 if Call: ani_data["call"] = Call
                 if CallAgrc: ani_data["argc"] = CallAgrc
+            ani_data["sv"] = sv
             ani_data["ev"] = ev
             e_ani = AnimationFactory(self.parent(), ani_data, self.aniObjMode()).createAni()
-            e_ani.setStartValue(sv)
-            e_ani.setEndValue(ev)
+            # e_ani.setStartValue(sv)
+            # e_ani.setEndValue(ev)
             sv = ev
             self.ani_list.append(e_ani)
 
