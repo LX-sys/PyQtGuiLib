@@ -24,18 +24,18 @@
   说明:动画方向模式类变量
   ```
 
-### <font color=blue>addWidget(<font color=green>widget:QWidget</font>)</font>
+#### <font color=blue>addWidget(<font color=green>widget:QWidget</font>)</font>
 
 - **功能**: 添加一个窗口到轮播组件
 
 - **widget**:  一个QWidget窗口,或者是继承与QWidget的窗口
 
-### <font color=blue>setCurrentIndex(<font color=green>index:int=0</font>)</font>
+#### <font color=blue>setCurrentIndex(<font color=green>index:int=0</font>)</font>
 
 - **功能**: 切换到指定窗口
 - **index**: 窗口索引(默认切换到0)
 
-### <font color=blue>setAinDirectionMode(<font color=green>mode:tuple</font>)</font>
+#### <font color=blue>setAinDirectionMode(<font color=green>mode:tuple</font>)</font>
 
 - **功能**: 设置窗口动画模式
 
@@ -47,7 +47,7 @@
   还有其他组合模式,请自行尝试,但是并不是所有的组合一定是正确的
   ```
 
-### <font color=blue>setAutoSlideShow(<font color=green>b:bool,interval=1500,direction_:str="R"</font>)</font>
+#### <font color=blue>setAutoSlideShow(<font color=green>b:bool,interval=1500,direction_:str="R"</font>)</font>
 
 - **功能**: 设置自动轮播
 
@@ -63,28 +63,45 @@
   轮播的方向会受到动画模式下影响
   ```
 
-### <font color=blue>removeWidget(<font color=green>widget:QWidget</font>)</font>
+#### <font color=blue>removeWidget(<font color=green>widget:QWidget</font>)</font>
 
 - **功能**: 移除窗口
 - **widget**: 轮播组件上的窗口对象
 
-### <font color=blue>getButtons()</font>
+#### <font color=blue>getButtons()</font>
 
 - **功能**: 获取左右可点击按钮的对象
 - **返回值**: tuple
 
-### <font color=blue>setButtonsHide(<font color=green>b:bool</font>)</font>
+#### <font color=blue>setButtonsHide(<font color=green>b:bool</font>)</font>
 
 - **功能**: 隐藏左右可点击按钮
 - **b**: 是否隐藏
 
-### <font color=blue>count()</font>
+#### <font color=blue>count()</font>
 
 - **功能**: 返回窗口的数量
 - **返回值**: int
 
-### <font color=blue>getWidget(<font color=green>index:int</font>)</font>
+#### <font color=blue>getWidget(<font color=green>index:int</font>)</font>
 
 - **功能**: 通过索引获取窗口
 - **返回值**: QWidget对象
 
+------
+
+### FlowLayout(流式布局)
+
+- 导入方式: `from PyQtGuiLib.core import FlowLayout`
+
+#### <font color=blue>addWidget(<font color=green>widget:QWidget</font>)</font>
+
+- **功能**: 添加一个窗口到流式布局
+- **widget**:  一个QWidget窗口,或者是继承与QWidget的窗口
+
+#### <font color=blue>addItem(<font color=green>item: QLayoutItem</font>)</font>
+
+- **功能**: 添加一个布局到流式布局
+- **item**: 布局对象(Eg: 垂直,网格之类,.....)
+
+#### <font color=blue>更多方法,可以之间参考其他的,方法名几乎都是一致的...</font>
