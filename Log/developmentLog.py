@@ -148,11 +148,11 @@
     --- 动态样式链接器 from PyQtGuiLib.styles import StyleLinker
         目前仅支持 QPushButton,QLabel,QLineEdit 控件
         
-2023.2.20 - 2023.3.13
+2023.2.20 - 2023.3.23 [2.5.18.11]
     调整结构 将 abandonCasem目录,Log目录和tests目录移出项目
-    新增ToolListWidget 控件
-    新增SuperPainter 超级画师(未完成)
-    新增Animation 动画框架(未完成)
+    新增ToolListWidget 控件(未完成)
+    新增SuperPainter 超级画师(未完成) - 重构中
+    新增Animation 动画框架(未完成) - 测试部分
 '''
 
 
