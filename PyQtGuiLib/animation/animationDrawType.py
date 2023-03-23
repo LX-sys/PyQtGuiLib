@@ -14,20 +14,16 @@ from PyQtGuiLib.header import (
 )
 
 Any = typing.Any
-'''
-
-后续这里的值需要改成float类型
-'''
 
 # 值类型
 class AniNumber:
-    def __init__(self,n):
+    def __init__(self,n:Any):
         self.__n = n
 
-    def setNumber(self,n):
+    def setNumber(self,n:Any):
         self.__n = n
 
-    def value(self)->int:
+    def value(self)->Any:
         return self.__n
 
     # 这里表示任意类型
@@ -81,3 +77,15 @@ class AniRect(AniNumbers):
 
     def values(self) -> QRect:
         return QRect(*super().values())
+
+
+# 阴影类型
+class AniShadow(AniNumbers):
+    def __init__(self,offx:int,offy:int,r:int,color:QColor):
+        super().__init__(offx,offy,r,color)
+
+    def type(self) -> str:
+        return "shadow"
+
+    def values(self) -> list:
+        return [*super().values()]

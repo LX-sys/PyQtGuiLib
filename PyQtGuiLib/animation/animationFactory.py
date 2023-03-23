@@ -9,6 +9,8 @@ from PyQtGuiLib.header import (
     QSize,
     pyqtProperty,
     Signal,
+    QGraphicsDropShadowEffect,
+    QGraphicsBlurEffect
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from PyQtGuiLib.animation.animationDrawType import AniNumber
@@ -16,6 +18,7 @@ from PyQtGuiLib.animation.animationDrawType import AniNumber
     QPropertyAnimation: you're trying to animate a non-existing property value of your QObject
     该警告出现mac下,部分win可能也会出现,可以忽略该警告
 '''
+
 
 # 公用动画基类
 class PropertyAnimation(QPropertyAnimation):
@@ -76,10 +79,14 @@ class PropertyAnimation(QPropertyAnimation):
         return self.easingCurve()
 
     # 判断sv是不是this
-    def isThis(self):
+    def isThis(self)->bool:
         if isinstance(self.sv,str) and self.sv.lower() == "this":
             return True
         return False
+
+    # 判断是否开启特殊动画
+    def isEffect(self)->bool:
+        return True if self.allAniDatas().get("isEffect",None) else False
 
     # 刷新绘图动画
     def updateDraw(self):
@@ -196,6 +203,40 @@ class AnimationControl(PropertyAnimation):
         super().setStartValue(value)
 
 
+# 普通控件的特殊效果动画 - 阴影动画
+class ShadowAnimation(PropertyAnimation):
+    def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):
+        super().__init__(parent,ani_data,ani_obj_mode)
+
+        if self.isEffect() is False:
+            raise Exception("Special animation is not enabled,isEffect is False!")
+        if self.targetObj.graphicsEffect() is None:
+            self.__shadow = QGraphicsDropShadowEffect()
+            self.targetObj.setGraphicsEffect(self.__shadow)
+            self.__shadow.setOffset(0, 0)
+        else:
+            self.__shadow = self.targetObj.graphicsEffect()
+        self.setPropertyName(self.propertyName)
+        self.createAni()
+
+    def setStartValue(self, value) -> None:
+        value = value.value()
+        if isinstance(value,int):
+            self.__shadow.setBlurRadius(value)
+            super().setStartValue(value)
+        elif isinstance(value,QColor):
+            self.__shadow.setColor(value)
+            super().setStartValue(value)
+
+    def updateCurrentValue(self, value: typing.Any) -> None:
+        # print(value)
+        if isinstance(value,int):
+            print(value)
+            self.__shadow.setBlurRadius(value)
+        if isinstance(value,QColor):
+            self.__shadow.setColor(value)
+
+
 
 # 普通绘图 - 单值动画
 class AnimationDrawValue(PropertyAnimation):
@@ -218,7 +259,6 @@ class AnimationDrawValue(PropertyAnimation):
         if self.drawSv():
             self.drawSv().setNumber(value)
             self.updateDraw()
-
 
 
 # 返回动画类型
@@ -258,6 +298,8 @@ class AnimationFactory:
         if self.aniObjMode() == AnimationFactory.Control:
             if self.propertyName() in [b"geometry",b"size",b"pos",b"windowOpacity"]:
                 ani = AnimationControl(*self.argc())
+            elif self.propertyName() == b"shadow":
+                ani = ShadowAnimation(*self.argc())
             elif self.propertyName() and self.aniData().get("selector",None):  # 处理所有qss属性
                 ani = QSSPropertyAnimation(*self.argc())
             else:

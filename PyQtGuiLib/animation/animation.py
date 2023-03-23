@@ -16,7 +16,7 @@ import copy
 '''
 
 from PyQtGuiLib.animation.animationFactory import AnimationFactory
-from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers,AniColor,AniRect
+from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers,AniColor,AniRect,AniShadow
 
 AniMode = int
 ObjMode = str
@@ -128,6 +128,11 @@ class AnimationAttr:
     def createAniRect(*args) -> AniRect:
         return AniRect(*args)
 
+    # 绘图动画的 阴影封装
+    @staticmethod
+    def createAniShadow(*args) -> AniShadow:
+        return AniShadow(*args)
+
 
 # 动画类
 class Animation(AnimationAttr):
@@ -165,6 +170,7 @@ class Animation(AnimationAttr):
             "ev":xx
             "selector":""  # 选择器,这个参数qss样式动画时使用 eg:backgroundColor  可选参数
             "qss-suffix":"px"  # qss属性单位 如果: 写宽度时单位是px,表示文字大小时,有时候会用到pt  可选参数
+            "isEffect":True/False # 这个参数觉得了是否开启特殊动画,阴影,模糊 可选参数
         }
         注意 sv,atv,ev 中的值的参数类型必须一致
         这里的每一个动画都是独立的,不会在并联动画连续播放
@@ -265,31 +271,36 @@ class Animation(AnimationAttr):
         :param ends:
         :return:
         '''
-        if self.isDrawMode():
-            # 先移除属性
-            TargetObj = ani_data.get("targetObj")
-            Sv = ani_data.get("sv",None)
-            Ev = ani_data.get("ev",None)
-            Call = ani_data.get("call",None)
-            if TargetObj:del ani_data["targetObj"]
-            if Sv:del ani_data["sv"]
-            if Ev:del ani_data["ev"]
-            if Call:del ani_data["call"]
+        # if self.isDrawMode():
+        # 先移除属性
 
-            # 类型检测,并转换
-            if isinstance(ends,QColor):
-                ends = ends.getRgb()
-            elif isinstance(ends,QRect):
-                ends = ends.getRect()
 
-            for sv,ev in zip(startObj.numberObjs(),ends):
+        Sv = ani_data.get("sv",None)
+        Ev = ani_data.get("ev",None)
+        Call = ani_data.get("call",None)
+        if Sv:del ani_data["sv"]
+        if Ev:del ani_data["ev"]
+        if Call:del ani_data["call"]
+
+        # 类型检测,并转换
+        if isinstance(ends,QColor):
+            ends = ends.getRgb()
+        elif isinstance(ends,QRect):
+            ends = ends.getRect()
+
+        for sv,ev in zip(startObj.numberObjs(),ends):
+            if self.isDrawMode():
+                TargetObj = ani_data.get("targetObj")
+                if TargetObj: del ani_data["targetObj"]
                 copy_ani_data = copy.deepcopy(ani_data)
-                copy_ani_data["targetObj"] = QObject()
-                copy_ani_data["sv"] = sv
-                copy_ani_data["ev"] = ev
-                self.addAni(copy_ani_data)
-        else:
-            raise Exception("addValuesAni() This method supports only the Animation.Draw mode!")
+            else:
+                copy_ani_data = copy.copy(ani_data)
+            copy_ani_data["targetObj"] = copy_ani_data.get("targetObj",QObject())
+            copy_ani_data["sv"] = sv
+            copy_ani_data["ev"] = ev
+            self.addAni(copy_ani_data)
+    # else:
+    #     raise Exception("addValuesAni() This method supports only the Animation.Draw mode!")
 
     # Executive function
     def __exeCall(self,call:Callable, argc=None):
