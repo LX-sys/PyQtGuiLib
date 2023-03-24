@@ -14,8 +14,8 @@ import copy
     重构动画框架
     Animation 仅创建,管理,播放动画
 '''
-
-from PyQtGuiLib.animation.animationFactory import AnimationFactory
+import pprint
+from PyQtGuiLib.animation.animationFactory import AnimationFactory,PropertyAnimation
 from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers,AniColor,AniRect,AniShadow
 
 AniMode = int
@@ -27,8 +27,15 @@ AnimationModeType = TypeVar("AnimationModeType",QParallelAnimationGroup,QSequent
 
 # 动画属性类
 class AnimationAttr:
+    '''
+
+        并行模式
+        串行模式
+        混合模式
+    '''
     Parallel = 1
     Sequential = 2
+    Blend = 3
 
     # 动画对象模式
     Control = "control"  # 动画作用在普通控件上面
@@ -155,55 +162,60 @@ class Animation(AnimationAttr):
         if loopCount is None:
             ani_data["loopCount"] = self.loopCount()
 
-    def addAni(self,ani_data:dict):
+    # 创建动画
+    def __createAni(self,ani_data:dict)->PropertyAnimation:
         '''
-        {
-            "targetObj":xx
-            "propertyName":""
-            "duration":1000,  # 可选参数
-            "special":        # 可选参数
-            "loop":1          # 可选参数
-            "call":fun  回调函数  # 可选参数
-            "argc":tuple    # 回调函数的参数  可选参数
-            "sv":xx  # 该参数在控件模式下,可以写 this 指向自己的属性
-            "atv":[()] 或者 []          # 可选参数
-            "ev":xx
-            "selector":""  # 选择器,这个参数qss样式动画时使用 eg:backgroundColor  可选参数
-            "qss-suffix":"px"  # qss属性单位 如果: 写宽度时单位是px,表示文字大小时,有时候会用到pt  可选参数
-            "isEffect":True/False # 这个参数觉得了是否开启特殊动画,阴影,模糊 可选参数
-        }
-        注意 sv,atv,ev 中的值的参数类型必须一致
-        这里的每一个动画都是独立的,不会在并联动画连续播放
-        普通控件动画最简化版
-        {
-            "targetObj":xx,
-            "propertyName":"",
-            "sv":xx,
-            "ev":xx
-        }
-       绘图动画最简化版
-        {
-            "propertyName":"",
-            "sv":xx,
-            "ev":xx
-        }
-        :param ani_data:
-        :return:
-        '''
+         {
+             "targetObj":xx
+             "propertyName":""
+             "duration":1000,  # 可选参数
+             "special":        # 可选参数
+             "loop":1          # 可选参数
+             "call":fun  回调函数  # 可选参数
+             "argc":tuple    # 回调函数的参数  可选参数
+             "sv":xx  # 该参数在控件模式下,可以写 this 指向自己的属性
+             "atv":[()] 或者 []          # 可选参数
+             "ev":xx
+             "selector":""  # 选择器,这个参数qss样式动画时使用 eg:backgroundColor  可选参数
+             "qss-suffix":"px"  # qss属性单位 如果: 写宽度时单位是px,表示文字大小时,有时候会用到pt  可选参数
+             "isEffect":True/False # 这个参数觉得了是否开启特殊动画,阴影,模糊 可选参数
+             "comment":xx  # 备注  可选参数
+             "blendFlag":True/False 混合动画标志,表示在混合模式下这类东西是串行的  可选参数
+         }
+         注意 sv,atv,ev 中的值的参数类型必须一致
+         这里的每一个动画都是独立的,不会在并联动画连续播放
+         普通控件动画最简化版
+         {
+             "targetObj":xx,
+             "propertyName":"",
+             "sv":xx,
+             "ev":xx
+         }
+        绘图动画最简化版
+         {
+             "propertyName":"",
+             "sv":xx,
+             "ev":xx
+         }
+         :param ani_data:
+         :return:
+         '''
         if not ani_data:
             return
 
         self.__setGeneralAttr(ani_data)
 
         if self.isControlMode() and self.parent():
-            ani = AnimationFactory(self.parent(),ani_data,self.aniObjMode()).createAni()
+            ani = AnimationFactory(self.parent(), ani_data, self.aniObjMode()).createAni()
         elif self.isDrawMode():
             ani_data["targetObj"] = QObject()
             ani = AnimationFactory(self.parent(), ani_data, self.aniObjMode()).createAni()
         else:
             raise Exception("Pattern error,Only Animation.Control or Animation.Draw is supported!")
+        return ani
 
-        self.ani_list.append(ani)
+    def addAni(self,ani_data:dict):
+        self.ani_list.append(self.__createAni(ani_data))
 
     def addAnis(self,*args):
         for ani_data in args:
@@ -249,15 +261,12 @@ class Animation(AnimationAttr):
         # 在创建出后续的连续动画
         variation_len = len(variation)
         for i,ev in enumerate(variation):
-            # ev = variation[i]
             if i == variation_len-1:  # 这里判断是否是最后一项数值
                 if Call: ani_data["call"] = Call
                 if CallAgrc: ani_data["argc"] = CallAgrc
             ani_data["sv"] = sv
             ani_data["ev"] = ev
             e_ani = AnimationFactory(self.parent(), ani_data, self.aniObjMode()).createAni()
-            # e_ani.setStartValue(sv)
-            # e_ani.setEndValue(ev)
             sv = ev
             self.ani_list.append(e_ani)
 
@@ -301,6 +310,99 @@ class Animation(AnimationAttr):
             self.addAni(copy_ani_data)
     # else:
     #     raise Exception("addValuesAni() This method supports only the Animation.Draw mode!")
+
+    # 添加混合动画
+    def addBlend(self,ani_datas:list):
+        '''
+            混合动画,专注处理,即需要并行的动画,由需要串行的动画
+                    n个动画组成并行 --> n个动画组成串行 --> n个动画组成并行,...
+            [
+                {
+                "targetObj": xxx,
+                "propertyName": xxx,
+                "sv": xxx,
+                "ev": xxxx,
+                },
+                {
+                "targetObj": xxx,
+                "propertyName": xxx,
+                "sv": xxx,
+                "ev": xxxx,
+                },
+                {
+                "targetObj": xxx,
+                "propertyName": xxx,
+                "sv": xxx,
+                "ev": xxxx,
+                "blendFlag":True
+                },
+                {
+                "targetObj": xxx,
+                "propertyName": xxx,
+                "sv": xxx,
+                "ev": xxxx,
+                "blendFlag":True
+                },
+                ....
+            ]
+            这个参数 表示先执行一组 并行动画之后,在执行一组串行动画
+        :return:
+        '''
+        if not ani_datas:
+            return
+
+        # 并行/串行动画列表
+        ani_list = []
+
+        '''
+            根据第一个动画数据进行动画标记
+        '''
+        ani_flag = Animation.Sequential if ani_datas[0].get("blendFlag",False) else Animation.Parallel
+
+        temp_list = []
+
+        for data in ani_datas:
+            if data.get("blendFlag",False) is False:
+                if ani_flag == Animation.Sequential:
+                    ani_list.append({"datas":temp_list,"aniMode":Animation.Sequential})
+                    temp_list = []
+
+                ani_flag = Animation.Parallel
+            else:
+                if ani_flag == Animation.Parallel:
+                    ani_list.append({"datas":temp_list,"aniMode":Animation.Parallel})
+                    temp_list = []
+
+                ani_flag = Animation.Sequential
+            temp_list.append(self.__createAni(data))
+
+        if ani_flag == Animation.Sequential:
+            ani_list.append({"datas":temp_list,"aniMode":Animation.Sequential})
+        else:
+            ani_list.append({"datas":temp_list,"aniMode":Animation.Parallel})
+
+        # 混合
+        blend_list = []
+        for data in ani_list:
+            data:dict
+            aniMode, datas = data["aniMode"],data["datas"]
+
+            if aniMode == Animation.Parallel:
+                g_ani = QParallelAnimationGroup()
+            else:
+                g_ani = QSequentialAnimationGroup()
+
+            for ani in datas:
+                g_ani.addAnimation(ani)
+            blend_list.append(g_ani)
+
+
+        self.ll = QSequentialAnimationGroup()
+        for i in blend_list:
+            self.ll.addAnimation(i)
+
+        self.ll.start()
+
 
     # Executive function
     def __exeCall(self,call:Callable, argc=None):
@@ -368,3 +470,35 @@ class Animation(AnimationAttr):
                 self.resume()
                 if btn:
                     btn.setText(pause_)
+
+    def getAni(self,index:int)->PropertyAnimation:
+        return self.ani_list[index]
+
+    # 根据备注获取动画
+    def getCommentAni(self,comment:str) -> PropertyAnimation:
+        for ani in self.ani_list:
+            if ani.commentInfo() == comment:
+                return ani
+
+    # 更新单个动画的信息
+    def updateAni(self,ani:PropertyAnimation,new_datas:dict):
+        ani.updateAni(new_datas)
+
+    def removeAni(self,index:int):
+        del self.ani_list[index]
+
+    # 根据备注来移除动画
+    def removeCommentAni(self,comment:str,count=1):
+        '''
+
+        :param comment:
+        :param count: 默认只删除遇到的第一个相匹配的值,如果需要删除所有相匹配的值(count=-1)
+        :return:
+        '''
+        temp_count = 0
+        for ani in self.ani_list[::-1]:
+            if count != -1 and (temp_count == count):
+                break
+            if ani.commentInfo() == comment:
+                self.ani_list.remove(ani)
+                temp_count += 1
