@@ -21,6 +21,7 @@ from PyQtGuiLib.header import (
 from PyQtGuiLib.animation import Animation
 from PyQtGuiLib.animation.animationLayout import AnimationLayout
 
+
 class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -107,7 +108,6 @@ class Test(QWidget):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-
     win = Test()
     win.show()
     # win.showMaximized()
