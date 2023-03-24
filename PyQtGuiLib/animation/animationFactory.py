@@ -40,33 +40,36 @@ class PropertyAnimation(QPropertyAnimation):
 
         self.__all_ani_data = ani_data
 
-        self.targetObj = ani_data.get("targetObj", None)
-        self.propertyName = ani_data.get("propertyName", None)
-        self.sv = ani_data.get("sv", None)
-        self.atv = ani_data.get("atv", None)
-        self.ev = ani_data.get("ev", None)
-        self.call = ani_data.get("call", None)
-        self.call_argc = ani_data.get("argc", None)
-        self.selector = ani_data.get("selector", None)
-        self.qssSuffix = ani_data.get("qss-suffix","px")
-
-        self.duration = ani_data.get("duration", self.duration())
-        self.special = ani_data.get("special", self.special())
-        self.loopCount = ani_data.get("loop", self.loopCount())
-
-        self.setTargetObject(self.targetObj)
-        self.setDuration(self.duration)
-        self.setSpecial(self.special)
-        self.setLoopCount(self.loopCount)
+        self.aniInit()
 
         # 保存绘图动画的开始对象
         self.__drawStartObj = self.sv
 
-    def drawSv(self):
-        return self.__drawStartObj
-
     def allAniDatas(self)->dict:
         return self.__all_ani_data
+
+    def aniInit(self):
+        self.targetObj = self.allAniDatas().get("targetObj", None)
+        self.propertyName = self.allAniDatas().get("propertyName", None)
+        self.sv = self.allAniDatas().get("sv", None)
+        self.atv = self.allAniDatas().get("atv", None)
+        self.ev = self.allAniDatas().get("ev", None)
+        self.call = self.allAniDatas().get("call", None)
+        self.call_argc = self.allAniDatas().get("argc", None)
+        self.selector = self.allAniDatas().get("selector", None)
+        self.qssSuffix = self.allAniDatas().get("qss-suffix", "px")
+
+        special = self.allAniDatas().get("special", self.special())
+        duration = self.allAniDatas().get("duration", self.duration())
+        loopCount = self.allAniDatas().get("loop", self.loopCount())
+
+        self.setTargetObject(self.targetObj)
+        self.setDuration(duration)
+        self.setSpecial(special)
+        self.setLoopCount(loopCount)
+
+    def drawSv(self):
+        return self.__drawStartObj
 
     def aniObjMode(self):
         return self.__ani_obj_mode
@@ -79,18 +82,28 @@ class PropertyAnimation(QPropertyAnimation):
         return self.easingCurve()
 
     # 判断sv是不是this
-    def isThis(self)->bool:
+    def isThis(self) -> bool:
         if isinstance(self.sv,str) and self.sv.lower() == "this":
             return True
         return False
 
     # 判断是否开启特殊动画
-    def isEffect(self)->bool:
+    def isEffect(self) -> bool:
         return True if self.allAniDatas().get("isEffect",None) else False
+
+    # 返回备注信息
+    def commentInfo(self) -> str:
+        return self.allAniDatas().get("comment","")
 
     # 刷新绘图动画
     def updateDraw(self):
         self.__parent.update()
+
+    # 更新动画信息
+    def updateAni(self,new_datas:dict):
+        self.allAniDatas().update(new_datas)
+        self.aniInit()
+        self.createAni()
 
     # 子类重写(默认模式)
     def createAni(self):
