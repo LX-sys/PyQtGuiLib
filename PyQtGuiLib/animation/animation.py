@@ -35,7 +35,6 @@ class AnimationAttr:
     '''
     Parallel = 1
     Sequential = 2
-    Blend = 3
 
     # 动画对象模式
     Control = "control"  # 动画作用在普通控件上面
@@ -143,11 +142,32 @@ class AnimationAttr:
 
 # 动画类
 class Animation(AnimationAttr):
+    '''
+
+        主要方法:
+            addAni()  最常用的添加单个动画的方式
+            addAnis() 添加多个单个动画的方式
+            addSeriesAni() 添加连续动画的方法
+                - 连续动作必须一致,Eg: 初始动作是pos,那么后续动作也必须的pos
+                - 这个方法必须最串行模式下运行
+
+            addValuesAni() 多值动画,这个方法比较特殊
+                - 使用这个方法之前,这个类的初始模式必须会绘图模式
+            addBlend() 添加混合动画
+                - 这个方法必须最串行模式下运行
+                - 这个方法最好单独使用,不要和其他添加动画的方式一起使用
+    '''
+    BlendStart = AnimationAttr.Sequential
+    BlendEnd = AnimationAttr.Parallel
+
     def __init__(self, parent: QObject = None, ani_obj_mode="control"):
         super(Animation, self).__init__(parent,ani_obj_mode)
 
         # 动画列表(里面每一个元素都是一个完整的动画对象)
         self.ani_list = []
+
+        # 混合动画标记
+        self._blendFlag = Animation.BlendEnd
 
     # 设置通用属性
     def __setGeneralAttr(self,ani_data:dict):
@@ -314,6 +334,7 @@ class Animation(AnimationAttr):
     # 添加混合动画
     def addBlend(self,ani_datas:list):
         '''
+            混合模式必须的串行
             混合动画,专注处理,即需要并行的动画,由需要串行的动画
                     n个动画组成并行 --> n个动画组成串行 --> n个动画组成并行,...
             [
@@ -350,6 +371,9 @@ class Animation(AnimationAttr):
         '''
         if not ani_datas:
             return
+
+        if self.aniMode() != Animation.Sequential:
+            raise Exception("The blend mode must be Animation.Sequential")
 
         # 并行/串行动画列表
         ani_list = []
@@ -396,13 +420,10 @@ class Animation(AnimationAttr):
                 g_ani.addAnimation(ani)
             blend_list.append(g_ani)
 
-
-        self.ll = QSequentialAnimationGroup()
-        for i in blend_list:
-            self.ll.addAnimation(i)
-
-        self.ll.start()
-
+        self._blendFlag = Animation.BlendStart # 混合模式开启
+        self.setAniMode(Animation.BlendStart)
+        for ani in blend_list:
+            self.ani_list.append(ani)
 
     # Executive function
     def __exeCall(self,call:Callable, argc=None):
@@ -441,6 +462,16 @@ class Animation(AnimationAttr):
             self.aniGroupObj().addAnimation(ani)
 
         self.aniGroupObj().start()
+
+        # 结束混合模式
+        def _f():
+            self.setAniMode(self._blendFlag)
+            self.aniGroupObj().disconnect()
+
+
+        if self._blendFlag == Animation.BlendStart:
+            self._blendFlag = Animation.BlendEnd
+            self.aniGroupObj().finished.connect(_f)
 
     # 开关
     def aniSwitch(self,btn:QPushButton=None,texts:dict=None):
