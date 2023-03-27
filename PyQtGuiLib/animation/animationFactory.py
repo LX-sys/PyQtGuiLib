@@ -251,7 +251,6 @@ class ShadowAnimation(PropertyAnimation):
             self.__shadow.setColor(value)
 
 
-
 # 普通绘图 - 单值动画
 class AnimationDrawValue(PropertyAnimation):
     def __init__(self,parent:QObject,ani_data:dict,ani_obj_mode="control"):

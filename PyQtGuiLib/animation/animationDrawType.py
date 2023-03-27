@@ -79,7 +79,7 @@ class AniRect(AniNumbers):
         return QRect(*super().values())
 
 
-# 阴影类型
+# 阴影类型(测试中)
 class AniShadow(AniNumbers):
     def __init__(self,offx:int,offy:int,r:int,color:QColor):
         super().__init__(offx,offy,r,color)
