@@ -235,6 +235,9 @@ class Animation(AnimationAttr):
         return ani
 
     def addAni(self,ani_data:dict):
+        if not ani_data:
+            raise Exception("The first argument cannot be null!")
+
         self.ani_list.append(self.__createAni(ani_data))
 
     def addAnis(self,*args):
@@ -250,7 +253,7 @@ class Animation(AnimationAttr):
         :return:
         '''
         if not ani_data:
-            return
+            raise Exception("The first argument cannot be null!")
 
         if self.aniMode() != Animation.Sequential:
             raise Exception("Current animation mode is not Animation.Sequential")
@@ -303,6 +306,8 @@ class Animation(AnimationAttr):
         # if self.isDrawMode():
         # 先移除属性
 
+        if not ani_data:
+            raise Exception("The first argument cannot be null!")
 
         Sv = ani_data.get("sv",None)
         Ev = ani_data.get("ev",None)
@@ -507,12 +512,18 @@ class Animation(AnimationAttr):
 
     # 根据备注获取动画
     def getCommentAni(self,comment:str) -> PropertyAnimation:
+        if not comment:
+            return None
+
         for ani in self.ani_list:
             if ani.commentInfo() == comment:
                 return ani
 
     # 更新单个动画的信息
     def updateAni(self,ani:PropertyAnimation,new_datas:dict):
+        if not new_datas:
+            return
+
         ani.updateAni(new_datas)
 
     def removeAni(self,index:int):
