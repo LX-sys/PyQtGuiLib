@@ -28,7 +28,6 @@ class SendLog(QThread):
         super().__init__(*args, **kwargs)
 
 
-
 # # 本地日志管理
 class LoadLocalLog(QThread):
     loaded = Signal(str)
