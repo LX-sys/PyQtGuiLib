@@ -201,6 +201,14 @@ class AnimationABC(AnimationAttr):
              "sv":xx,
              "ev":xx
          }
+         QSS属性动画的最简化版
+        {
+             "targetObj":xx,
+             "propertyName":"",
+             "sv":xx,
+             "ev":xx,
+             "selector":xx
+         }
         绘图动画最简化版
          {
              "propertyName":"",
@@ -482,25 +490,7 @@ class Animation(AnimationAttr):
     def __init__(self, parent: QObject = None):
         super().__init__(parent,"control")
 
-        #
-        self.__blend_mode = False
-
         self.__ani_build_groups = []
-
-    def setBlend(self,b:bool):
-        '''
-            开启混合模式,
-            混合模式是一种从代码层面来控件某一部分动画的并行还是串行的设计,
-            这个模式一旦开启,setAniMode() 该方法的全局设置将会失效,并且将模式锁定在串行,
-            通过 blendStart()和blendEnd()两个区域来划分出并行动画
-
-        :param b:
-        :return:
-        '''
-        self.__blend_mode = b
-
-    def isBlend(self)->bool:
-        return self.__blend_mode
 
     def addAni(self,ani_data:dict):
         ani = AnimationABC(self.parent())
@@ -584,7 +574,7 @@ class Animation(AnimationAttr):
         self.aniGroupObj().setLoopCount(self.loopCount())
         self.aniGroupObj().start()
 
-    def allAni(self)->list:
+    def allAni(self) -> list:
         return self.__ani_build_groups
 
     # 开关
@@ -632,7 +622,7 @@ class Animation(AnimationAttr):
                     infos.append(a)
         return infos
 
-    # # 更新单个动画的信息
+    # 更新单个动画的信息
     def updateAni(self,ani:PropertyAnimation,new_datas:dict):
         if not new_datas:
             return
