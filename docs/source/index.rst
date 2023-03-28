@@ -12,6 +12,7 @@ Welcome to PyQtGuiLib's documentation!
 
    introduction
    component
+   animationFramework
 
 
 Indices and tables
