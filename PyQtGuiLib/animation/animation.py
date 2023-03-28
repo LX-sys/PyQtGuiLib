@@ -16,7 +16,7 @@ import copy
 '''
 import pprint
 from PyQtGuiLib.animation.animationFactory import AnimationFactory,PropertyAnimation
-from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers,AniColor,AniRect,AniShadow
+from PyQtGuiLib.animation.animationDrawType import AniNumber,AniNumbers,AniColor,AniRect,AniShadow,AniPoint
 
 AniMode = int
 ObjMode = str
@@ -139,9 +139,10 @@ class AnimationAttr:
     def createAniShadow(*args) -> AniShadow:
         return AniShadow(*args)
 
-'''
-    再次重构,将不同的动画模式彻底打散
-'''
+    # 点封装
+    @staticmethod
+    def createPoint(*args) -> AniPoint:
+        return AniPoint(*args)
 
 
 # 动画的基类,抽离不同动画模式的共同点
@@ -262,7 +263,6 @@ class AnimationContinuous(AnimationABC):
 
         # 默认串行
         self.setAniMode(AnimationABC.Sequential)
-
 
     # 添加连续动画(运动必须是相同的)
     def addSeriesAni(self, ani_data: dict, variation: list):
