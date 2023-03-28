@@ -58,17 +58,17 @@ class Test(QWidget):
             "sv": self.btn.pos(),
             "ev": QPoint(300,100)
         })
-        a = self.ani.getAni(0)
 
 
-        # self.ani.addAni({
-        #     "targetObj": self.btn,
-        #     "propertyName": b"background-color", # pos动作 是表示移动
-        #     "sv": "this",
-        #     "ev": QColor(0,255,0),
-        #     "selector":"QPushButton",
-        #     "comment": "hello"
-        # })
+
+        self.ani.addAni({
+            "targetObj": self.btn,
+            "propertyName": b"background-color", # pos动作 是表示移动
+            "sv": "this",
+            "ev": QColor(0,255,0),
+            "selector":"QPushButton",
+            "call":self.test
+        })
 
         # self.ani.addSeriesAni({
         #     "targetObj": self.btn,
@@ -137,7 +137,10 @@ class Test(QWidget):
 
         # 开始动画
         # self.btn.clicked.connect(self.ani.start)
-        # self.ani.start()
+        self.ani.start()
+
+    def test(self,obj):
+        print("dsa",obj)
 
     # def paintEvent(self, e) -> None:
     #     painter = QPainter(self)
