@@ -573,13 +573,12 @@ QComboBox:editable{
 
 }
 QComboBox::drop-down{
-	  width: 30px;
+	 width: 30px;
 	padding-right:8px;
 	image: url(:/QComboBox/QComboBox/down-arrow.png);
 }
-QComboBox::down-arrow{
+QComboBox::drop-down:pressed{
 
-	
 }
 QComboBox QAbstractItemView{
 background-color: rgb(0, 0, 0);

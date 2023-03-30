@@ -4,6 +4,7 @@
     <file>QRadioButton/QRadioButton.png</file>
   </qresource>
   <qresource prefix="QComboBox">
+    <file>QComboBox/down-arrow2.png</file>
     <file>QComboBox/down-arrow.png</file>
   </qresource>
   <qresource prefix="QCheckBox">
