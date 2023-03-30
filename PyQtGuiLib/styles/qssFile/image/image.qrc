@@ -1,0 +1,13 @@
+<RCC>
+  <qresource prefix="QRadioButton">
+    <file>QRadioButton/QRadioButton_pressed.png</file>
+    <file>QRadioButton/QRadioButton.png</file>
+  </qresource>
+  <qresource prefix="QComboBox">
+    <file>QComboBox/down-arrow.png</file>
+  </qresource>
+  <qresource prefix="QCheckBox">
+    <file>QCheckBox/QCheckBox.png</file>
+    <file>QCheckBox/QCheckBox_pressed.png</file>
+  </qresource>
+</RCC>

@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1232</width>
+    <height>797</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">*{
+	background-color: rgb(50, 50, 50);
+	color:rgb(220, 220, 220);
+	font: 12pt &quot;黑体&quot;;
+}
+/*---------------------*/
+QScrollBar:horizontal{
+    padding:0px;
+    max-height:12px;
+	padding:2px;
+}
+QScrollBar:vertical{
+    padding:0px;
+    max-width:12px;
+	padding:2px;
+}
+QScrollBar::handle{
+background-color: rgb(39, 39, 39);
+border-radius:4%;
+
+}
+QScrollBar::handle:hover{
+background-color: rgb(72, 72, 72);
+border:1px solid rgb(149, 149, 149);
+}
+QScrollBar::add-page,QScrollBar::sub-page {
+    background:rgb(57, 57, 57);
+}
+QScrollBar::sub-line,QScrollBar::add-line {
+    background:none;
+}</string>
+  </property>
+  <widget class="QPushButton" name="pushButton">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>50</y>
+     <width>141</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPushButton{
+background-color: rgb(8, 8, 8);
+border:2px solid rgb(230, 230, 230);
+color:rgb(220, 220, 220);
+border-radius:6%;
+}
+QPushButton:hover{
+background-color: rgb(0, 0, 0);
+}
+QPushButton:pressed{
+background-color:rgb(50, 50, 50);
+}</string>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>200</y>
+     <width>131</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QRadioButton{
+
+}
+QRadioButton:hover{
+}
+QRadioButton:pressed{
+
+}
+QRadioButton::indicator {
+	padding:3px 0px 0px 0px;
+    width: 20px;
+    height: 20px;
+}
+QRadioButton::indicator::unchecked{
+	image: url(:/QRadioButton/QRadioButton/QRadioButton.png);
+}
+QRadioButton::indicator::checked{
+	image: url(:/QRadioButton/QRadioButton/QRadioButton_pressed.png);
+}</string>
+   </property>
+   <property name="text">
+    <string>RadioButton</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>280</y>
+     <width>111</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCheckBox::indicator {
+	padding:3px 0px 0px 0px;
+    width: 20px;
+    height: 20px;
+}
+QCheckBox::indicator::unchecked{ 
+	image: url(:/QCheckBox/QCheckBox/QCheckBox.png);
+}
+QCheckBox::indicator::checked{
+	image: url(:/QCheckBox/QCheckBox/QCheckBox_pressed.png);
+}</string>
+   </property>
+   <property name="text">
+    <string>CheckBox</string>
+   </property>
+  </widget>
+  <widget class="QCommandLinkButton" name="commandLinkButton">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>350</y>
+     <width>185</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QCommandLinkButton{
+background-color: rgb(8, 8, 8);
+border:1px solid rgb(0, 120, 215);
+color:rgb(220, 220, 220);
+border-radius:6%;
+}
+QCommandLinkButton:hover{
+background-color: rgb(0, 0, 0);
+}
+QCommandLinkButton:pressed{
+background-color:rgb(50, 50, 50);
+}</string>
+   </property>
+   <property name="text">
+    <string>CommandLinkButton</string>
+   </property>
+  </widget>
+  <widget class="QTableWidget" name="tableWidget">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>200</y>
+     <width>261</width>
+     <height>291</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTableView{
+outline: 0px;
+background-color:rgb(33, 33, 33);
+gridline-color:rgb(125, 125, 125);
+}
+QTableView QHeaderView,QTableView QHeaderView::section, QTableView QTableCornerButton::section {
+background-color:rgb(0, 0, 0);
+color:rgb(175, 175, 175);
+}
+QTableView QHeaderView::section::pressed{
+color:rgb(207, 207, 103);
+}
+QTableView QTableCornerButton::section{
+background-color: rgb(0, 0, 0);
+}
+QHeaderView::section, QTableCornerButton:section {
+    padding: 3px;
+    margin: 0px;
+    border: 1px solid gray;
+    border-left-width: 0px;
+    border-right-width: 1px;
+    border-top-width: 0px;
+    border-bottom-width: 1px;
+}
+QTableView::indicator{
+background-color: rgb(255, 170, 0);
+}
+QTableView::indicator:checked{
+background-color:rgb(33, 33, 33);
+}
+QTableView::item{
+padding:0px;
+border:0px;
+}
+QTableView::item:selected{
+	background-color:#000;
+}
+QTableView::item:hover{
+background-color: rgb(86, 86, 86);
+}
+
+</string>
+   </property>
+   <row>
+    <property name="text">
+     <string>新建行</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>新建行</string>
+    </property>
+   </row>
+   <row>
+    <property name="text">
+     <string>新建行</string>
+    </property>
+   </row>
+   <column>
+    <property name="text">
+     <string>新建列</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>新建列</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>新建列</string>
+    </property>
+   </column>
+  </widget>
+  <widget class="QListWidget" name="listWidget_2">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>40</y>
+     <width>261</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QListView {
+outline: 0px;
+background-color: rgb(2, 2, 2);
+color: #FFFFFF;
+border: 1px solid #666666;
+}
+QListView::item:hover{
+padding:0px 0px 0px 15px;
+color:rgb(255, 255, 255);
+background-color: qlineargradient(spread:pad, x1:0, y1:0.5625, x2:0.994318, y2:0.614, stop:0 rgba(0, 0, 0, 255), stop:0.909091 rgba(73, 73, 73, 255));
+}
+QListView::item {
+background-color: rgb(2, 2, 2);
+color: rgb(143, 143, 143);
+padding: 5px;
+border-bottom: 1px solid #666666;
+}
+QListView::item:selected {
+padding:0px 0px 0px 15px;
+color:rgb(255, 255, 255);
+background-color: qlineargradient(spread:pad, x1:0, y1:0.5625, x2:0.994318, y2:0.614, stop:0 rgba(0, 0, 0, 255), stop:0.909091 rgba(73, 73, 73, 255));
+}</string>
+   </property>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QToolButton" name="toolButton_2">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>130</y>
+     <width>191</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolButton {
+	border-radius:6%;
+    background-color: #1E1E1E; 
+    color: #FFFFFF; 
+    border: 1px solid #2F2F2F; 
+    padding: 5px;
+}
+
+QToolButton:hover {
+    background-color: rgb(18, 18, 18);
+}
+
+QToolButton:pressed {
+    background-color:#1E1E1E; 
+}
+</string>
+   </property>
+   <property name="text">
+    <string>...</string>
+   </property>
+  </widget>
+  <widget class="QTreeWidget" name="treeWidget">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>40</y>
+     <width>261</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTreeView{
+	background-color: rgb(33, 33, 33);
+	color:rgb(188, 188, 188);
+}
+QTreeView QHeaderView,QTreeView QHeaderView::section{
+background-color: rgb(0, 0, 0);
+color:rgb(175, 175, 175);
+}
+QTreeView::item:hover{
+background-color:transparent;
+}
+QTreeView::item:selected{
+background-color:rgb(121, 121, 121);
+color: rgb(255, 255, 255);
+}
+QTreeView::branch:selected{
+	background-color:rgb(121, 121, 121);
+}</string>
+   </property>
+   <property name="rootIsDecorated">
+    <bool>true</bool>
+   </property>
+   <property name="uniformRowHeights">
+    <bool>false</bool>
+   </property>
+   <property name="itemsExpandable">
+    <bool>true</bool>
+   </property>
+   <property name="sortingEnabled">
+    <bool>false</bool>
+   </property>
+   <property name="animated">
+    <bool>false</bool>
+   </property>
+   <attribute name="headerCascadingSectionResizes">
+    <bool>false</bool>
+   </attribute>
+   <attribute name="headerDefaultSectionSize">
+    <number>200</number>
+   </attribute>
+   <attribute name="headerHighlightSections">
+    <bool>false</bool>
+   </attribute>
+   <column>
+    <property name="text">
+     <string>属性</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>值</string>
+    </property>
+   </column>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+    <item>
+     <property name="text">
+      <string>新建子项目</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>新建子项目</string>
+     </property>
+    </item>
+   </item>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+    <item>
+     <property name="text">
+      <string>新建子项目</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>新建子项目</string>
+     </property>
+    </item>
+   </item>
+  </widget>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>580</x>
+     <y>260</y>
+     <width>231</width>
+     <height>141</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QGroupBox {
+border:1px solid rgb(118, 118, 118);
+border-radius:5px;
+background-color: rgb(26, 26, 26);
+}
+</string>
+   </property>
+   <property name="title">
+    <string>分组</string>
+   </property>
+  </widget>
+  <widget class="QToolBox" name="toolBox">
+   <property name="geometry">
+    <rect>
+     <x>900</x>
+     <y>60</y>
+     <width>241</width>
+     <height>131</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QToolBox::tab {
+	background-color: rgb(90, 90, 90);
+	border-radius:3%;
+	padding:5px;
+}
+
+QToolBox::tab:selected{
+    font: italic;
+    color: white;
+}</string>
+   </property>
+   <property name="frameShape">
+    <enum>QFrame::NoFrame</enum>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="page">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>241</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <attribute name="label">
+     <string>第一页</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="page_2">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>241</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <attribute name="label">
+     <string>第二页</string>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QTabWidget" name="tabWidget">
+   <property name="geometry">
+    <rect>
+     <x>840</x>
+     <y>250</y>
+     <width>331</width>
+     <height>181</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTabWidget::pane {
+}
+QTabWidget QWidget{
+background-color: rgb(20, 20, 20);
+}
+QTabWidget QTabBar::tab{
+background-color: rgb(20, 20, 20);
+min-width: 20ex;
+padding: 5px;
+}
+QTabBar::tab:selected{
+color: rgb(180, 239, 255);
+}
+
+QTabBar::tab:!selected{
+background-color: rgb(65, 65, 65);
+}</string>
+   </property>
+   <widget class="QWidget" name="tab">
+    <attribute name="title">
+     <string>Tab 1</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tab_2">
+    <attribute name="title">
+     <string>Tab 2</string>
+    </attribute>
+   </widget>
+  </widget>
+  <widget class="QComboBox" name="comboBox">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>550</y>
+     <width>211</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QComboBox {
+background-color: rgb(0, 0, 0);
+border:1px solid rgb(255, 255, 255);
+border-bottom:none;
+border-left:none;
+border-right:none;
+	color: rgb(182, 182, 182);
+    border-radius: 1px;
+    padding: 1px 18px 1px 3px;
+    min-width: 6em;
+}
+QComboBox:editable{
+
+}
+QComboBox::drop-down{
+	  width: 30px;
+	padding-right:8px;
+	image: url(:/QComboBox/QComboBox/down-arrow.png);
+}
+QComboBox::down-arrow{
+
+	
+}
+QComboBox QAbstractItemView{
+background-color: rgb(0, 0, 0);
+border:none;
+outline: 0px;
+selection-background-color:rgb(0, 0, 0);
+selection-color:rgb(0, 255, 255);
+}</string>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
+   </property>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>新建项目</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QFontComboBox" name="fontComboBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>640</y>
+     <width>211</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QFontComboBox {
+    border:2px solid rgb(103, 103, 103);
+    border-radius: 5px;
+    padding: 1px 18px 1px 3px;
+    min-width: 6em;
+}
+QFontComboBox QAbstractItemView{
+outline: 0px;
+selection-background-color: rgb(90, 90, 90);
+}</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>520</y>
+     <width>241</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QLineEdit{
+border:2px solid rgb(0, 0, 0);
+border-top:none;
+border-left:none;
+border-right:none;
+}
+QLineEdit:hover{
+border:2px solid qlineargradient(spread:pad, x1:0.012, y1:0.556818, x2:1, y2:0.573864, stop:0 rgba(110, 203, 205, 255), stop:0.965909 rgba(67, 91, 95, 255));
+border-top:none;
+border-left:none;
+border-right:none;
+}</string>
+   </property>
+   <property name="text">
+    <string>dsad</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="textEdit">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>590</y>
+     <width>231</width>
+     <height>81</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QTextEdit{
+border:1px solid rgb(0, 0, 0);
+border-radius: 3px;
+}
+QTextEdit:hover{
+	border:1px solid rgb(0, 85, 255);
+}</string>
+   </property>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'黑体'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;dsad&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;das&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;d&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;as&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;d&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;as&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPlainTextEdit" name="plainTextEdit">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>710</y>
+     <width>241</width>
+     <height>71</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QPlainTextEdit{
+border:1px solid rgb(0, 0, 0);
+border-radius: 4%;
+	background-color: rgb(66, 66, 66);
+}
+QPlainTextEdit:hover{
+border:1px solid rgb(109, 109, 109);
+}</string>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>480</y>
+     <width>151</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="doubleSpinBox">
+   <property name="geometry">
+    <rect>
+     <x>570</x>
+     <y>560</y>
+     <width>141</width>
+     <height>41</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QProgressBar" name="progressBar">
+   <property name="geometry">
+    <rect>
+     <x>780</x>
+     <y>490</y>
+     <width>331</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">QProgressBar {
+    border: 2px solid rgb(0, 0, 0);
+    border-radius: 5px;
+}
+
+QProgressBar::chunk {
+	border: 2px solid rgb(72, 72, 72);
+    width: 20px;
+}</string>
+   </property>
+   <property name="value">
+    <number>100</number>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+  </widget>
+  <widget class="QLCDNumber" name="lcdNumber">
+   <property name="geometry">
+    <rect>
+     <x>760</x>
+     <y>560</y>
+     <width>64</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="digitCount">
+    <number>5</number>
+   </property>
+   <property name="intValue" stdset="0">
+    <number>41</number>
+   </property>
+  </widget>
+ </widget>
+ <resources>
+  <include location="image/image.qrc"/>
+ </resources>
+ <connections/>
+</ui>
