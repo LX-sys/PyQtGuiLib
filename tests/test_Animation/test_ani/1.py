@@ -118,50 +118,50 @@ class Test(QWidget):
         #     "propertyName": b"value"
         # },self.rect_r,
         # [400,400,30,30,1,1])
-        #
-        # self.ani.addValuesAni({
-        #     "propertyName": b"value"
-        # },self.rgb,QColor(100,45,200))
+
+        self.ani.addValuesAni({
+            "propertyName": b"value"
+        },self.rgb,QColor(100,45,200))
 
         # self.ani.setAniMode(Animation2.Sequential)
         self.v1 = self.ani.createAniNumbers(200,200)
         self.v2 = self.ani.createAniNumbers(230,230)
-        # self.ani.addValuesAni({
-        #     "propertyName": b"value"
-        # },self.v1,
-        # [230,230])
-        # self.ani.addValuesAni({
-        #     "propertyName": b"value"
-        # },self.v2,
-        # [260,150])
+        self.ani.addValuesAni({
+            "propertyName": b"value"
+        },self.v1,
+        [230,230])
+        self.ani.addValuesAni({
+            "propertyName": b"value"
+        },self.v2,
+        [260,150])
 
         # 开始动画
-        # self.btn.clicked.connect(self.ani.start)
+        self.btn.clicked.connect(self.ani.start)
         self.ani.start()
 
     def test(self,obj):
         print("dsa",obj)
 
-    # def paintEvent(self, e) -> None:
-    #     painter = QPainter(self)
-    #     op = QPen()
-    #     op.setColor(self.rgb.values())
-    #     op.setWidth(3)
-    #     painter.setPen(op)
-    #     # painter.setBrush(self.rgb.values())
-    #     # painter.setBrush(QColor(123,45,89))
-    #     painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-    #
-    #     # painter.translate(self.width() // 2, self.height() // 2)
-    #     # painter.scale(0.5, 0.5)
-    #     # painter.rotate(*self.aotate_a.values())
-    #
-    #     # painter.drawRoundedRect(*self.rect_r.values())
-    #     # lay = AnimationLayout(e)
-    #
-    #     painter.drawLine(QPoint(200,200),QPoint(*self.v1.values()))
-    #     painter.drawLine(QPoint(230,230),QPoint(*self.v2.values()))
-    #     painter.end()
+    def paintEvent(self, e) -> None:
+        painter = QPainter(self)
+        op = QPen()
+        op.setColor(self.rgb.values())
+        op.setWidth(3)
+        painter.setPen(op)
+        # painter.setBrush(self.rgb.values())
+        # painter.setBrush(QColor(123,45,89))
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+
+        # painter.translate(self.width() // 2, self.height() // 2)
+        # painter.scale(0.5, 0.5)
+        # painter.rotate(*self.aotate_a.values())
+
+        # painter.drawRoundedRect(*self.rect_r.values())
+        # lay = AnimationLayout(e)
+
+        painter.drawLine(QPoint(200,200),QPoint(*self.v1.values()))
+        painter.drawLine(QPoint(230,230),QPoint(*self.v2.values()))
+        painter.end()
 
 
 if __name__ == '__main__':
