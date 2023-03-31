@@ -3,6 +3,9 @@
 # @author:LX
 # @file:logBrowser.py
 # @software:PyCharm
+import os
+import time
+from datetime import datetime as dt
 from PyQtGuiLib.header import (
     QApplication,
     sys,
@@ -13,96 +16,19 @@ from PyQtGuiLib.header import (
     Signal,
     QObject,
     QScrollBar,
-    QListWidget
+    QListWidget,
+    QMutex
 )
-import os
-import time
-from datetime import datetime as dt
+from PyQtGuiLib.core.logBrowser.logSizeTh import LogSizeTh
+from PyQtGuiLib.core.logBrowser.loadLogTh import LoadLocalLog
+
 
 
 TimeFormat = str
 
 
-class SendLog(QThread):
-    send = Signal()
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
-# 计算日志大小线程
-class LogSizeTh(QThread):
-    Sizeed = Signal(int)
-
-    def __init__(self, path:str):
-        super().__init__()
-        self.__path = path
-
-    def setPath(self,path):
-        self.__path = path
-
-    def run(self):
-        st = os.stat(self.__path)
-        self.Sizeed.emit(st.st_size)
-
-
-# 本地日志管理
-class LoadLocalLog(QThread):
-    loaded = Signal(str)
-    finish = Signal()
-
-    def __init__(self, path=".",filename="test.txt",encoding="utf8",limit=1000):
-        super().__init__()
-        self.__local_log = {
-            "path": path,
-            "filename": filename
-        }
-        self.__encoding = encoding
-        self.__limit = limit
-
-    def setLimit(self,n:int):
-        self.__limit = n
-
-    def limit(self)->int:
-        return self.__limit
-
-    def encoding(self) -> str:
-        return self.__local_log
-
-    def setLocalFileInfo(self, path, filename):
-        self.__local_log["path"] = path
-        self.__local_log["filename"] = filename
-
-    def localFileInfo(self) -> dict:
-        return self.__local_log
-
-    def path(self) -> str:
-        return self.__local_log["path"]
-
-    def fileName(self) -> str:
-        return self.__local_log["filename"]
-
-    def run(self):
-        old = time.time()
-        print("开始:",old)
-        path = os.path.join(self.path(),self.fileName())
-        with open(path,"r") as f:
-            n = 0
-            size = 0
-            limit = self.limit()
-            while n<limit or limit == -1:
-                data = f.readline()
-                if data:
-                    size += len(data)
-                    self.loaded.emit(data)
-                    # self.msleep(1)
-                else:
-                    break
-                n += 1
-        print("数据量:{} 字节大小:{}".format(n,size))
-        new = time.time()
-        print("耗时:",new-old)
-        self.finish.emit()
 
 # 日志控件
 class LogBrowser(QTextBrowser):
@@ -119,16 +45,31 @@ class LogBrowser(QTextBrowser):
         self._start_slider_value = 0
         self._next_slider_value = 0
 
+        '''
+            将日志暂时存储在内存中,避免过渡读取磁盘
+        '''
+        self.__logs = []
+        self.__logMax = 300
+        self.__culog = 0
+        self.__mutex = QMutex()
 
-        self.log_size = LogSizeTh(r"D:\code\PyQtGuiLib\PyQtGuiLib\core\logBrowser\test.txt")
-        self.log_size.Sizeed.connect(lambda n:print("日志大小:",n))
-        self.log_size.start()
+        # 本地日志路径
+        self.__localLogPath = "."
 
-        self.ll = LoadLocalLog(limit=1000)
-        self.ll.loaded.connect(self.test)
-        self.ll.finish.connect(self.init_slider_event)
-        self.ll.start()
-        self.verticalScrollBar().sliderMoved.connect(self.info)
+        # self.ll = LoadLocalLog(limit=1000)
+        # self.ll.loaded.connect(self.test)
+        # self.ll.finish.connect(self.init_slider_event)
+        # self.ll.start()
+        # self.verticalScrollBar().sliderMoved.connect(self.info)
+
+    def setMemoryLogMax(self,max_num):
+        self.__logMax = max_num
+
+    def setLocalLogPath(self,path):
+        self.__localLogPath = path
+
+    def localLogPath(self) -> str:
+        return self.__localLogPath
 
     # 在第一次加载日志后,初始化滚动条
     def init_slider_event(self):
@@ -163,18 +104,44 @@ class LogBrowser(QTextBrowser):
         return self.__timeFormat
 
     def append(self, p_str,mode="Info"):
+        '''
+            每次写入的输入会存入内存,当然数据到达一定的量的时候,
+            才会写入本地,避免过渡读取磁盘
+
+        :param p_str:
+        :param mode:
+        :return:
+        '''
         for_time = dt.strftime(dt.now(),self.timeFormat())
         log = "{mode} [{time}] > {info}".format(mode=mode,
                                             time=for_time,
                                             info=p_str.replace("\n",""))
+        self.__logs.append(log+"\n")
+        self.__culog += 1
+        if self.__culog >= self.__logMax:
+            self.saveLocalLog()
+            self.__culog = 0
         super().append(log)
 
+    # 将日志一次性存入本地
+    def saveLocalLog(self):
+        self.__mutex.lock() # 保证多线程的安全
+        with open(self.localLogPath(),"a+") as f:
+            f.write("".join(self.__logs))
+        self.__mutex.unlock()
+
+    def closeEvent(self, a) -> None:
+        self.saveLog()
+        super().closeEvent(a)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     win = LogBrowser()
     win.show()
+    win.setLocalLogPath(r"D:\code\PyQtGuiLib\PyQtGuiLib\core\logBrowser\test.log")
+
+
 
     if PYQT_VERSIONS in ["PyQt6","PySide6"]:
         sys.exit(app.exec())
