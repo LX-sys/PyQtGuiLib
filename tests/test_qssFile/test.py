@@ -17,7 +17,7 @@ from PyQtGuiLib.header import (
 from PyQtGuiLib.styles.qssFile.drak import qssDrak
 
 
-print(qssDrak.QssDrak)
+
 
 class Test(QWidget):
     def __init__(self,*args,**kwargs):

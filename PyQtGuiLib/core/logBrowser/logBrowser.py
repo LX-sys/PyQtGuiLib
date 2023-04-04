@@ -23,10 +23,54 @@ from PyQtGuiLib.core.logBrowser.logSizeTh import LogSizeTh
 from PyQtGuiLib.core.logBrowser.loadLogTh import LoadLocalLog
 
 
-
 TimeFormat = str
 
 
+# 日志缓存
+class LogCache(QObject):
+    finish = Signal()
+
+    def __init__(self):
+        super().__init__()
+        self.__logs = {
+            "logs":[],
+            "max":2,
+            "value":0
+        }
+
+    def isEmpty(self)->bool:
+        return False if self.__logs["logs"] else True
+
+    def allLogs(self)->list:
+        return self.__logs["logs"]
+
+    def setMaxValue(self,v:int):
+        self.__logs["max"] = v
+
+    def pushLog(self,log:str):
+        self.__logs["logs"].append(log)
+        self.addValue()
+        '''
+            当缓存的日志到达最大值,会触发一个信号,通知需要同步到本地文本/服务器,
+        '''
+        if self.isMax():
+            self.finish.emit()
+
+    def isMax(self) -> bool:
+        return True if self.value() == self.maxValue() else False
+
+    def addValue(self):
+        self.__logs["value"]+=1
+
+    def resetLog(self):
+        self.__logs["logs"].clear()
+        self.__logs["value"] = 0
+
+    def maxValue(self)->int:
+        return self.__logs["max"]
+
+    def value(self)->int:
+        return self.__logs["value"]
 
 
 
@@ -48,22 +92,15 @@ class LogBrowser(QTextBrowser):
         '''
             将日志暂时存储在内存中,避免过渡读取磁盘
         '''
-        self.__logs = []
-        self.__logMax = 300
-        self.__culog = 0
+        self.__logs = LogCache()
         self.__mutex = QMutex()
 
         # 本地日志路径
         self.__localLogPath = "."
+        self.myEvents()
 
-        # self.ll = LoadLocalLog(limit=1000)
-        # self.ll.loaded.connect(self.test)
-        # self.ll.finish.connect(self.init_slider_event)
-        # self.ll.start()
-        # self.verticalScrollBar().sliderMoved.connect(self.info)
-
-    def setMemoryLogMax(self,max_num):
-        self.__logMax = max_num
+    def setMemoryLogMax(self,v:int):
+        self.__logs.setMaxValue(v)
 
     def setLocalLogPath(self,path):
         self.__localLogPath = path
@@ -116,23 +153,24 @@ class LogBrowser(QTextBrowser):
         log = "{mode} [{time}] > {info}".format(mode=mode,
                                             time=for_time,
                                             info=p_str.replace("\n",""))
-        self.__logs.append(log+"\n")
-        self.__culog += 1
-        if self.__culog >= self.__logMax:
-            self.saveLocalLog()
-            self.__culog = 0
+        self.__logs.pushLog(log+"\n")
         super().append(log)
 
     # 将日志一次性存入本地
     def saveLocalLog(self):
-        self.__mutex.lock() # 保证多线程的安全
-        with open(self.localLogPath(),"a+") as f:
-            f.write("".join(self.__logs))
-        self.__mutex.unlock()
+        if not self.__logs.isEmpty():
+            self.__mutex.lock()  # 保证多线程的安全
+            with open(self.localLogPath(),"a+") as f:
+                f.write("".join(self.__logs.allLogs()))
+            self.__logs.resetLog() # 这里需要调用一下重置
+            self.__mutex.unlock()
 
     def closeEvent(self, a) -> None:
-        self.saveLog()
+        self.saveLocalLog()
         super().closeEvent(a)
+
+    def myEvents(self):
+        self.__logs.finish.connect(lambda :self.saveLocalLog())
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -140,7 +178,6 @@ if __name__ == '__main__':
     win = LogBrowser()
     win.show()
     win.setLocalLogPath(r"D:\code\PyQtGuiLib\PyQtGuiLib\core\logBrowser\test.log")
-
 
 
     if PYQT_VERSIONS in ["PyQt6","PySide6"]:
