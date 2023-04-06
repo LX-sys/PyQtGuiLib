@@ -13,6 +13,7 @@ Welcome to PyQtGuiLib's documentation!
    introduction
    component
    animationFramework
+   QssStyleAnalysis
 
 
 Indices and tables

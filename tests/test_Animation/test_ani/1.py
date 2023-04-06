@@ -126,18 +126,15 @@ class Test(QWidget):
         # self.ani.setAniMode(Animation2.Sequential)
         self.v1 = self.ani.createAniNumbers(200,200)
         self.v2 = self.ani.createAniNumbers(230,230)
-        self.ani.addValuesAni({
-            "propertyName": b"value"
-        },self.v1,
-        [230,230])
-        self.ani.addValuesAni({
-            "propertyName": b"value"
-        },self.v2,
-        [260,150])
+        # 再添加一个移动的动画
+        self.textv = [(182, 283), (183, 287), (185, 293), (185, 296), (187, 299), (187, 304), (187, 308), (189, 313), (190, 316), (192, 318), (193, 321), (195, 322), (196, 324), (196, 325), (196, 326), (197, 326), (199, 326), (202, 328), (205, 329), (211, 331), (213, 331), (218, 332), (224, 335), (226, 335), (230, 337), (236, 337), (239, 337), (242, 337), (245, 337), (250, 337), (254,
+ 336), (260, 334), (266, 332), (272, 328), (276, 325), (280, 322), (283, 319), (287, 318), (290, 317), (295, 313), (299, 309), (304, 307), (308, 304), (313, 300), (318, 297), (321, 295), (324, 293), (329, 289), (334, 286), (340, 282), (342, 280), (348, 276), (350, 275), (355, 274), (358, 270), (361, 268), (363, 267), (365, 264), (367, 262), (370, 259), (374, 256),
+ (375, 254), (378, 251), (380, 248), (383, 246), (385, 245), (386, 242), (387, 239), (389, 237), (392, 232), (394, 230), (397, 226), (401, 222), (405, 218), (408, 214), (410, 213), (413, 210), (414, 209), (416, 208), (417, 206), (420, 205), (422, 202), (424, 201), (425, 199), (427, 198), (430, 196), (431, 196), None]
+
 
         # 开始动画
-        self.btn.clicked.connect(self.ani.start)
-        self.ani.start()
+        # self.btn.clicked.connect(self.ani.start)
+        # self.ani.start()
 
     def test(self,obj):
         print("dsa",obj)
@@ -152,15 +149,23 @@ class Test(QWidget):
         # painter.setBrush(QColor(123,45,89))
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
+        s,e = None,None
+        for value in self.textv[:-1]:
+            if s is None and e is None:
+                s=e=value
+            else:
+                s = value
+            painter.drawLine(*s,*e)
+            e = value
         # painter.translate(self.width() // 2, self.height() // 2)
         # painter.scale(0.5, 0.5)
         # painter.rotate(*self.aotate_a.values())
 
         # painter.drawRoundedRect(*self.rect_r.values())
         # lay = AnimationLayout(e)
-
-        painter.drawLine(QPoint(200,200),QPoint(*self.v1.values()))
-        painter.drawLine(QPoint(230,230),QPoint(*self.v2.values()))
+        #
+        # painter.drawLine(QPoint(200,200),QPoint(*self.v1.values()))
+        # painter.drawLine(QPoint(230,230),QPoint(*self.v2.values()))
         painter.end()
 
 
