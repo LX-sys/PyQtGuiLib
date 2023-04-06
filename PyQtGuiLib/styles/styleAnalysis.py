@@ -31,12 +31,16 @@ class Qss:
         self.__parent =parent
         self.__qs = qs
 
-        self._qss_str = qss
+        self._qss_str = self.uncomment(qss)
         self._qss_dict = dict()
         self._qss_header = ""
         self._qss_body = ""
 
         self.Init()
+
+    # Uncomment information
+    def uncomment(self,qss:str) -> str:
+        return re.sub("/\*.*?\*/","",qss,flags=re.DOTALL)
 
     def Init(self):
         header = re.findall(".*{", self._qss_str, re.DOTALL)
