@@ -1,15 +1,15 @@
-### QSS样式解析器
+## QSS样式解析器
 
 ```
 将原本不易操作的字符串静态样式,变为易操作的动态样式.
 注:字符串静态样式值的是原本写在setStyleSheet()中的样式,这里的样式对于需要动态修改时,十分的困难,当然你可以使用正则表达式,但是你想修改特定控件下的某个样式,即便是编写正则,也会显的非常繁琐,且容易出错,而QSS样式解析器的诞生就是为了解决这一系列问题.
 ```
 
-#### 导入方式
+### 导入方式
 
 `from PyQtGuiLib.styles import QssStyleAnalysis`
 
-#### 一个简单例子来演示
+### 一个简单例子来演示
 
 ```python
 from PyQtGuiLib.header import (
@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
 操作窗口的样式,`setQSS()`这个方法与`setStyleSheet()`都是一样的设置一个字符串样式,在这个例子在更新了按钮`color`的值,修改完成立即生效,看起来是不是很方便
 
-#### 下面来详情介绍方法的使用
+### 下面来详情介绍方法的使用
 
 **<font color=blue>setQSS(<font color=green>qss:str</font>)</font>**
 
@@ -168,7 +168,7 @@ if __name__ == '__main__':
 
 
 
-#### QSS对象
+### QSS对象
 
 **<font color=blue>header()</font>**
 
