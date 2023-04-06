@@ -13,8 +13,10 @@ from PyQtGuiLib.header import (
     KeyError,
     QMutex
 )
+import typing
 import re
 
+Ang = typing.TypeVar("Any",str,int)
 
 def dictTostr(qss_dict)->str:
     combination = ""
@@ -59,7 +61,9 @@ class Qss:
         return self._qss_header
 
     def headerSubdivision(self)->list:
-        return self.header().split(",")
+        if "," in self.header():
+            return self.header().split(",")
+        return self.header().split(" ")
 
     def body(self)->str:
         return self._qss_body
@@ -82,20 +86,20 @@ class Qss:
     def toDict(self)->dict:
         return self._qss_dict
 
-    def attr(self,key)->str:
+    def attr(self,key:str)->str:
         if key in self.bodyToDict():
             return self.bodyToDict()[key]
         else:
            raise KeyError("Without this attribute,'%s'" % key)
 
-    def updateAttr(self,key,value):
+    def updateAttr(self,key:str,value:str):
         self._qss_dict[self.header()][key]=value
         self._qss_str = dictTostr(self._qss_dict)
         self.Init()
         if self.__parent:
             self.__qs.updateStyleSheet()
 
-    def removeAttr(self,key):
+    def removeAttr(self,key:str):
         if key in self._qss_dict[self.header()]:
             del self._qss_dict[self.header()][key]
             self._qss_str = dictTostr(self._qss_dict)
@@ -105,7 +109,7 @@ class Qss:
         else:
             raise TypeError("Without this attribute,'%s'"%key)
 
-    def isAttr(self,key):
+    def isAttr(self,key:str)->bool:
         if self._qss_dict[self.header()].get(key):
             return True
         return False
@@ -201,13 +205,13 @@ class QssStyleAnalysis:
     def appendQSSDict(self,qss_dict:dict):
         self.appendQSS(dictTostr(qss_dict))
 
-    def selectorKey(self,key)->Qss:
+    def selectorKey(self,key:str)->Qss:
         return self.selectorIndex(self._map_qss[key])
 
     def selectorIndex(self,i:int)->Qss:
         return self._qss[i]
 
-    def selector(self,ang)->Qss:
+    def selector(self,ang:Ang)->Qss:
         if isinstance(ang,int):
             return self.selectorIndex(ang)
         elif isinstance(ang,str):
@@ -228,7 +232,7 @@ class QssStyleAnalysis:
     def removeSelectorKey(self,key:str):
         self.removeSelectorIndex(self._map_qss[key])
 
-    def removeSelector(self,ang):
+    def removeSelector(self,ang:Ang):
         if isinstance(ang, int):
             return self.removeSelectorIndex(ang)
         elif isinstance(ang, str):
@@ -236,7 +240,7 @@ class QssStyleAnalysis:
         else:
             raise TypeError("Parameter error!")
 
-    def isSelectKey(self,key):
+    def isSelectKey(self,key:str):
         if self._map_qss.get(key,-1)>=0:
             return True
         return False
@@ -254,13 +258,14 @@ class QssStyleAnalysis:
         return dictTostr(self.toDict())
 
     def __updateStyle(self, parent):
+        # Thread safety
         self.__mutex.lock()
         parent.setStyleSheet("")
         parent.setStyleSheet(self.toStr())
         parent.update()
         self.__mutex.unlock()
 
-    # 更新样式
+    # updata QSS
     def updateStyleSheet(self,ang=None,parent=None):
         if ang is None:
             ang = self._qss[0].header()
