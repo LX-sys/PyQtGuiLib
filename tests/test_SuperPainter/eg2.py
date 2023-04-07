@@ -8,7 +8,9 @@ from PyQtGuiLib.header import (
     QApplication,
     sys,
     QWidget,
-    QColor
+    QColor,
+    Qt,
+    qt
 )
 from PyQtGuiLib.styles import SuperPainter
 
