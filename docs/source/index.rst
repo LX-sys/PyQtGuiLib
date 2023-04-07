@@ -14,6 +14,7 @@ Welcome to PyQtGuiLib's documentation!
    component
    animationFramework
    QssStyleAnalysis
+   SuperPainter
 
 
 Indices and tables

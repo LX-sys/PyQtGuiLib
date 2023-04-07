@@ -529,7 +529,6 @@ padding: 5px;
 QTabBar::tab:selected{
 color: rgb(180, 239, 255);
 }
-
 QTabBar::tab:!selected{
 background-color: rgb(65, 65, 65);
 }</string>
