@@ -8,7 +8,7 @@
 '''
 
 
-'''
+r'''
 2022.12.13  0.0.1.4版本  气泡窗口已经基本实现,持续优化更新
 2022.12.13  0.0.1.5版本  重写了气泡窗口的部分实现代码
 2022.12.19  0.0.2.0版本
@@ -153,6 +153,13 @@
     新增ToolListWidget 控件(未完成)
     新增SuperPainter 超级画师(未完成) - 重构中
     新增Animation 动画框架(未完成) - 测试部分
+
+2023.3.24 - 2023.4.7
+    - Animation 动画框架 已经快接近完成,目前大部分功能已经可用
+    - 修改QSS解析器的已知BUG,并且在多线程时,是安全的
+    - 新增 SuperPainter 超级画师类
+        - 导入方法 from PyQtGuiLib.styles import SuperPainter
+        - 教学案例在test\test_SuperPainter 目录下
 '''
 
 
