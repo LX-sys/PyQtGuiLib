@@ -1,9 +1,5 @@
 # -*- coding:utf-8 -*-
 from PyQtGuiLib.header import (
-    QApplication,
-    PYQT_VERSIONS,
-    sys,
-    QWidget,
     QPainter,
     QPen,
     QBrush,
@@ -12,62 +8,131 @@ from PyQtGuiLib.header import (
     Qt,
     QColor,
     QPaintEvent,
-    QPushButton
 )
 import typing
 
+'''
+        drawRect 有(x,y)
+        drawRoundedRect  有(x,y)
+        drawLine 有(x,y)
+        drawLines  
+        drawArc  有(x,y)
+        drawEllipse  有(x,y)
+        drawPoint  有(x,y)
+        drawPoints 
+        drawText 有(x,y)
+        drawStaticText 
+        drawPolygon 
+        drawPie 有(x,y)
+        drawPicture 有(x,y)
+        drawChord 有(x,y)
+        drawRects 
+        drawPolyline 
+        drawPath 
+        drawConvexPolygon 
+        drawGlyphRun 
+        drawPixmap 有(x,y)
+        drawImage 有(x,y)
+        drawPixmapFragments 
+        drawTiledPixmap 有(x,y)
+'''
+RECT_TYPES = ["drawRect","drawRoundedRect","drawLine","drawArc","drawEllipse","drawPoint",
+                "drawText","drawPie","drawPicture","drawChord","drawPixmap","drawImage","drawTiledPixmap"]
 
-# 虚拟图形对象类
+
+# 图形分类函数
+def patternClassification(name:str):
+    '''
+        返回参数含义:
+            Rect 表示前两个参数是x,y,可以直接进行移动操作
+
+    :param name:
+    :return:
+    '''
+    if name in RECT_TYPES:
+        return "Rect"
+
+
 class VirtualObject:
+    def __init__(self,vobj_name:str,**kwargs):
+        self.__vobj_name = vobj_name
+        self.__vir_attr = kwargs # 虚拟属性
+
+    def type(self)->str:
+        return self.getVirtualFunc().__name__
+
+    def virName(self) -> str:
+        return self.__vobj_name
+
+    def getVirtualObjectAttr(self) -> dict:
+        return self.__vir_attr
+
+    def getVirtualObjectAttrValue(self, key: str):
+        return self.getVirtualObjectAttr()[key]
+
+    def getVirtualFunc(self) -> typing.Callable:
+        return self.getVirtualObjectAttr()["func"]
+
+    def getVirtualArgs(self) -> tuple:
+        return self.getVirtualObjectAttr()["args"]
+
+    def getVirtualOpenAttr(self) -> dict:
+        return self.getVirtualObjectAttr()["openAttr"]
+
+    def getVirtualBrushAttr(self)->dict:
+        return self.getVirtualObjectAttr()["brushAttr"]
+
+    def updateArgs(self,*args):
+        if args:
+            self.getVirtualObjectAttr()["args"] = args
+
+    def updateOpenAttr(self,openAttr:dict):
+        if openAttr:
+            self.getVirtualObjectAttr()["openAttr"] = openAttr
+
+    def updateBrushAttr(self,brushAttr:dict):
+        if brushAttr:
+            self.getVirtualObjectAttr()["brushAttr"] = brushAttr
+
+    def updateDraw(self,*args,**kwargs):
+        self.updateArgs(self.virtualObjName(),*args)
+        openAttr = kwargs.get("openAttr", None)
+        brushAttr = kwargs.get("brushAttr", None)
+        self.updateOpenAttr(self.virtualObjName(),openAttr)
+        self.updateBrushAttr(self.virtualObjName(),brushAttr)
+
+    def move(self,x,y):
+        if patternClassification(self.type()) == "Rect":
+            args = self.getVirtualArgs()[2:]
+            self.updateArgs(x,y,*args)
+
+    def scale(self,proportion:float):
+        if patternClassification(self.type()) == "Rect":
+            xy = self.getVirtualArgs()[:2]
+            wh = self.getVirtualArgs()[2:4]
+            w,h = int(wh[0]*proportion),int(wh[1]*proportion)
+            self.updateArgs(*xy,w,h)
+
+
+# 虚拟图形对象管理类
+class VirtualObjectManagement:
     def __init__(self):
         # 虚拟对象字典
         self.__virtualObjects = dict()  # type:typing.Dict[str:typing.List]
 
-    def isVirtualObject(self, vobj_name: str)->bool:
+    def virtualObjName(self,vobj_name:str)->str:
+        if self.isVirtualObject(vobj_name):
+            return self.__virtualObjects[vobj_name]
+        else:
+            raise Exception("[{}] The virtual object does not exist!".format(vobj_name))
+
+    def isVirtualObject(self,vobj_name:str)->bool:
         return True if self.__virtualObjects.get(vobj_name,None) else False
 
     def appendVirtualObject(self, vobj_name: str, **kwargs):
         if not self.isVirtualObject(vobj_name):
-            self.__virtualObjects[vobj_name] = kwargs
+            self.__virtualObjects[vobj_name] = VirtualObject(vobj_name,**kwargs)
 
-    def getVirtualObjectAttr(self,vobj_name: str):
-        if self.isVirtualObject(vobj_name):
-            return self.__virtualObjects[vobj_name]
-
-    def getVirtualObjectAttrValue(self,vobj_name: str,key:str):
-        if self.isVirtualObject(vobj_name):
-            return self.__virtualObjects[vobj_name][key]
-
-    def getVirtualFunc(self,vobj_name:str)->typing.Callable:
-        return self.__virtualObjects[vobj_name]["func"]
-
-    def getVirtualArgs(self,vobj_name:str)->tuple:
-        return self.__virtualObjects[vobj_name]["args"]
-
-    def getVirtualOpenAttr(self,vobj_name:str)->dict:
-        return self.__virtualObjects[vobj_name]["openAttr"]
-
-    def getVirtualBrushAttr(self,vobj_name:str)->dict:
-        return self.__virtualObjects[vobj_name]["brushAttr"]
-
-    def updateArgs(self,vobj_name:str,*args):
-        if args:
-            self.__virtualObjects[vobj_name]["args"] = args
-
-    def updateOpenAttr(self,vobj_name:str,openAttr:dict):
-        if openAttr:
-            self.__virtualObjects[vobj_name]["openAttr"] = openAttr
-
-    def updateBrushAttr(self,vobj_name:str,brushAttr:dict):
-        if brushAttr:
-            self.__virtualObjects[vobj_name]["brushAttr"] = brushAttr
-
-    def updateDraw(self,vobj_name:str,*args,**kwargs):
-        self.updateArgs(vobj_name,*args)
-        openAttr = kwargs.get("openAttr", None)
-        brushAttr = kwargs.get("brushAttr", None)
-        self.updateOpenAttr(vobj_name,openAttr)
-        self.updateBrushAttr(vobj_name,brushAttr)
 
 
 class SuperPainterAttr(QPainter):
@@ -77,10 +142,10 @@ class SuperPainterAttr(QPainter):
         self.__op = QPen(QColor(0,0,0))  # type:QPen
         self.__brush = QBrush(QColor(0,0,0)) # type: QBrush
         self.__font = None  # type: QFont
-        self.__virtualObject = VirtualObject()
+        self.__virtualObject = VirtualObjectManagement() # 虚拟对象
 
-    def virtualObj(self)->VirtualObject:
-        return self.__virtualObject
+    def virtualObj(self,vobj_name:str)->VirtualObject:
+        return self.__virtualObject.virtualObjName(vobj_name)
 
     def setPen(self, op:QPen):
         if not isinstance(op,QPen):
@@ -191,7 +256,6 @@ class SuperPainterAttr(QPainter):
     def __restorePrivateAttr(self, op:QPen, brush:QBrush):
         if op:
             self.setPen(op)
-
         if brush:
             self.setBrush(brush)
 
@@ -207,12 +271,19 @@ class SuperPainterAttr(QPainter):
                 if virtual_object_name:
                     self.__virtualObject.appendVirtualObject(virtual_object_name,func=func,args=args,kwargs=kwargs,
                                                              openAttr=openAttr,brushAttr=brushAttr)
+                    vir_obj = self.virtualObj(virtual_object_name)
+                    args = vir_obj.getVirtualArgs()
+                    vir_openAttr = vir_obj.getVirtualOpenAttr()
+                    vir_brushAttr = vir_obj.getVirtualBrushAttr()
+                    if openAttr:openAttr = vir_openAttr
+                    elif vir_openAttr:
+                        openAttr = vir_openAttr
+                        kwargs["openAttr"] = openAttr
+                    if brushAttr:brushAttr = vir_brushAttr
+                    elif vir_brushAttr:
+                        brushAttr = vir_brushAttr
+                        kwargs["brushAttr"] = brushAttr
 
-                    args = self.virtualObj().getVirtualArgs(virtual_object_name)
-                    if openAttr:
-                        openAttr = self.virtualObj().getVirtualOpenAttr(virtual_object_name)
-                    if brushAttr:
-                        brushAttr = self.virtualObj().getVirtualBrushAttr(virtual_object_name)
                 self.__privateAttr(openAttr, brushAttr)
                 if openAttr:del kwargs["openAttr"]
                 if brushAttr:del kwargs["brushAttr"]
@@ -252,45 +323,3 @@ class SuperPainter(SuperPainterAttr):
         super().__init__(*args,**kwargs)
         self.decorator_to_all_draw_methods()
 
-
-class Test(QWidget):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.resize(600,600)
-        self.painter = SuperPainter()
-        self.btn = QPushButton("更新图像",self)
-        self.btn.move(300,50)
-        self.btn.clicked.connect(lambda :self.test_update())
-
-    def test_update(self):
-        print(self.painter.virtualObj().getVirtualObjectAttr("rect_tt"))
-        self.painter.virtualObj().updateDraw("rect_tt",20,20,70,70,openAttr={"color":"blue"},brushAttr={"color":"yellow"})
-        self.update()
-        print(self.painter.virtualObj().getVirtualObjectAttr("rect_tt"))
-
-    def paintEvent(self, e:QPaintEvent) -> None:
-        self.painter.begin(self)
-        self.painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-
-        self.painter.setPen(QColor(52,44,120))
-
-        self.painter.drawRect(20, 20, 50, 50, openAttr={"color": "red", "brush": "#9bff7d"},brushAttr={"color":"green"},
-                              virtualObjectName="rect_tt")
-
-        self.painter.drawLine(70, 70, 200, 200)
-        self.painter.drawRect(200, 200, 50, 50,openAttr={"color":"yellow"},brushAttr={"color":"#9bff7d"})
-
-        self.painter.end()
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    win = Test()
-
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
