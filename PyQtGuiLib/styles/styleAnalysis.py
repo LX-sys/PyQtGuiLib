@@ -96,7 +96,7 @@ class Qss:
         self._qss_dict[self.header()][key]=value
         self._qss_str = dictTostr(self._qss_dict)
         self.Init()
-        if self.__parent:
+        if self.__parent is not None:
             self.__qs.updateStyleSheet()
 
     def removeAttr(self,key:str):
@@ -104,7 +104,7 @@ class Qss:
             del self._qss_dict[self.header()][key]
             self._qss_str = dictTostr(self._qss_dict)
             self.Init()
-            if self.__parent:
+            if self.__parent is not None:
                 self.__qs.updateStyleSheet()
         else:
             raise TypeError("Without this attribute,'%s'"%key)
@@ -165,7 +165,7 @@ class QssStyleAnalysis:
         # Mapping coordinate
         self.__mappCoordinate(0,self.count())
 
-        if self.__parent:
+        if self.__parent is not None:
             self.__updateStyle(self.__parent)
 
     # Bidirectional mapping
@@ -199,7 +199,7 @@ class QssStyleAnalysis:
 
         # remap
         self.__mappCoordinate(old_count,self.count())
-        if self.__parent:
+        if self.__parent is not None:
             self.__updateStyle(self.__parent)
 
     def appendQSSDict(self,qss_dict:dict):
@@ -261,6 +261,7 @@ class QssStyleAnalysis:
         # Thread safety
         self.__mutex.lock()
         parent.setStyleSheet("")
+        print(self.toStr())
         parent.setStyleSheet(self.toStr())
         parent.update()
         self.__mutex.unlock()
