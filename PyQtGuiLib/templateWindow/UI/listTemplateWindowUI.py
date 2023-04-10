@@ -14,8 +14,13 @@ from PyQtGuiLib.header import (
     QVBoxLayout,
     QListWidget,
     QSize,
-    QStackedWidget
+    QPushButton,
+    qt,
+    QGridLayout
 )
+
+from PyQtGuiLib.core import SlideShow
+from PyQtGuiLib.styles import QssStyleAnalysis
 
 
 class ListTemplateWindowUI(QWidget):
@@ -23,6 +28,7 @@ class ListTemplateWindowUI(QWidget):
         super().__init__(*args,**kwargs)
         self.setWindowTitle("ListTemplateWindow")
         self.setupUi()
+        self.defaultStyle()
 
     def setupUi(self):
         self.resize(1229, 746)
@@ -32,7 +38,7 @@ class ListTemplateWindowUI(QWidget):
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.left_widget = QWidget(self)
         self.left_widget.setMaximumSize(QSize(260, 16777215))
-        self.left_widget.setStyleSheet("border: 1px solid rgb(170, 170, 127);")
+        # self.left_widget.setStyleSheet("border: 1px solid rgb(170, 170, 127);")
         self.left_widget.setObjectName("left_widget")
         self.verticalLayout = QVBoxLayout(self.left_widget)
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
@@ -41,7 +47,7 @@ class ListTemplateWindowUI(QWidget):
         self.title_widget = QWidget(self.left_widget)
         self.title_widget.setMinimumSize(QSize(0, 100))
         self.title_widget.setMaximumSize(QSize(16777215, 100))
-        self.title_widget.setStyleSheet("border: 1px solid rgb(0, 85, 255);")
+        # self.title_widget.setStyleSheet("border: 1px solid rgb(0, 85, 255);")
         self.title_widget.setObjectName("title_widget")
         self.verticalLayout.addWidget(self.title_widget)
         self.listWidget = QListWidget(self.left_widget)
@@ -49,7 +55,7 @@ class ListTemplateWindowUI(QWidget):
         self.verticalLayout.addWidget(self.listWidget)
         self.horizontalLayout.addWidget(self.left_widget)
         self.body_widget = QWidget(self)
-        self.body_widget.setStyleSheet("border: 1px solid rgb(0, 170, 255);")
+        # self.body_widget.setStyleSheet("border: 1px solid rgb(0, 170, 255);")
         self.body_widget.setObjectName("body_widget")
         self.verticalLayout_2 = QVBoxLayout(self.body_widget)
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -58,7 +64,7 @@ class ListTemplateWindowUI(QWidget):
         self.head_widget = QWidget(self.body_widget)
         self.head_widget.setMinimumSize(QSize(0, 100))
         self.head_widget.setMaximumSize(QSize(16777215, 100))
-        self.head_widget.setStyleSheet("border:1px solid rgb(85, 85, 0);")
+        # self.head_widget.setStyleSheet("border:1px solid rgb(85, 85, 0);")
         self.head_widget.setObjectName("head_widget")
         self.horizontalLayout_2 = QHBoxLayout(self.head_widget)
         self.horizontalLayout_2.setContentsMargins(2, 0, 2, 0)
@@ -78,15 +84,56 @@ class ListTemplateWindowUI(QWidget):
         self.head_right_widget.setObjectName("head_right_widget")
         self.horizontalLayout_2.addWidget(self.head_right_widget)
         self.verticalLayout_2.addWidget(self.head_widget)
-        self.stackedWidget = QStackedWidget(self.body_widget)
-        self.stackedWidget.setStyleSheet("border:1px solid rgb(255, 170, 0);")
+        self.shell_st = QWidget(self.body_widget)
+        self.shell_gboy = QGridLayout(self.shell_st)
+        self.shell_gboy.setContentsMargins(9,9,9,9)
+        self.stackedWidget = SlideShow()
+        # self.stackedWidget.setStyleSheet("border:1px solid rgb(255, 170, 0);")
         self.stackedWidget.setObjectName("stackedWidget")
-        self.page = QWidget()
-        self.page.setObjectName("page")
-        self.stackedWidget.addWidget(self.page)
-        self.page_2 = QWidget()
-        self.page_2.setObjectName("page_2")
-        self.stackedWidget.addWidget(self.page_2)
-        self.verticalLayout_2.addWidget(self.stackedWidget)
+        self.verticalLayout_2.addWidget(self.shell_st)
         self.horizontalLayout.addWidget(self.body_widget)
+        self.shell_gboy.addWidget(self.stackedWidget)
 
+        self.listWidget.setVerticalScrollBarPolicy(qt.ScrollBarAlwaysOff)
+        self.listWidget.setHorizontalScrollBarPolicy(qt.ScrollBarAlwaysOff)
+        self.stackedWidget.setButtonsHide(True)
+
+        self.gboy = QGridLayout(self.head_left_widget)
+        self.gboy.setContentsMargins(0,0,0,0)
+        self.gboy.setSpacing(0)
+        self.btn_fold = QPushButton()
+        self.btn_fold.setStyleSheet(r'''
+        background-color: rgb(234, 234, 234);
+        border:none;
+        font: 14pt "黑体";
+        ''')
+        self.btn_fold.setText("三")
+        self.btn_fold.setFixedSize(50,50)
+        self.gboy.addWidget(self.btn_fold)
+
+    def defaultStyle(self):
+        self.qss = QssStyleAnalysis(self.listWidget)
+        self.qss.setQSS('''
+QListView {
+border:none;
+outline: 0px;
+background-color: #fff;
+color: #000;
+font: 14pt "黑体";
+}
+QListView::item{
+padding: 5px;
+}
+QListView::item:hover{
+border-right:5px solid #0055ff;
+background-color: rgba(170, 255, 255,100);
+color: #000;
+}
+QListView::item:selected{
+border-right:5px solid #0055ff;
+background-color: rgba(170, 255, 255,200);
+color: #000;
+}
+        ''')
+        # print(self.qss.toStr())
+        # self.listWidget.setStyleSheet(self.qss.toStr())
