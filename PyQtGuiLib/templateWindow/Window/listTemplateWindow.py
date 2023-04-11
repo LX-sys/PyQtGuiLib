@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-# @time:2023/4/1017:42
+# @time:2023/4/1110:30
 # @author:LX
 # @file:listTemplateWindow.py
 # @software:PyCharm
@@ -12,16 +12,20 @@ from PyQtGuiLib.header import (
     QIcon,
     QSize,
     QPropertyAnimation,
-    QGridLayout
+    QGridLayout,
+    qt,
+    Qt,
+    QMenu,
+    QAction,
+    QPoint,
+    QGraphicsDropShadowEffect,
+    QColor
 )
 from random import randint
 import typing
 
 from PyQtGuiLib.templateWindow.UI.listTemplateWindowUI import ListTemplateWindowUI
 
-'''
-    模板窗口
-'''
 
 class ListTemplateWindow(ListTemplateWindowUI):
     def __init__(self,*args,**kwargs):
@@ -33,27 +37,71 @@ class ListTemplateWindow(ListTemplateWindowUI):
 
         self.listWidget.setIconSize(QSize(50,50))
 
-        w1 = QWidget()
-        w2 = QWidget()
-        w3 = QWidget()
-        for i in [w1,w2,w3]:
-            i.setStyleSheet('''
-        background-color: rgb({},{},{});
-        border-radius:8px;
-        '''.format(randint(1,255),randint(1,255),randint(1,255)))
-        self.addItem("111",w1,r"D:\myGitProject\PyQtGuiLib\tests\temp_image\python1.png")
-        self.addItem("222",w2,r"D:\myGitProject\PyQtGuiLib\tests\temp_image\python1.png")
-        self.addItem("333",w3,r"D:\myGitProject\PyQtGuiLib\tests\temp_image\python1.png")
+        self.__ani = QPropertyAnimation(self)
+        self.__ani.setTargetObject(self.listWidget)
+        self.__ani.setPropertyName(b"size")
+        self.__ani.setDuration(600)
 
-        self.myEvent()
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
 
-        self.ani = QPropertyAnimation(self)
-        self.ani.setTargetObject(self.left_widget)
-        self.ani.setPropertyName(b"size")
-        self.ani.setDuration(600)
+        self.__shadow = QGraphicsDropShadowEffect(self)
+        self.__shadow.setOffset(0,0)
+        self.__shadow.setBlurRadius(30)
+        self.__shadow.setColor(QColor("#8ab2e7"))
+        self.btn_head_picture.setGraphicsEffect(self.__shadow)
+
+        # 菜单列表
+        self.__menus = []
+        self.__meun_list = []
+
+        self.__myEvent()
+
+    def addMenu(self,item:dict):
+        self.__menus.append(item)
+
+    def __menu_event(self):
+        if not self.__menus:
+            return
+
+        self.menu = QMenu(self)
+        self.menu.setStyleSheet('''
+        QMenu {
+        border:none;
+        font: 12pt "黑体";
+        border-radius:5px;
+        padding: 0,0,0,15px;
+        }
+        QMenu::item:selected{
+        background-color:#789ac9;
+        }
+                ''')
+
+        for act in self.__menus:
+            text = act["text"]
+            call = act.get("call",None)
+            obj = act.get("obj",None)
+            if obj is None:
+                act["obj"] = QAction(text)
+                obj = act["obj"]
+                if call:
+                    obj.triggered.connect(call)
+            self.menu.addAction(obj)
+
+        x = self.btn_head_picture.pos().x()+self.x()+self.listWidget.width()
+        y = self.btn_head_picture.pos().y()+self.y()+self.head_middle_widget.height()+10
+
+        pos = QPoint(x,y)
+        self.menu.popup(pos)
+
+    # 设置头像
+    def setHeadPicture(self,path:str,size:tuple=(100,100)):
+        self.btn_head_picture.setIconSize(QSize(*size))
+        self.btn_head_picture.setIcon(QIcon(path))
 
     def addItem(self,text:typing.Union[str,QListWidgetItem],widget:QWidget,icon:str=None):
         if isinstance(text,QListWidgetItem):
+            if icon:
+                text.setIcon(QIcon(icon))
             self.listWidget.addItem(text)
             return
 
@@ -62,36 +110,40 @@ class ListTemplateWindow(ListTemplateWindowUI):
         if icon:
             item.setIcon(QIcon(icon))
         self.listWidget.addItem(item)
-
         self.stackedWidget.addWidget(widget)
 
-    def change_st_event(self,item:QListWidgetItem):
-        index = self.listWidget.indexFromItem(item).row()
-        self.stackedWidget.setCurrentIndex(index)
+    # 添加头部窗口
+    def addHeadWidget(self,widget:QWidget):
+        self.head_middle_vbody.addWidget(widget)
 
-    def ani_value_event(self,v:QSize):
-        w = v.width()
-        self.left_widget.setMaximumWidth(w)
+    def __ani_event(self):
+        if self.stackedWidget.count() < 1:
+            return
 
-    def ani_event(self):
-        self.ani.setStartValue(self.left_widget.size())
+        self.__ani.setStartValue(self.listWidget.size())
         if self.__flexible_flag:
             self.qss.selector("QListView::item:hover").removeAttr("border-right")
             self.qss.selector("QListView::item:selected").removeAttr("border-right")
-            self.ani.setEndValue(QSize(self.__flexible_value[1],self.left_widget.height()))
+            self.__ani.setEndValue(QSize(self.__flexible_value[1],self.listWidget.height()))
             self.__flexible_flag = False
         else:
             self.qss.selector("QListView::item:hover").updateAttr("border-right","5px solid #0055ff;")
             self.qss.selector("QListView::item:selected").updateAttr("border-right","5px solid #0055ff")
-            self.ani.setEndValue(QSize(self.__flexible_value[0], self.left_widget.height()))
+            self.__ani.setEndValue(QSize(self.__flexible_value[0], self.listWidget.height()))
             self.__flexible_flag = True
 
-        self.ani.valueChanged.connect(self.ani_value_event)
-        self.ani.start()
+        self.__ani.valueChanged.connect(lambda v:self.listWidget.setMaximumWidth(v.width()))
+        self.__ani.start()
 
-    def myEvent(self):
-        self.listWidget.itemClicked.connect(self.change_st_event)
-        self.btn_fold.clicked.connect(self.ani_event)
+    def __change_st_event(self,item:QListWidgetItem):
+        index = self.listWidget.indexFromItem(item).row()
+        self.stackedWidget.setCurrentIndex(index)
+
+    def __myEvent(self):
+        self.listWidget.itemClicked.connect(self.__change_st_event)
+        self.btn_fold.clicked.connect(self.__ani_event)
+        self.btn_head_picture.clicked.connect(self.__menu_event)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

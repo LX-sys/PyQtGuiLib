@@ -160,6 +160,8 @@ r'''
     - 新增 SuperPainter 超级画师类
         - 导入方法 from PyQtGuiLib.styles import SuperPainter
         - 教学案例在test\test_SuperPainter 目录下
+2023.4.7 - 2023.4.11
+    - 更新模板窗口 ListTemplateWindow
 '''
 
 

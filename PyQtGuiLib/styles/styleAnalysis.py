@@ -261,7 +261,6 @@ class QssStyleAnalysis:
         # Thread safety
         self.__mutex.lock()
         parent.setStyleSheet("")
-        print(self.toStr())
         parent.setStyleSheet(self.toStr())
         parent.update()
         self.__mutex.unlock()

@@ -15,6 +15,7 @@ Welcome to PyQtGuiLib's documentation!
    animationFramework
    QssStyleAnalysis
    SuperPainter
+   listTemplateWindow
 
 
 Indices and tables

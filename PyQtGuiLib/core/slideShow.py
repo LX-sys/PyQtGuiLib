@@ -9,7 +9,8 @@ from PyQtGuiLib.header import (
     QPushButton,
     QPoint,
     QPropertyAnimation,
-    Signal
+    Signal,
+    QSize
 )
 
 '''
@@ -50,6 +51,9 @@ class SlideShow(QWidget):
 
         # 创建两侧按钮
         self.createButtons()
+
+    def setDuration(self,p_int):
+        self.animation_time = p_int
 
     # 设置自动轮播
     def setAutoSlideShow(self,b:bool,interval=1500,direction_:str="R"):
@@ -138,6 +142,7 @@ border:2px solid #00557f;
         if not direction:
             return
 
+
         w_2 = self.widgets[self.index]
         self.cursor_widget_p = w_2 # 保存当前窗口
         self.cursor_widget_p2 = w_1
@@ -149,6 +154,7 @@ border:2px solid #00557f;
 
     def addWidget(self,widget:QWidget):
         widget.setParent(self)
+
         widget.resize(self.size())
         widget.lower()
         self.widgets.append(widget)
@@ -220,6 +226,7 @@ border:2px solid #00557f;
         wid1,wid2 = widget_out,widget_show
         wid1.resize(self.size())
         wid2.resize(self.size())
+
 
         ani_1 = QPropertyAnimation(wid1,b"pos",self)
         ani_2 = QPropertyAnimation(wid2,b"pos",self)
