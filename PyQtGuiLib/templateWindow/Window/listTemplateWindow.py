@@ -55,9 +55,28 @@ class ListTemplateWindow(ListTemplateWindowUI):
         self.__meun_list = []
 
         self.__myEvent()
+        self.__builtInMenu()
+
+    def __builtInMenu(self):
+        self.addMenus([{
+            "text":"隐藏/显示菜单(内置功能)",
+            "call":self.sidebar_event
+            },
+            # {
+            #     "text":"窗口切换模式"
+            #     "call":
+            # }
+        ])
 
     def addMenu(self,item:dict):
         self.__menus.append(item)
+
+    def addMenus(self,items:typing.List[dict]):
+        for item in items:
+            self.addMenu(item)
+
+    def removeMenu(self,text:str):
+        del self.__menus[text]
 
     def __menu_event(self):
         if not self.__menus:
@@ -87,8 +106,11 @@ class ListTemplateWindow(ListTemplateWindowUI):
                     obj.triggered.connect(call)
             self.menu.addAction(obj)
 
-        x = self.btn_head_picture.pos().x()+self.x()+self.listWidget.width()
-        y = self.btn_head_picture.pos().y()+self.y()+self.head_middle_widget.height()+10
+        if self.listWidget.isHidden():
+            x = self.btn_head_picture.x() + self.x()
+        else:
+            x = self.btn_head_picture.x() + self.x() + self.listWidget.width()
+        y = self.btn_head_picture.y()+self.y()+self.head_middle_widget.height() + 10
 
         pos = QPoint(x,y)
         self.menu.popup(pos)
@@ -116,18 +138,32 @@ class ListTemplateWindow(ListTemplateWindowUI):
     def addHeadWidget(self,widget:QWidget):
         self.head_middle_vbody.addWidget(widget)
 
+    # 隐藏/显示侧边栏
+    def sidebar_event(self):
+        if self.listWidget.isHidden():
+            self.listWidget.show()
+            self.btn_fold.show()
+        else:
+            self.listWidget.hide()
+            self.btn_fold.hide()
+
+    # 通过索引隐藏/显示,某个item
+    def setHideItem(self,index:int,b:bool=True):
+        item = self.listWidget.item(index) # type:QListWidgetItem
+        item.setHidden(b)
+
     def __ani_event(self):
         if self.stackedWidget.count() < 1:
             return
 
         self.__ani.setStartValue(self.listWidget.size())
         if self.__flexible_flag:
-            self.qss.selector("QListView::item:hover").removeAttr("border-right")
+            # self.qss.selector("QListView::item:hover").removeAttr("border-right")
             self.qss.selector("QListView::item:selected").removeAttr("border-right")
             self.__ani.setEndValue(QSize(self.__flexible_value[1],self.listWidget.height()))
             self.__flexible_flag = False
         else:
-            self.qss.selector("QListView::item:hover").updateAttr("border-right","5px solid #0055ff;")
+            # self.qss.selector("QListView::item:hover").updateAttr("border-right","5px solid #0055ff;")
             self.qss.selector("QListView::item:selected").updateAttr("border-right","5px solid #0055ff")
             self.__ani.setEndValue(QSize(self.__flexible_value[0], self.listWidget.height()))
             self.__flexible_flag = True

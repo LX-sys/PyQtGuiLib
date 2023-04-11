@@ -109,7 +109,6 @@ QListView::item{
 padding: 5px;
 }
 QListView::item:hover{
-border-right:5px solid #0055ff;
 background-color: rgba(170, 255, 255,100);
 color: #000;
 }

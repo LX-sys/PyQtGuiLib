@@ -28,6 +28,12 @@ class myWidget(ListTemplateWindow):
             "text": "测试",
             "call": self.test,
         })
+        self.addMenu(
+            {
+                "text":"隐藏第二页(测试功能)",
+                "call":self.test_hide
+            }
+        )
 
         # 添加头像
         self.setHeadPicture(r"D:\code\PyQtGuiLib\tests\temp_image\python1.png")
@@ -35,9 +41,16 @@ class myWidget(ListTemplateWindow):
         # 添加页面
         self.addItem("首页",self.frist_page(),r"D:\code\PyQtGuiLib\tests\temp_image\python1.png")
         self.addItem("第二页",self.two_page(),r"D:\code\PyQtGuiLib\tests\temp_image\python1.png")
+        self.addItem("第三页",self.three_page(),r"D:\code\PyQtGuiLib\tests\temp_image\python1.png")
 
         # 头部窗口
         self.addHeadWidget(self.headWidget())
+
+    def test_hide(self):
+        if self.listWidget.item(1).isHidden():
+            self.setHideItem(1,False)
+        else:
+            self.setHideItem(1)
 
     def test(self):
         print("测试回调函数")
@@ -47,6 +60,15 @@ class myWidget(ListTemplateWindow):
         widget.setAlignment(Qt.AlignCenter)
         widget.setStyleSheet('''
 background-color: rgb(229, 229, 229);
+font: 22pt "黑体";
+        ''')
+        return widget
+
+    def three_page(self):
+        widget = QLabel("第三页")
+        widget.setAlignment(Qt.AlignCenter)
+        widget.setStyleSheet('''
+background-color: rgb(0, 0, 229);
 font: 22pt "黑体";
         ''')
         return widget
