@@ -68,7 +68,7 @@ font: 22pt "黑体";
         widget = QLabel("第三页")
         widget.setAlignment(Qt.AlignCenter)
         widget.setStyleSheet('''
-background-color: rgb(0, 0, 229);
+background-color: rgb(100, 100, 45);
 font: 22pt "黑体";
         ''')
         return widget

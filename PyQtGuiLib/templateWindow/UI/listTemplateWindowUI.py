@@ -16,11 +16,47 @@ from PyQtGuiLib.header import (
     QSize,
     QPushButton,
     qt,
+    Qt,
     QGridLayout,
     QIcon,
+    QSizePolicy,
+    QBitmap,
+    QColor,
+    QPainter,
+    QFrame
 )
 from PyQtGuiLib.core import SlideShow
 from PyQtGuiLib.styles import QssStyleAnalysis
+
+
+class CoreWidget(QFrame):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        # 悬浮标准
+        self.__suspension = False
+
+    # 设置悬浮
+    def setSuspension(self,b:bool):
+        self.__suspension = b
+
+    def paintEvent(self, e) -> None:
+        if self.__suspension:
+            mask = QBitmap(self.size())
+            mask.fill(Qt.black)
+            painter = QPainter(mask)
+            painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
+            painter.setBrush(QColor(Qt.white))
+            painter.drawEllipse(self.width()-98, -6, 110, 105)
+            self.setMask(mask)
+            painter.end()
+        else:
+            mask = QBitmap(self.size())
+            mask.fill(Qt.black)
+            self.setMask(mask)
+
+
+
 
 class ListTemplateWindowUI(QWidget):
     def __init__(self,*args,**kwargs):
@@ -40,15 +76,15 @@ class ListTemplateWindowUI(QWidget):
         self.listWidget.setMaximumSize(QSize(260, 16777215))
         self.listWidget.setObjectName("listWidget")
         self.gridLayout.addWidget(self.listWidget, 0, 0, 2, 1)
-        self.widget_2 = QWidget(self)
-        self.widget_2.setMinimumSize(QSize(0, 130))
-        self.widget_2.setMaximumSize(QSize(16777215, 130))
-        self.widget_2.setObjectName("widget_2")
-        self.horizontalLayout = QHBoxLayout(self.widget_2)
+        self.widget_head = QWidget(self)
+        self.widget_head.setMinimumSize(QSize(0, 130))
+        self.widget_head.setMaximumSize(QSize(16777215, 130))
+        self.widget_head.setObjectName("widget_2")
+        self.horizontalLayout = QHBoxLayout(self.widget_head)
         self.horizontalLayout.setContentsMargins(5, 0, 5, 0)
         self.horizontalLayout.setSpacing(0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.btn_fold = QPushButton(self.widget_2)
+        self.btn_fold = QPushButton(self.widget_head)
         self.btn_fold.setText("三")
         self.btn_fold.setMinimumSize(QSize(50, 50))
         self.btn_fold.setMaximumSize(QSize(50, 50))
@@ -57,20 +93,21 @@ class ListTemplateWindowUI(QWidget):
 "font: 14pt \"黑体\";")
         self.btn_fold.setObjectName("btn_fold")
         self.horizontalLayout.addWidget(self.btn_fold)
-        self.head_middle_widget = QWidget(self.widget_2)
+        self.head_middle_widget = QWidget(self.widget_head)
         self.head_middle_vbody = QVBoxLayout(self.head_middle_widget)
         self.head_middle_vbody.setContentsMargins(0,0,0,0)
         self.head_middle_vbody.setSpacing(0)
         self.head_middle_widget.setObjectName("head_middle_widget")
         self.horizontalLayout.addWidget(self.head_middle_widget)
-        self.btn_head_picture = QPushButton(self.widget_2)
+        self.btn_head_picture = QPushButton()
         self.btn_head_picture.setMinimumSize(QSize(100, 100))
         self.btn_head_picture.setMaximumSize(QSize(100, 100))
         self.btn_head_picture.setObjectName("btn_head_picture")
         self.horizontalLayout.addWidget(self.btn_head_picture)
-        self.gridLayout.addWidget(self.widget_2, 0, 1, 1, 1)
-        self.core_widget = QWidget(self)
+        self.gridLayout.addWidget(self.widget_head, 0, 1, 1, 1)
+        self.core_widget = CoreWidget(self)
         self.core_widget.setObjectName("core_widget")
+        self.core_widget.setSizePolicy(QSizePolicy.Expanding,QSizePolicy.Expanding)
         self.gridLayout.addWidget(self.core_widget, 1, 1, 1, 1)
         self.core_vboy = QVBoxLayout(self.core_widget)
         self.core_vboy.setContentsMargins(6,6,6,6)
@@ -87,7 +124,8 @@ class ListTemplateWindowUI(QWidget):
         border:none;
         ''')
 
-        self.btn_head_picture.setStyleSheet(r'''
+        self.qss_head_picture = QssStyleAnalysis(self.btn_head_picture)
+        self.qss_head_picture.setQSS(r'''
         QPushButton{
         border:2px solid #789ac9;
         border-radius:50px;
@@ -96,8 +134,10 @@ class ListTemplateWindowUI(QWidget):
         border:2px solid #f7e151;
         }
         ''')
-        self.qss = QssStyleAnalysis(self.listWidget)
-        self.qss.setQSS('''
+        self.qss_head_picture.selector("QPushButton").updateAttr("border-radius","{}px".format(self.btn_head_picture.width()//2))
+
+        self.qss_listwiget = QssStyleAnalysis(self.listWidget)
+        self.qss_listwiget.setQSS('''
 QListView {
 border-right:1px solid rgb(234,234,234);
 outline: 0px;
@@ -118,14 +158,3 @@ background-color: rgba(170, 255, 255,200);
 color: #000;
 }
         ''')
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-
-    win = ListTemplateWindowUI()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())

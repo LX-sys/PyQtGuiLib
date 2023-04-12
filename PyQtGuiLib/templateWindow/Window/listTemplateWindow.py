@@ -19,7 +19,8 @@ from PyQtGuiLib.header import (
     QAction,
     QPoint,
     QGraphicsDropShadowEffect,
-    QColor
+    QColor,
+    QResizeEvent
 )
 from random import randint
 import typing
@@ -29,11 +30,18 @@ from PyQtGuiLib.templateWindow.UI.listTemplateWindowUI import ListTemplateWindow
 
 class ListTemplateWindow(ListTemplateWindowUI):
     def __init__(self,*args,**kwargs):
+        # 头像状态记录
+        self.head_suspension = {
+            "isSuspension": False
+        }
+
         super().__init__(*args,**kwargs)
 
         # 伸缩标记,伸缩值
         self.__flexible_flag = True
         self.__flexible_value = (260,60)
+
+
 
         self.listWidget.setIconSize(QSize(50,50))
 
@@ -57,16 +65,61 @@ class ListTemplateWindow(ListTemplateWindowUI):
         self.__myEvent()
         self.__builtInMenu()
 
+
     def __builtInMenu(self):
         self.addMenus([{
             "text":"隐藏/显示菜单(内置功能)",
             "call":self.sidebar_event
             },
-            # {
-            #     "text":"窗口切换模式"
-            #     "call":
-            # }
+            {
+                "text":"头像悬浮(内置功能)",
+                "call":self.__suspension
+            }
         ])
+
+    # 移除头部,头像悬浮功能
+    def __suspension(self):
+        scale = 0.8  # 缩放倍率
+
+        if self.head_suspension["isSuspension"]:
+            self.btn_head_picture.setParent(None)
+            w = int(self.btn_head_picture.width() / scale)
+            h = int(self.btn_head_picture.height() / scale)
+            self.btn_head_picture.setFixedSize(w, h)
+            self.qss_head_picture.selector("QPushButton").updateAttr("border-radius",
+                                                                     "{}px".format(self.btn_head_picture.width() // 2))
+            iw = int(self.btn_head_picture.iconSize().width() / scale)
+            ih = int(self.btn_head_picture.iconSize().height() / scale)
+            self.btn_head_picture.setIconSize(QSize(iw, ih))
+
+            self.horizontalLayout.addWidget(self.btn_head_picture)
+            self.widget_head.show()
+            self.head_suspension["isSuspension"] = False
+            self.core_widget.setSuspension(False)
+            print("恢复")
+            return
+
+        '''
+            将头像按钮从布局中移出,在隐藏会整个头部,
+            在将头像按钮的父级设置为整个窗口
+        '''
+        self.horizontalLayout.removeWidget(self.btn_head_picture)
+        self.widget_head.hide()
+        self.btn_head_picture.setParent(self)
+        self.btn_head_picture.show()
+        self.btn_head_picture.move(self.width()-self.btn_head_picture.width()+10,10)
+        # 样式,图片大小跟随缩小
+        w = int(self.btn_head_picture.width()*scale)
+        h = int(self.btn_head_picture.height()*scale)
+        self.btn_head_picture.setFixedSize(w,h)
+        self.qss_head_picture.selector("QPushButton").updateAttr("border-radius","{}px".format(self.btn_head_picture.width() // 2))
+        iw = int(self.btn_head_picture.iconSize().width()*scale)
+        ih = int(self.btn_head_picture.iconSize().height()*scale)
+        self.btn_head_picture.setIconSize(QSize(iw,ih))
+
+        self.head_suspension["isSuspension"] = True
+        self.core_widget.setSuspension(True)
+        print("悬浮")
 
     def addMenu(self,item:dict):
         self.__menus.append(item)
@@ -158,13 +211,11 @@ class ListTemplateWindow(ListTemplateWindowUI):
 
         self.__ani.setStartValue(self.listWidget.size())
         if self.__flexible_flag:
-            # self.qss.selector("QListView::item:hover").removeAttr("border-right")
-            self.qss.selector("QListView::item:selected").removeAttr("border-right")
+            self.qss_listwiget.selector("QListView::item:selected").removeAttr("border-right")
             self.__ani.setEndValue(QSize(self.__flexible_value[1],self.listWidget.height()))
             self.__flexible_flag = False
         else:
-            # self.qss.selector("QListView::item:hover").updateAttr("border-right","5px solid #0055ff;")
-            self.qss.selector("QListView::item:selected").updateAttr("border-right","5px solid #0055ff")
+            self.qss_listwiget.selector("QListView::item:selected").updateAttr("border-right","5px solid #0055ff")
             self.__ani.setEndValue(QSize(self.__flexible_value[0], self.listWidget.height()))
             self.__flexible_flag = True
 
@@ -179,6 +230,13 @@ class ListTemplateWindow(ListTemplateWindowUI):
         self.listWidget.itemClicked.connect(self.__change_st_event)
         self.btn_fold.clicked.connect(self.__ani_event)
         self.btn_head_picture.clicked.connect(self.__menu_event)
+
+
+    def resizeEvent(self, e: QResizeEvent) -> None:
+        # 在这里面处理头像悬浮状态下的位置
+        if self.head_suspension["isSuspension"]:
+            self.btn_head_picture.move(self.width() - self.btn_head_picture.width()-10, 10)
+        super().resizeEvent(e)
 
 
 if __name__ == '__main__':
