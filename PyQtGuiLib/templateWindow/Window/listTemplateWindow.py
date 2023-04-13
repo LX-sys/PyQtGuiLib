@@ -92,7 +92,6 @@ class ListTemplateWindow(ListTemplateWindowUI):
             iw = int(self.btn_head_picture.iconSize().width() / scale)
             ih = int(self.btn_head_picture.iconSize().height() / scale)
             self.btn_head_picture.setIconSize(QSize(iw, ih))
-
             self.horizontalLayout.addWidget(self.btn_head_picture)
             self.widget_head.show()
             self.head_suspension["isSuspension"] = False

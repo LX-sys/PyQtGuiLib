@@ -162,6 +162,9 @@ r'''
         - 教学案例在test\test_SuperPainter 目录下
 2023.4.7 - 2023.4.11
     - 更新模板窗口 ListTemplateWindow
+2023.4.13 
+     感谢! PyQt5学习爱好群-(讨厌自己) 贡献 CircularProgressBar 进度条模块
+     导入方式 from PyQtGuiLib.core.progressBar import CircularProgressBar
 '''
 
 
