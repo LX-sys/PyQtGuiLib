@@ -37,21 +37,26 @@ class Test(QWidget):
         # self.ss.resize(600,200)
         self.test()  # 添加测试窗口
 
+        self.flag = True
         self.boyy.addWidget(self.ss)
 
         self.ss.changeWidget.connect(self.my_event)
 
     def my_event(self,index:int):
-        print("当前索引:",index)
+        pass
+        # print("当前索引:",index)
 
     def change(self):
         # self.ss.removeWidget(self.ss.getWidget(0))
-        self.pp = self.ss.popWidget(self.ss.getWidget(0))  # type:QWidget
-        self.pp.setParent(None)
-        self.pp.resize(50,50)
-        self.pp.move(30,30)
-        self.pp.show()
-        # print(pp)
+        if self.flag:
+            self.pp = self.ss.popWidget(self.ss.getWidget(0))  # type:QWidget
+            self.pp.move(30,30)
+            self.pp.show()
+            self.flag =False
+        else:
+            self.flag=True
+            self.ss.insertWidget(0,self.pp)
+
 
     def test(self):
         t = QWidget()

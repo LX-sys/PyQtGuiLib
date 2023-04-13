@@ -22,13 +22,35 @@ from PyQtGuiLib.header import (
     QColor,
     QResizeEvent,
     QShortcut,
-    QKeySequence
+    QKeySequence,
+    QVBoxLayout
 )
 from random import randint
 import typing
 
 from PyQtGuiLib.templateWindow.UI.listTemplateWindowUI import ListTemplateWindowUI
 
+
+# 文档外框
+class DocumentFrame(QWidget):
+    def __init__(self, widget:QWidget,st,index,documents:list):
+        super().__init__()
+        self.resize(500,500)
+        self.vboy = QVBoxLayout(self)
+
+
+        self.widget = widget
+        self.st = st
+        self.index = index
+        self.documents = documents
+        print(st,index)
+
+        self.vboy.addWidget(self.widget)
+
+    def closeEvent(self, e) -> None:
+        self.st.insertWidget(self.index,self.widget)
+        self.documents.remove(self.widget)
+        super().closeEvent(e)
 
 class ListTemplateWindow(ListTemplateWindowUI):
     def __init__(self,*args,**kwargs):
@@ -45,6 +67,9 @@ class ListTemplateWindow(ListTemplateWindowUI):
 
         # 模块图标大小
         self.listWidget.setIconSize(QSize(50,50))
+
+        # 文档窗口存储
+        self.documents = []
 
         self.__ani = QPropertyAnimation(self)
         self.__ani.setTargetObject(self.listWidget)
@@ -234,7 +259,12 @@ class ListTemplateWindow(ListTemplateWindowUI):
         QShortcut(QKeySequence(self.tr("Ctrl+Q")),self,self.tt)
 
     def tt(self):
-        print(self.stackedWidget.getCursorWidget().text())
+        index = self.stackedWidget.getCursorWidgetIndex()
+        widget = self.stackedWidget.popWidget(self.stackedWidget.getCursorWidget())
+        pp = DocumentFrame(widget,self.stackedWidget,index,self.documents)
+        pp.show()
+        self.documents.append(pp)
+
 
     def resizeEvent(self, e: QResizeEvent) -> None:
         # 在这里面处理头像悬浮状态下的位置

@@ -32,6 +32,7 @@ class SlideShow(QWidget):
         self.resize(700, 300)
         #
         self.widgets = []
+        self._temp_widgets = [] # 临时窗口
 
         self.animation_time = 800 # 毫秒
 
@@ -163,6 +164,22 @@ border:2px solid #00557f;
         else:
             self.cursor_widget_p = widget
 
+    def insertWidget(self,index:int,widget:QWidget):
+        widget.setParent(self)
+
+        widget.resize(self.size())
+        widget.lower()
+        self.widgets.insert(index,widget)
+        if index == self.getCursorWidgetIndex():
+            self.cursor_widget_p = widget
+            self.cursor_widget_p.show()
+            if self.cursor_widget_p2:
+                self.cursor_widget_p2 = self.getCursorWidget()
+                self.cursor_widget_p2.hide()
+                self.update()
+        else:
+            widget.hide()
+
     # 设置动作模式
     def setAinDirectionMode(self, mode:tuple):
         if mode[0] not in [SlideShow.Ani_Up,SlideShow.Ani_Left] and\
@@ -200,7 +217,7 @@ border:2px solid #00557f;
     def popWidget(self,widget:QWidget):
         if widget == self.cursor_widget_p:
             index = self.widgets.index(widget)
-            if index == 0 and self.count() >=1:
+            if index == 0 and self.count() >=2:
                 wid = self.widgets[index+1]
                 wid.resize(self.size())
                 wid.show()
@@ -297,6 +314,7 @@ border:2px solid #00557f;
 
     # 返回当前的窗口索引
     def getCursorWidgetIndex(self)->int:
+        print("--->",self.getCursorWidget())
         return self.widgets.index(self.getCursorWidget())
 
     def resizeEvent(self, event) -> None:
