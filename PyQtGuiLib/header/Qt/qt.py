@@ -121,3 +121,6 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     CosineCurve = QEasingCurve.Type.CosineCurve
     SineCurve = QEasingCurve.Type.SineCurve
     InCurve = QEasingCurve.Type.InCurve
+    Unchecked = Qt.CheckState.Unchecked
+    Checked = Qt.CheckState.Checked
+    PartiallyChecked = Qt.CheckState.PartiallyChecked

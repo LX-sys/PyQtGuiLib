@@ -1,5 +1,3 @@
-from PyQt5 import QtGui
-
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,sys,

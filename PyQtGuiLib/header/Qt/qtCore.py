@@ -87,6 +87,7 @@ if PYQT_VERSIONS == "PySide2":
     # )
 if PYQT_VERSIONS == "PySide6":
     from PySide6.QtCore import *
+    from PySide6.QtCore import Property as pyqtProperty
     # from PySide6.QtCore import (
     #     Qt,
     #     QUrl,

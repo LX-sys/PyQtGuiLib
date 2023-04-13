@@ -45,7 +45,13 @@ class Test(QWidget):
         print("当前索引:",index)
 
     def change(self):
-        self.ss.removeWidget(self.ss.getWidget(1))
+        # self.ss.removeWidget(self.ss.getWidget(0))
+        self.pp = self.ss.popWidget(self.ss.getWidget(0))  # type:QWidget
+        self.pp.setParent(None)
+        self.pp.resize(50,50)
+        self.pp.move(30,30)
+        self.pp.show()
+        # print(pp)
 
     def test(self):
         t = QWidget()

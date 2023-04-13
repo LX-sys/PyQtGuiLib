@@ -3,40 +3,13 @@ from PyQtGuiLib.header import (
     QApplication,
     sys,
     QWidget,
-    qt,
-    QPushButton,
-    Qt,
-    QPalette,
-    QColor,
-    QPaintEvent,
-    QPainter,
-    QBrush,
-    QSize,
-    QMainWindow,
-    QLineEdit,
-    desktopCenter,
-    QPixmap,
-    QLinearGradient,
-    QLabel,
-    QFont,
-    textSize,
-    QFontMetricsF,
-    Qt,
-    QMouseEvent,
-    QVBoxLayout,
 )
 
-import time
-from PyQt5.QtWidgets import QSplashScreen,QDialog,QProxyStyle,QButtonGroup
-from PyQt5.QtCore import QThread,QRunnable,QThreadPool
-from PyQt5.QtGui import QFontMetrics,QFocusEvent
 
 # QSplashScreen
 '''
     测试用例的标准模板,该代码用于复制
 '''
-from PyQtGuiLib.core.resolver import dumpStructure
-from functools import partial
 
 
 class Test(QWidget):

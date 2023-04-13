@@ -20,7 +20,9 @@ from PyQtGuiLib.header import (
     QPoint,
     QGraphicsDropShadowEffect,
     QColor,
-    QResizeEvent
+    QResizeEvent,
+    QShortcut,
+    QKeySequence
 )
 from random import randint
 import typing
@@ -41,8 +43,7 @@ class ListTemplateWindow(ListTemplateWindowUI):
         self.__flexible_flag = True
         self.__flexible_value = (260,60)
 
-
-
+        # 模块图标大小
         self.listWidget.setIconSize(QSize(50,50))
 
         self.__ani = QPropertyAnimation(self)
@@ -64,7 +65,7 @@ class ListTemplateWindow(ListTemplateWindowUI):
 
         self.__myEvent()
         self.__builtInMenu()
-
+        self.__shortcutKey()
 
     def __builtInMenu(self):
         self.addMenus([{
@@ -96,7 +97,6 @@ class ListTemplateWindow(ListTemplateWindowUI):
             self.widget_head.show()
             self.head_suspension["isSuspension"] = False
             self.core_widget.setSuspension(False)
-            print("恢复")
             return
 
         '''
@@ -119,7 +119,6 @@ class ListTemplateWindow(ListTemplateWindowUI):
 
         self.head_suspension["isSuspension"] = True
         self.core_widget.setSuspension(True)
-        print("悬浮")
 
     def addMenu(self,item:dict):
         self.__menus.append(item)
@@ -231,6 +230,12 @@ class ListTemplateWindow(ListTemplateWindowUI):
         self.btn_fold.clicked.connect(self.__ani_event)
         self.btn_head_picture.clicked.connect(self.__menu_event)
 
+    # 默认快捷键
+    def __shortcutKey(self):
+        QShortcut(QKeySequence(self.tr("Ctrl+Q")),self,self.tt)
+
+    def tt(self):
+        print(self.stackedWidget.getCursorWidget().text())
 
     def resizeEvent(self, e: QResizeEvent) -> None:
         # 在这里面处理头像悬浮状态下的位置

@@ -55,7 +55,7 @@ class TestPullOverWidget(QWidget):
 # }
 #         ''')
 
-        self.vboy = QHBoxLayout(self)
+        # self.vboy = QHBoxLayout(self)
 
         self.waterbar = WaterBar(self)
         self.waterbar.move(100,250)
@@ -76,9 +76,9 @@ class TestPullOverWidget(QWidget):
         self.cir.setTextSize(15)
         self.cir.move(50, 50)
 
-        self.vboy.addWidget(self.waterbar)
-        self.vboy.addWidget(self.loadbar)
-        self.vboy.addWidget(self.cir)
+        # self.vboy.addWidget(self.waterbar)
+        # self.vboy.addWidget(self.loadbar)
+        # self.vboy.addWidget(self.cir)
         #
         self.th = DurationTimeThread()
         self.th.added.connect(self.test)

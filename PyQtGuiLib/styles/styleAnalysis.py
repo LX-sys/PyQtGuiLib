@@ -9,6 +9,7 @@
     QSS 样式解析器
 '''
 from PyQtGuiLib.header import (
+    PYQT_VERSIONS,
     SyntaxError,
     KeyError,
     QMutex
@@ -262,7 +263,10 @@ class QssStyleAnalysis:
         self.__mutex.lock()
         parent.setStyleSheet("")
         parent.setStyleSheet(self.toStr())
-        parent.update()
+        if PYQT_VERSIONS == "PyQt5":
+            parent.update()
+        else:
+            parent.repaint()
         self.__mutex.unlock()
 
     # updata QSS

@@ -142,7 +142,6 @@ border:2px solid #00557f;
         if not direction:
             return
 
-
         w_2 = self.widgets[self.index]
         self.cursor_widget_p = w_2 # 保存当前窗口
         self.cursor_widget_p2 = w_1
@@ -196,6 +195,25 @@ border:2px solid #00557f;
             self.cursor_widget_p2 = None
         self.widgets.remove(widget)
         del widget
+
+    # 弹出一个完全独立的窗口
+    def popWidget(self,widget:QWidget):
+        if widget == self.cursor_widget_p:
+            index = self.widgets.index(widget)
+            if index == 0 and self.count() >=1:
+                wid = self.widgets[index+1]
+                wid.resize(self.size())
+                wid.show()
+                self.cursor_widget_p = wid
+            else:
+                self.cursor_widget_p = None
+        if widget == self.cursor_widget_p2:
+            self.cursor_widget_p2 = None
+
+        independence_widget = self.widgets.pop(self.widgets.index(widget)) # type:QWidget
+        independence_widget.setParent(None)
+        independence_widget.resize(300,300)
+        return independence_widget
 
     # 切换到指定窗口
     def setCurrentIndex(self,index:int=0):
@@ -275,7 +293,11 @@ border:2px solid #00557f;
 
     # 返回当前的窗口
     def getCursorWidget(self)->QWidget:
-        return self.cursor_widget
+        return self.cursor_widget_p
+
+    # 返回当前的窗口索引
+    def getCursorWidgetIndex(self)->int:
+        return self.widgets.index(self.getCursorWidget())
 
     def resizeEvent(self, event) -> None:
         self.btnPos()

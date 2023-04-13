@@ -4,7 +4,7 @@ from PyQtGuiLib.header import (
     Qt,
     QPoint,
     QRect,
-    pyqtProperty
+    pyqtProperty,
 )
 import re
 import json

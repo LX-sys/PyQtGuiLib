@@ -7,6 +7,7 @@ from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     sys,
     QApplication,
+    QWidget
 )
 
 from abandonCase.widgets import (
@@ -17,6 +18,7 @@ from abandonCase.widgets import StatusBar
 from PyQtGuiLib.core.progressBar import GradientBar
 
 '''
+    这个例子无法运行 2023.4.13 号
     测试 状态栏
 '''
 
