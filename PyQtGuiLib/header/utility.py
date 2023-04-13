@@ -9,7 +9,10 @@ from PyQtGuiLib.header import (
     QWidget,
 )
 from PyQtGuiLib.header.customStyle import CustomStyle
-
+'''
+QListWidget 在Pyqt5页面刷新的方式 update(),其他版本可以用repaint()来达到一样的效果
+QListWidget 的update(item)需要传递一个参数
+'''
 
 is_win_sys = True if platform.system() == "win32" else False
 
