@@ -213,6 +213,14 @@ border:2px solid #00557f;
         self.widgets.remove(widget)
         del widget
 
+    def replaceWidget(self,old_widget:QWidget,new_widget:QWidget):
+        if old_widget == self.cursor_widget_p:
+            pass
+        elif old_widget == self.cursor_widget_p2:
+            pass
+        else:
+            pass
+
     # 弹出一个完全独立的窗口
     def popWidget(self,widget:QWidget):
         if widget == self.cursor_widget_p:

@@ -256,9 +256,9 @@ class ListTemplateWindow(ListTemplateWindowUI):
 
     # 默认快捷键
     def __shortcutKey(self):
-        QShortcut(QKeySequence(self.tr("Ctrl+Q")),self,self.tt)
+        QShortcut(QKeySequence(self.tr("Ctrl+Q")),self,self.shortcut_ctrl_q)
 
-    def tt(self):
+    def shortcut_ctrl_q(self):
         index = self.stackedWidget.getCursorWidgetIndex()
         widget = self.stackedWidget.popWidget(self.stackedWidget.getCursorWidget())
         pp = DocumentFrame(widget,self.stackedWidget,index,self.documents)
