@@ -9,7 +9,8 @@ from PyQtGuiLib.header import (
     sys,
     QWidget,
     QColor,
-    QPushButton
+    QPushButton,
+    QPoint
 )
 from PyQtGuiLib.styles import SuperPainter
 
@@ -31,6 +32,26 @@ class Test(QWidget):
         self.btn.move(200,50)
         self.btn.clicked.connect(self.updateDraw)
 
+        self.setMouseTracking(True)
+        self.cupos = QPoint(-1,-1)
+
+    def mousePressEvent(self, e):
+        myrect = self.painter.virtualObj("myrect")
+        myrect2 = self.painter.virtualObj("myrect2")
+        print("是否点击在myrect图形上",myrect.isClick(self.cupos))
+        print("是否点击在myrect2图形上",myrect2.isClick(self.cupos))
+        super().mousePressEvent(e)
+
+    def mouseMoveEvent(self, e):
+        self.cupos = e.pos()
+        myrect2 = self.painter.virtualObj("myrect2")
+        if myrect2.isClick(self.cupos):
+            myrect2.updateOpenAttr(openAttr={"color": "red", "width": 3})
+        else:
+            myrect2.updateOpenAttr(openAttr={"color": "green", "width": 3})
+        self.update()
+        super().mouseMoveEvent(e)
+
     # 修改图形事件
     def updateDraw(self):
         '''
@@ -50,9 +71,11 @@ class Test(QWidget):
 
 
         myrect2=self.painter.virtualObj("myrect2")
-        myrect2.updateArgs(200, 200,100,100)
-        myrect2.updateOpenAttr(openAttr={"color":"red","width":3})
-        myrect2.updateBrushAttr(brushAttr={"color":QColor("green")})
+        myrect2.scale(1.2)
+        # myrect2.setHide(True) # True隐藏图形
+        # myrect2.move(300,300)
+        # myrect2.updateOpenAttr(openAttr={"color":"red","width":3})
+        # myrect2.updateBrushAttr(brushAttr={"color":QColor("green")})
 
         self.update() # 这里必须调用一下,来刷新图形
 
