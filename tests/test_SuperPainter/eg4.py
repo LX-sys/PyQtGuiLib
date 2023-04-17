@@ -43,10 +43,17 @@ class Test(QWidget):
                 updateArgs() 修改当前图形的位置大小等信息
                 updateOpenAttr() 修改当前图形的属性
         '''
-        print(self.painter.virtualObj().getVirtualArgs("myrect"))
-        self.painter.virtualObj().updateArgs("myrect",20,20,100,100)
-        # 注意一下,目前版本中,这句修改属性的句话,必须在创建图形虚拟对象的有才可以修改,如果没有,这修改无效
-        self.painter.virtualObj().updateOpenAttr("myrect",openAttr={"color":"red"})
+        myrect=self.painter.virtualObj("myrect")
+        myrect.updateArgs(20,20,100,100)
+        myrect.updateOpenAttr(openAttr={"color":"red","width":3})
+        myrect.updateBrushAttr(brushAttr={"color":QColor("green")})
+
+
+        myrect2=self.painter.virtualObj("myrect2")
+        myrect2.updateArgs(200, 200,100,100)
+        myrect2.updateOpenAttr(openAttr={"color":"red","width":3})
+        myrect2.updateBrushAttr(brushAttr={"color":QColor("green")})
+
         self.update() # 这里必须调用一下,来刷新图形
 
     def paintEvent(self, QPaintEvent):
@@ -54,6 +61,7 @@ class Test(QWidget):
 
         # 创建一个 图形虚拟对象
         self.painter.drawRect(20, 20, 50, 50,openAttr={"color":"green"}, virtualObjectName="myrect")
+        self.painter.drawRect(200, 200, 50, 50,openAttr={"color":"green"}, virtualObjectName="myrect2")
 
         self.painter.end()
 
