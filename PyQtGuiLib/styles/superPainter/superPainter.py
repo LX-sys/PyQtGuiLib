@@ -8,6 +8,8 @@ from PyQtGuiLib.header import (
     Qt,
     QColor,
     QPaintEvent,
+    QPoint,
+    QRect
 )
 import typing
 
@@ -58,6 +60,14 @@ class VirtualObject:
         self.__vobj_name = vobj_name
         self.__vir_attr = kwargs # 虚拟属性
 
+        self.__isHide = False
+
+    def setHide(self,b:bool):
+        self.__isHide = b
+
+    def isHide(self)->bool:
+        return self.__isHide
+
     def type(self)->str:
         return self.getVirtualFunc().__name__
 
@@ -101,23 +111,38 @@ class VirtualObject:
         self.updateOpenAttr(self.virtualObjName(),openAttr)
         self.updateBrushAttr(self.virtualObjName(),brushAttr)
 
+    def __getRect(self)->QRect:
+        return QRect(*self.getVirtualArgs())
+
+    # 移动
     def move(self,x,y):
         if patternClassification(self.type()) == "Rect":
             args = self.getVirtualArgs()[2:]
             self.updateArgs(x,y,*args)
 
+    # 缩放
     def scale(self,proportion:float):
         if patternClassification(self.type()) == "Rect":
-            xy = self.getVirtualArgs()[:2]
-            wh = self.getVirtualArgs()[2:4]
-            w,h = int(wh[0]*proportion),int(wh[1]*proportion)
-            self.updateArgs(*xy,w,h)
+            x, y, w, h = self.getVirtualArgs()
+            w,h = int(w*proportion),int(h*proportion)
+            self.updateArgs(x,y,w,h)
 
+    # 检测鼠标是否点在图形上
+    def isClick(self,pos:QPoint)->bool:
+        if patternClassification(self.type()) == "Rect":
+            x,y,w,h =self.getVirtualArgs()
+            cx,cy = pos.x(),pos.y()
+
+            if cx >= x and cx <= x+w and cy >= y and cy <= y+h:
+                return True
+            return False
 
 # 虚拟图形对象管理类
 class VirtualObjectManagement:
     def __init__(self):
-        # 虚拟对象字典
+        '''
+            虚拟对象管理
+        '''
         self.__virtualObjects = dict()  # type:typing.Dict[str:typing.List]
 
     def virtualObjName(self,vobj_name:str)->str:
@@ -132,7 +157,6 @@ class VirtualObjectManagement:
     def appendVirtualObject(self, vobj_name: str, **kwargs):
         if not self.isVirtualObject(vobj_name):
             self.__virtualObjects[vobj_name] = VirtualObject(vobj_name,**kwargs)
-
 
 
 class SuperPainterAttr(QPainter):
@@ -284,13 +308,13 @@ class SuperPainterAttr(QPainter):
                         brushAttr = vir_brushAttr
                         kwargs["brushAttr"] = brushAttr
 
-                self.__privateAttr(openAttr, brushAttr)
-                if openAttr:del kwargs["openAttr"]
-                if brushAttr:del kwargs["brushAttr"]
-                if virtual_object_name: del kwargs["virtualObjectName"]
-                value = func(*args,**kwargs)
-                self.__restorePrivateAttr(op,brush)
-                return value
+                if virtual_object_name and vir_obj.isHide() is False:
+                    self.__privateAttr(openAttr, brushAttr)
+                    if openAttr:del kwargs["openAttr"]
+                    if brushAttr:del kwargs["brushAttr"]
+                    if virtual_object_name: del kwargs["virtualObjectName"]
+                    func(*args,**kwargs)
+                    self.__restorePrivateAttr(op,brush)
             return wrapper
 
         self.drawRect = decorator(self.drawRect)
