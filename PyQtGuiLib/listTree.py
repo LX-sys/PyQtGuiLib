@@ -56,13 +56,10 @@ class ListTree(QWidget):
     def addItem(self,text:str):
         if self.count() == 0:
             self.__items.append({
-                "rect": QRect(self.__margin, self.__margin, -1, self.__item_height)
+
             })
         elif self.count() > 0:
-            self.__items.append({
-                "rect": QRect(self.__margin, self.__margin * (self.count()+1)  + self.__item_height * self.count(), -1,
-                              self.__item_height)
-            })
+            pass
 
     def addItems(self,data:list):
         for info in data:
