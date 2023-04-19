@@ -85,7 +85,7 @@ class Test(QWidget):
         # 创建一个 图形虚拟对象
         self.painter.drawRect(20, 20, 50, 50,openAttr={"color":"green"}, virtualObjectName="myrect")
         self.painter.drawRect(200, 200, 50, 50,openAttr={"color":"green"}, virtualObjectName="myrect2")
-
+        self.painter.drawRoundedRect(10,300,150,80,openAttr={"c":"#00557f"})
         self.painter.end()
 
 
