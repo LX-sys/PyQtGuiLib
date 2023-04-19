@@ -11,6 +11,7 @@ from PyQtGuiLib.header import (
 from random import randint
 from PyQtGuiLib.core import Notice,Notices
 
+
 class Time(QThread):
     add = Signal()
     def __init__(self,*args,**kwargs):
@@ -25,6 +26,7 @@ class Time(QThread):
             if n == 5:
                 break
             n+=1
+
 
 class Test(QWidget):
     def __init__(self,*args,**kwargs):
