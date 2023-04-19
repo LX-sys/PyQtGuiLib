@@ -353,6 +353,11 @@ class SuperPainterAttr(QPainter):
                         openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="") -> None:
         super().drawRoundedRect(x,y,w,h,r,r2)
 
+    def drawLine(self, x:int,y:int,x1:int,y1:int,
+                 openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="") -> None:
+        super().drawLine(x,y,x1,y1)
+
+
 class SuperPainter(SuperPainterAttr):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
