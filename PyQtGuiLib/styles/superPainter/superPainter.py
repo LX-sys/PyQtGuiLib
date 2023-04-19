@@ -308,13 +308,15 @@ class SuperPainterAttr(QPainter):
                         brushAttr = vir_brushAttr
                         kwargs["brushAttr"] = brushAttr
 
+                self.__privateAttr(openAttr, brushAttr)
+                if openAttr: del kwargs["openAttr"]
+                if brushAttr: del kwargs["brushAttr"]
+                if virtual_object_name: del kwargs["virtualObjectName"]
                 if virtual_object_name and vir_obj.isHide() is False:
-                    self.__privateAttr(openAttr, brushAttr)
-                    if openAttr:del kwargs["openAttr"]
-                    if brushAttr:del kwargs["brushAttr"]
-                    if virtual_object_name: del kwargs["virtualObjectName"]
-                    func(*args,**kwargs)
-                    self.__restorePrivateAttr(op,brush)
+                    func(*args, **kwargs)
+                else:
+                    func(*args, **kwargs)
+                self.__restorePrivateAttr(op, brush)
             return wrapper
 
         self.drawRect = decorator(self.drawRect)
@@ -341,6 +343,15 @@ class SuperPainterAttr(QPainter):
         self.drawPixmapFragments = decorator(self.drawPixmapFragments)
         self.drawTiledPixmap = decorator(self.drawTiledPixmap)
 
+    # ------------下面代码是作为工具的提示代码------------
+
+    def drawRect(self, x:int,y:int,w:int,h:int,
+                 openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="") -> None:
+        super().drawRect(x,y,w,h)
+
+    def drawRoundedRect(self, x:int,y:int,w:int,h:int,r:int=5,r2:int=5,
+                        openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="") -> None:
+        super().drawRoundedRect(x,y,w,h,r,r2)
 
 class SuperPainter(SuperPainterAttr):
     def __init__(self,*args,**kwargs):
