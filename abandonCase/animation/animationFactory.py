@@ -4,16 +4,11 @@ from PyQtGuiLib.header import (
     QPropertyAnimation,
     QObject,
     QColor,
-    QRect,
-    QPoint,
-    QSize,
-    pyqtProperty,
     Signal,
-    QGraphicsDropShadowEffect,
-    QGraphicsBlurEffect
+    QGraphicsDropShadowEffect
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
-from PyQtGuiLib.animation.animationDrawType import AniNumber
+from abandonCase.animation.animationDrawType import AniNumber
 '''
     QPropertyAnimation: you're trying to animate a non-existing property value of your QObject
     该警告出现mac下,部分win可能也会出现,可以忽略该警告

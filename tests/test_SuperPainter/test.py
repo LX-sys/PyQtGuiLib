@@ -40,28 +40,19 @@ class Test(QWidget):
     def test_update(self,v):
         rrent = self.painter.virtualObj("rrent")
         rrent.scale(v)
-
-        # rrent.move(200,200)
-
-        # print(rrent.type())
-        # print(rrent.getVirtualObjectAttr())
-        # # rrent.updateArgs(50,50,100,100,3,3)
-        # # rrent.updateArgs(50,50,100,100)
-        # rrent.updateOpenAttr(openAttr={"color":"red"})
-        # rrent.updateBrushAttr(brushAttr={"color":"blue"})
         self.update()
 
     def paintEvent(self, e:QPaintEvent) -> None:
         self.painter.begin(self)
         self.painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
-        # self.painter.drawRoundedRect(50,50,50,50,5,5,virtualObjectName="rrent")
+
+
         self.painter.drawRect(50,50,50,50,virtualObjectName="rrent")
 
         self.painter.end()
 
 '''
-    修复说明
-    重新优化结构,将虚拟对象图形类,拆分为(虚拟对象图形管理类,虚拟对象图形类)
+
 '''
 
 if __name__ == '__main__':

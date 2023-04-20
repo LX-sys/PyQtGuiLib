@@ -4,4 +4,4 @@
 # @file:__init__.py.py
 # @software:PyCharm
 from PyQtGuiLib.animation.lmlmAni import LmLmAnimation
-from PyQtGuiLib.animation.animation import Animation
+from PyQtGuiLib.animation.animation import Animation,ParallelAnimationGroup,SequentialAnimationGroup

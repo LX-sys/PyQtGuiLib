@@ -9,19 +9,13 @@ from PyQtGuiLib.header import (
     QApplication,
     sys,
     QWidget,
-    QSize,
     QPoint,
     QPushButton,
-    QObject,
-    QSpinBox,
-    QEasingCurve,
-    QColor,
-    QRect
+    QSpinBox
 )
 
-import typing
 # from PyQtGuiLib.animation.new_animation.PropertyAnimation import PropertyAnimation,SequentialAnimationGroup,ParallelAnimationGroup
-from PyQtGuiLib.animation.new_animation.animation import Animation,SequentialAnimationGroup,ParallelAnimationGroup
+from PyQtGuiLib.animation.animation import Animation, ParallelAnimationGroup
 
 
 

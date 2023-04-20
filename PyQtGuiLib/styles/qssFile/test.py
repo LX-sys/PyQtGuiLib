@@ -10,12 +10,10 @@
 
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtGui import QColor
+from PyQt5 import QtCore, QtWidgets
 
 from PyQtGuiLib.styles.qssFile.drak.qssDrak import QSSDrak
 from PyQtGuiLib.styles import QssStyleAnalysis
-from PyQtGuiLib.animation.animation import Animation
 
 
 class Test(QWidget):

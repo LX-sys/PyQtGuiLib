@@ -11,15 +11,11 @@ from PyQtGuiLib.header import (
     QPoint,
     qt,
     QPushButton,
-    QSize,
-    QPainter,
     QColor,
-    QLinearGradient,
-    QRect
+    QLinearGradient
 )
 
 from PyQtGuiLib.animation import Animation
-from PyQtGuiLib.animation.animationLayout import AnimationLayout
 
 
 class Test(QWidget):
