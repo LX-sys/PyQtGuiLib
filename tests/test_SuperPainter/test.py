@@ -17,7 +17,9 @@ from PyQtGuiLib.header import (
     QColor,
     QPaintEvent,
     QPushButton,
-    QRect
+    QRect,
+    QPoint,
+    QLine
 )
 
 from PyQtGuiLib.animation import Animation
@@ -48,7 +50,7 @@ class Test(QWidget):
 
 
         self.painter.drawRect(50,50,50,50,virtualObjectName="rrent")
-
+        self.painter.drawLines(QLine(10,10,100,100),QLine(50,50,100,100),openAttr={"c":"red"})
         self.painter.end()
 
 '''

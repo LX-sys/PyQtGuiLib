@@ -9,7 +9,8 @@ from PyQtGuiLib.header import (
     QColor,
     QPaintEvent,
     QPoint,
-    QRect
+    QRect,
+    QLine
 )
 import typing
 
@@ -357,6 +358,8 @@ class SuperPainterAttr(QPainter):
                  openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="") -> None:
         super().drawLine(x,y,x1,y1)
 
+    def drawLines(self,*args,openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="")->None:
+        super().drawLines(*args)
 
 class SuperPainter(SuperPainterAttr):
     def __init__(self,*args,**kwargs):

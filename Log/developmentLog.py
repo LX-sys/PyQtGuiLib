@@ -165,6 +165,8 @@ r'''
 2023.4.13 
      感谢! PyQt5学习爱好群-(讨厌自己) 贡献 CircularProgressBar 进度条模块
      导入方式 from PyQtGuiLib.core.progressBar import CircularProgressBar
+2023.4.20
+    - 新增 抽屉控件(Drawer) -- 编写中
 '''
 
 
