@@ -48,10 +48,34 @@ class Test(QWidget):
         self.painter.begin(self)
         self.painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
+        # self.painter.drawRect(self.width()//2-25,self.height()//2-25, 50, 50,openAttr={"c":"red"})
+        # self.painter.translate(self.width()//2-25,self.height()//2-25)
+        # self.painter.rotate(60)
+        # self.painter.shear(0.2,0.5)
 
-        self.painter.drawRect(50,50,50,50,virtualObjectName="rrent")
-        self.painter.drawLines(QLine(10,10,100,100),QLine(50,50,100,100),openAttr={"c":"red"})
+        self.painter.drawRect(50,50,50,50,virtualObjectName="rrent",brushAttr={"c":"green"})
+        self.painter.setCompositionMode(QPainter.CompositionMode_Xor)
+        self.painter.drawRect(50,75,50,50,brushAttr={"c":"red"})
+        # # self.painter.drawLines([QLine(10,10,100,100),QLine(50,50,100,100)],openAttr={"c":"red"})
+
+
+
+
+        # op = QPen()
+        # op.setColor(QColor(0,255,0))
+        # op.setWidth(3)
+        # self.painter.setPen(op)
+        # self.painter.drawRect(50,50,100,100)
+        # self.painter.save()
+        #
+        # self.painter.setPen(QColor(0, 0, 255))
+        # self.painter.drawRect(200, 50, 50, 50)
+        # self.painter.restore()
+        #
+        # self.painter.drawRect(200, 150, 50, 50)
+
         self.painter.end()
+
 
 '''
 

@@ -167,6 +167,8 @@ r'''
      导入方式 from PyQtGuiLib.core.progressBar import CircularProgressBar
 2023.4.20
     - 新增 抽屉控件(Drawer) -- 编写中
+2023.4.21 
+    -抽屉控件(Drawer)完成
 '''
 
 
