@@ -5,16 +5,13 @@
 # @software:PyCharm
 
 from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    QApplication,
-    sys,
     QWidget,
     QPushButton,
     QVBoxLayout,
     QSpacerItem,
     QSizePolicy,
     QScrollArea,
-    Qt
+    qt
 )
 
 from PyQtGuiLib.animation import Animation
@@ -28,38 +25,50 @@ class DrawerItem(QWidget):
         self.__vboy = QVBoxLayout(self)
         self.__vboy.setSpacing(0)
         self.__vboy.setContentsMargins(0,0,0,0)
-
-        self.btn = QPushButton("点击")
-        self.btn.setMinimumHeight(50)
-        self.btn.clicked.connect(self.stretch_event)
-
-        self.expansion_widget = QWidget()
-        self.expansion_widget.setStyleSheet('''
-        background-color: rgb(85, 170, 127);
-        ''')
-
         self.setFixedHeight(50)
 
         self._sp = QSpacerItem(0,0,QSizePolicy.Minimum,QSizePolicy.Expanding)
-
-        self.__vboy.addWidget(self.btn)
-        self.__vboy.addWidget(self.expansion_widget)
-        self.__vboy.addItem(self._sp)
-
         self.__flag = False
+
+        self.__duration = 200
+        self.__area = 300
+
+        self.setFixedHeight(30)
+
+    def setFixedHeight(self, h: int) -> None:
+        self._fh = h
+        super().setFixedHeight(h)
+
+    def setDuration(self,duration:int):
+        self.__duration =duration
+
+    # 设置展开高度
+    def setDevelopedArea(self,area):
+        self.__area = area
 
     def stretch_event(self):
         self.__ani = Animation()
         self.__ani.setStartMode(Animation.Parallel)
         if self.__flag is False:
-            self.__ani.addAni(self.btn.height(),300,duration=200,courseFunc=self.setFixedHeight)
-            self.__ani.addAni(self.expansion_widget.height(),300,duration=200,courseFunc=self.expansion_widget.setFixedHeight)
+            self.__ani.addAni(self.btn.height(),self.__area,duration=self.__duration,courseFunc=self.setFixedHeight)
+            self.__ani.addAni(self.expansion_widget.height(),self.__area,duration=self.__duration,courseFunc=self.expansion_widget.setFixedHeight)
             self.__flag = True
         else:
-            self.__ani.addAni(self.height(),self.btn.height(),duration=200,courseFunc=self.setFixedHeight)
-            self.__ani.addAni(self.expansion_widget.height(), 0,duration=200, courseFunc=self.expansion_widget.setFixedHeight)
+            self.__ani.addAni(self.height(),self.btn.height(),duration=self.__duration,courseFunc=self.setFixedHeight)
+            self.__ani.addAni(self.expansion_widget.height(), 0,duration=self.__duration, courseFunc=self.expansion_widget.setFixedHeight)
             self.__flag = False
         self.__ani.start()
+
+    def setButton(self,btn):
+        self.btn = btn
+        self.btn.setMinimumHeight(self._fh)
+        self.btn.clicked.connect(self.stretch_event)
+
+    def setWidget(self,widget:QWidget):
+        self.expansion_widget = widget
+        self.__vboy.addWidget(self.btn)
+        self.__vboy.addWidget(self.expansion_widget)
+        self.__vboy.addItem(self._sp)
 
 
 class Drawer(QScrollArea):
@@ -78,25 +87,16 @@ class Drawer(QScrollArea):
         self._vboy.setContentsMargins(0,0,0,0)
         self._sp = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-
-        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-
-        for _ in range(4):
-            self.addItem(DrawerItem())
+        self.setHorizontalScrollBarPolicy(qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(qt.ScrollBarAlwaysOff)
 
     def addItem(self,item:DrawerItem):
         self._vboy.removeItem(self._sp)
         self._vboy.addWidget(item)
         self._vboy.addItem(self._sp)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
+    def findItem(self,index:int)->DrawerItem:
+        return self._vboy.itemAt(index).widget()
 
-    win = Drawer()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
+    def removeItem(self,item:DrawerItem):
+        self._vboy.removeWidget(item)
