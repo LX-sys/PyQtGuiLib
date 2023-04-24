@@ -19,6 +19,7 @@ import re
 
 Ang = typing.TypeVar("Any",str,int)
 
+
 def dictTostr(qss_dict)->str:
     combination = ""
     for selector, attribute in qss_dict.items():
@@ -242,20 +243,20 @@ class QssStyleAnalysis:
             raise TypeError("Parameter error!")
 
     def isSelectKey(self,key:str):
-        if self._map_qss.get(key,-1)>=0:
+        if self._map_qss.get(key,-1) >= 0:
             return True
         return False
 
-    def toDict(self)->dict:
+    def toDict(self) -> dict:
         qss_dict = dict()
         for i in range(self.count()):
             qss_dict.update(self.selectorIndex(i).toDict())
         return qss_dict
 
-    def header(self)->list:
+    def header(self) -> list:
         return list(self.toDict().keys())
 
-    def toStr(self)->str:
+    def toStr(self) -> str:
         return dictTostr(self.toDict())
 
     def __updateStyle(self, parent):
