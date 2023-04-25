@@ -4,7 +4,7 @@
 # @file:qt.py
 # @software:PyCharm
 from PyQtGuiLib.header.versions import PYQT_VERSIONS
-from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy,QEasingCurve
+from PyQtGuiLib.header import Qt,QPainter,QStyle,QSizePolicy,QEasingCurve,QCompleter
 
 
 if PYQT_VERSIONS == "PyQt5"  :
@@ -68,6 +68,11 @@ if PYQT_VERSIONS == "PyQt5"  :
     PartiallyChecked = Qt.PartiallyChecked
     AscendingOrder=Qt.AscendingOrder
     DescendingOrder = Qt.DescendingOrder
+    MatchContains = Qt.MatchContains
+    PopupCompletion = QCompleter.PopupCompletion
+    Key_Enter = Qt.Key_Enter
+    Key_Backspace = Qt.Key_Backspace
+    Key_Return = Qt.Key_Return
 
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
@@ -130,3 +135,8 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     PartiallyChecked = Qt.CheckState.PartiallyChecked
     AscendingOrder = Qt.SortOrder.AscendingOrder
     DescendingOrder = Qt.SortOrder.DescendingOrder
+    MatchContains = Qt.MatchFlag.MatchContains
+    PopupCompletion = QCompleter.CompletionMode.PopupCompletion
+    Key_Enter = Qt.Key.Key_Enter
+    Key_Backspace = Qt.Key.Key_Backspace
+    Key_Return = Qt.Key.Key_Return
