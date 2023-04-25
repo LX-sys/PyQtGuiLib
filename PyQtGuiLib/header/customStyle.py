@@ -6,6 +6,7 @@ from PyQtGuiLib.header import (
     QRect,
     pyqtProperty,
 )
+
 import re
 import json
 '''

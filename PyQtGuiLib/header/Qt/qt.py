@@ -63,7 +63,11 @@ if PYQT_VERSIONS == "PyQt5"  :
     CosineCurve = QEasingCurve.CosineCurve
     SineCurve = QEasingCurve.SineCurve
     InCurve = QEasingCurve.InCurve
-
+    Checked = Qt.Checked
+    Unchecked = Qt.Unchecked
+    PartiallyChecked = Qt.PartiallyChecked
+    AscendingOrder=Qt.AscendingOrder
+    DescendingOrder = Qt.DescendingOrder
 
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
@@ -124,3 +128,5 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     Unchecked = Qt.CheckState.Unchecked
     Checked = Qt.CheckState.Checked
     PartiallyChecked = Qt.CheckState.PartiallyChecked
+    AscendingOrder = Qt.SortOrder.AscendingOrder
+    DescendingOrder = Qt.SortOrder.DescendingOrder

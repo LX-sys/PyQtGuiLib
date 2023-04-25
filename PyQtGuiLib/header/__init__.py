@@ -8,8 +8,17 @@ from PyQtGuiLib.header.Qt import qt
 from PyQtGuiLib.header.py.common import *
 
 from PyQtGuiLib.header.versions import PYQT_VERSIONS
-from PyQtGuiLib.header.utility import *
 from PyQtGuiLib.header.customStyle import CustomStyle
+from PyQtGuiLib.header.utility import (
+    is_mac_sys,
+    is_win_sys,
+    desktopSize,
+    desktopCenter,
+    textSize,
+    rgbTohsv,
+    loadUic,
+    Widget
+)
 from PyQtGuiLib.header.error import *
 
 

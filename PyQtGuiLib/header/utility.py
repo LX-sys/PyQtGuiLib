@@ -1,4 +1,6 @@
-import platform,math
+import platform
+import math
+
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     DesktopWidget,
@@ -7,8 +9,9 @@ from PyQtGuiLib.header import (
     QFontMetricsF,
     QFont,
     QWidget,
+    CustomStyle
 )
-from PyQtGuiLib.header.customStyle import CustomStyle
+
 '''
 QListWidget 在Pyqt5页面刷新的方式 update(),其他版本可以用repaint()来达到一样的效果
 QListWidget 的update(item)需要传递一个参数
