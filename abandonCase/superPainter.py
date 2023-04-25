@@ -55,7 +55,7 @@ class SuperPainter:
 
         if parent:
             self.begin()
-            self.painter().setRenderHints(QPainter.Antialiasing | QPainter.HighQualityAntialiasing | QPainter.SmoothPixmapTransform)
+            self.painter().setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         # 默认画笔
         op = QPen()
@@ -501,18 +501,13 @@ class Test(QWidget):
         painter = SuperPainter(self)
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
-        # painter.drawRoundedRect(300,300,100,100,openAttr={"c":QColor(0,0,255)},
-        #                  brushAttr={"c":QColor(0,255,0)})
-        # painter.drawLine(100,50,80)
-        # painter.drawText(50,50)
+        painter.drawRoundedRect(300,300,100,100,openAttr={"c":QColor(0,0,255)},
+                         brushAttr={"c":QColor(0,255,0)})
+        painter.drawLine(100,50,80)
+        painter.drawText(50,50)
         # painter.drawArc()
         # painter.drawChord()
-        painter.drawConvexPolygon([QPoint(50,50),QPoint(350,50)],openAttr={"c":QColor(255,60,60)})
-
-
-
-
-
+        # painter.drawConvexPolygon([QPoint(50,50),QPoint(350,50)],openAttr={"c":QColor(255,60,60)})
 '''
 drawRect().hover()
 '''
