@@ -177,6 +177,7 @@ r'''
     -新增控件ComboCheckBox,该控件是一个具体提示的输入框,同时也是一个多项选择框,
         控件由 "PyQt5学习爱好群-知行合一" 贡献
         该控件目前PySide系列支持性比较好,PyQt系列存在提示BUG
+        导入方式 from PyQtGuiLib.core import ComboCheckBox
     -删除老版本的超级画师代码,重构版本的超级画师目前代码提示还不完善
     -目前所有文档还未更新,
 '''
