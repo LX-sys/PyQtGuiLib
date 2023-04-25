@@ -19,7 +19,6 @@ from PyQtGuiLib.header import (
     QPushButton,
     QLabel,
     QObject,
-    qt,
     QTreeWidgetItem,
     QLineEdit,
     Qt,
@@ -32,12 +31,11 @@ from PyQtGuiLib.header import (
 )
 from PyQtGuiLib.styles import QssStyleAnalysis
 from functools import partial
-from PyQtGuiLib.core import PaletteFrame
 from PyQtGuiLib.core.flowLayout import FlowLayout
-from PyQtGuiLib.styles.linker.styleLinkerUi import StyleLinkerUI
+from abandonCase.linker.styleLinkerUi import StyleLinkerUI
 
-from PyQtGuiLib.styles.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
-from PyQtGuiLib.styles.linker.component import (
+from abandonCase.linker.controlType import getStyleLists,getStyleCommentLists,getMergeStyles
+from abandonCase.linker.component import (
     RegisterComponent
 )
 

@@ -14,9 +14,7 @@ from PyQtGuiLib.header import (
     QSpinBox
 )
 
-# from PyQtGuiLib.animation.new_animation.PropertyAnimation import PropertyAnimation,SequentialAnimationGroup,ParallelAnimationGroup
-from PyQtGuiLib.animation.animation import Animation, ParallelAnimationGroup
-
+from PyQtGuiLib.animation import Animation,ParallelAnimationGroup
 
 
 class Test(QWidget):
@@ -58,6 +56,7 @@ font-size:10px;
         self.g = ParallelAnimationGroup()
         self.g.builds([self.ani,self.ani2])
         self.g.start()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
