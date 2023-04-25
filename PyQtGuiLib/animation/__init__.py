@@ -3,4 +3,8 @@
 # @author:LX
 # @file:__init__.py.py
 # @software:PyCharm
-from PyQtGuiLib.animation.animation import Animation,ParallelAnimationGroup,SequentialAnimationGroup
+from PyQtGuiLib.animation.animation import (
+    Animation,
+    ParallelAnimationGroup,
+    SequentialAnimationGroup
+)

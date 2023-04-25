@@ -54,7 +54,6 @@ class CircularProgressBar(QWidget):
         self._timer.timeout.connect(self._animate)
         self._timer.setInterval(self._interval)
 
-    # 关于作者的信息
     def author(self) -> str:
         return self.__personalInformation
 
