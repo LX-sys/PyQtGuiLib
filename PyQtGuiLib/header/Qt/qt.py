@@ -73,6 +73,8 @@ if PYQT_VERSIONS == "PyQt5"  :
     Key_Enter = Qt.Key_Enter
     Key_Backspace = Qt.Key_Backspace
     Key_Return = Qt.Key_Return
+    PointingHandCursor = Qt.PointingHandCursor
+    ForbiddenCursor = Qt.ForbiddenCursor
 
 
 if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
@@ -140,3 +142,5 @@ if PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
     Key_Enter = Qt.Key.Key_Enter
     Key_Backspace = Qt.Key.Key_Backspace
     Key_Return = Qt.Key.Key_Return
+    PointingHandCursor = Qt.CursorShape.PointingHandCursor
+    ForbiddenCursor = Qt.CursorShape.ForbiddenCursor
