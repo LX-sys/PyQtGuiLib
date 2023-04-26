@@ -10,3 +10,4 @@ from PyQtGuiLib.core.slider.slider import Slider
 from PyQtGuiLib.core.toolList import ToolListWidget,ToolListItem
 from PyQtGuiLib.core.drawers.drawer import DrawerItem,Drawer
 from PyQtGuiLib.core.comboBox.comboCheckBox.comboCheckBox import ComboCheckBox
+from PyQtGuiLib.core.pager.pageCuttingButtonGroup import PageCuttingButtonGroup
