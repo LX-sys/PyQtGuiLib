@@ -180,6 +180,10 @@ r'''
         导入方式 from PyQtGuiLib.core import ComboCheckBox
     -删除老版本的超级画师代码,重构版本的超级画师目前代码提示还不完善
     -目前所有文档还未更新,
+2023.4.26
+    新增控件 PageCuttingButtonGroup 分页组件
+        控件由 "PyQt5学习爱好群-(讨厌自己)" 贡献
+        导入方式 from PyQtGuiLib.core import PageCuttingButtonGroup
 '''
 
 
