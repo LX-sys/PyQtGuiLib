@@ -20,7 +20,7 @@ import re
 Ang = typing.TypeVar("Any",str,int)
 
 
-def dictTostr(qss_dict)->str:
+def dictTostr(qss_dict) -> str:
     combination = ""
     for selector, attribute in qss_dict.items():
         combination += selector + "{\n"
