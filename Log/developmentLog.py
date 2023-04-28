@@ -184,6 +184,8 @@ r'''
     新增控件 PageCuttingButtonGroup 分页组件
         控件由 "PyQt5学习爱好群-(讨厌自己)" 贡献
         导入方式 from PyQtGuiLib.core import PageCuttingButtonGroup
+2023.4.28
+    - 修改协议 MIT -> Apache License 2.0
 '''
 
 
