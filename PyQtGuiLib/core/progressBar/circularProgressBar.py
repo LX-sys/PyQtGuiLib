@@ -1,7 +1,3 @@
-# from PyQt5.QtCore import Qt, QRectF, QTimer, pyqtProperty, pyqtSignal, QPointF, QSize
-# from PyQt5.QtGui import QColor, QPainter, QPen, QPainterPath, QFont,QFontMetrics
-# from PyQt5.QtWidgets import QWidget
-
 from PyQtGuiLib.header import (
     Qt,
     QSize,
