@@ -186,6 +186,8 @@ r'''
         导入方式 from PyQtGuiLib.core import PageCuttingButtonGroup
 2023.4.28
     - 修改协议 MIT -> Apache License 2.0
+2023.5.2
+    - 修复Drawer抽屉控件,添加QListWidget的BUG
 '''
 
 

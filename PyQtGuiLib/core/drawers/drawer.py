@@ -65,6 +65,7 @@ class DrawerItem(QWidget):
 
     def setWidget(self,widget:QWidget):
         self.expansion_widget = widget
+        self.expansion_widget.setFixedHeight(0)
         self.__vboy.addWidget(self.btn)
         self.__vboy.addWidget(self.expansion_widget)
         self.__vboy.addItem(self._sp)
