@@ -1,48 +1,70 @@
-# -*- coding:utf-8 -*-
-# @time:2023/4/2114:44
-# @author:LX
-# @file:test_drawer.py
-# @software:PyCharm
-from PyQtGuiLib.header import (
-    PYQT_VERSIONS,
-    QApplication,
-    sys,
-    QWidget,
-    QPushButton
-)
+from PyQt5.QtWidgets import QApplication, QWidget, QListWidget, QPushButton, QVBoxLayout
+from PyQt5.QtCore import Qt, QMimeData
+from PyQt5.QtGui import QDrag
 
-from PyQtGuiLib.core import Drawer,DrawerItem
-from PyQtGuiLib.styles import QSSDrak
 
-class Test(QWidget):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.resize(600,600)
+class SourceListWidget(QListWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setSelectionMode(self.SingleSelection)
 
-        self.setStyleSheet(QSSDrak)
 
-        self.drawer = Drawer(self)
-        self.drawer.move(10,10)
-        self.drawer.resize(300,500)
 
-        for i in range(5):
-            btn = QPushButton("hello_{}".format(i))
-            ww = QWidget()
-            ww.setStyleSheet('''
-            background-color: rgb(0, 170, 255);
-            ''')
-            item = DrawerItem()
-            item.setButton(btn)
-            item.setWidget(ww)
-            self.drawer.addItem(item)
+    def startDrag(self, supportedActions):
+        item = self.currentItem()
+        if item is not None:
+            drag = QDrag(self)
+            mimeData = QMimeData()
+            mimeData.setText(item.text())
+            drag.setMimeData(mimeData)
+            drag.exec_(Qt.CopyAction)
+
+
+class TargetWidget(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setAcceptDrops(True)
+        self.setStyleSheet('''border:1px solid blue;''')
+
+        self.setMinimumHeight(50)
+        self.layout = QVBoxLayout(self)
+        self.layout.setAlignment(Qt.AlignTop)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasText():
+            event.accept()
+        else:
+            event.ignore()
+
+    def dropEvent(self, event):
+        if event.mimeData().hasText():
+            pos = event.pos()
+            text = event.mimeData().text()
+            button = QPushButton(text, self)
+            button.move(pos)
+            button.show()
+            event.accept()
+        else:
+            event.ignore()
+
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle('Drag and Drop')
+        self.setGeometry(200, 200, 400, 300)
+
+        self.sourceListWidget = SourceListWidget(self)
+        self.targetWidget = TargetWidget()
+
+        layout = QVBoxLayout(self)
+        layout.addWidget(self.sourceListWidget)
+        layout.addWidget(self.targetWidget)
+
 
 if __name__ == '__main__':
+    import sys
     app = QApplication(sys.argv)
-
-    win = Test()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
+    window = MainWindow()
+    window.show()
+    sys.exit(app.exec_())

@@ -42,7 +42,7 @@ class Table(QTableWidget):
     def setHeaderLabels(self,labels:List[str],center=False):
         for i,label in enumerate(labels):
             item = HeaderItem(label)
-            self.setCellWidget(0,i,item)
+            self.setCellWidget(0,i+1,item)
 
     def setGrid(self,row:int,col:int):
         self.setRowCount(row)
