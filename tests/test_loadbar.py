@@ -10,7 +10,6 @@ from PyQtGuiLib.header import (
     QMainWindow,
     QThread,
     Signal,
-    QColor
 )
 
 from PyQtGuiLib.core.progressBar import LoadBar

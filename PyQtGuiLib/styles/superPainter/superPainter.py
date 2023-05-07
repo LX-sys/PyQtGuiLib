@@ -7,10 +7,8 @@ from PyQtGuiLib.header import (
     qt,
     Qt,
     QColor,
-    QPaintEvent,
     QPoint,
-    QRect,
-    QLine
+    QRect
 )
 import typing
 

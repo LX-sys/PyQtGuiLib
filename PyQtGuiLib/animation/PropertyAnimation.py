@@ -14,7 +14,7 @@ from PyQtGuiLib.header import (
 )
 import re
 import typing
-from typing import Any,List,TypeVar,Tuple,Union
+from typing import Any,List,Tuple,Union
 
 from PyQtGuiLib.styles import QssStyleAnalysis
 
