@@ -17,7 +17,7 @@ QListWidget 在Pyqt5页面刷新的方式 update(),其他版本可以用repaint(
 QListWidget 的update(item)需要传递一个参数
 '''
 
-is_win_sys = True if platform.system() == "win32" else False
+is_win_sys = True if platform.system() in ["win32","Windows"] else False
 
 is_mac_sys = True if platform.system() == "Darwin" else False
 
