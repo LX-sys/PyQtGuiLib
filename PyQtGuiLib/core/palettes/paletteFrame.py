@@ -37,7 +37,6 @@ class PaletteFrame(QWidget):
         super().__init__(*args,**kwargs)
         self.resize(480,340)
 
-
         # 占位窗口
         self.placeholderWidget = QWidget()
         self.placeholderWidget.setStyleSheet('''
@@ -50,17 +49,6 @@ background-color: rgb(19, 19, 19);
         else:
             self.colorLumpWidget = ColorRect()
 
-#         self.setStyleSheet('''
-# #leftWidget{
-# background-color: rgb(255, 255, 173);
-# }
-# #rightWidget{
-# background-color: rgb(164, 255, 185);
-# }
-# #lucency{
-# background-color: rgb(198, 217, 255);
-# }
-#         ''')
         self.Init()
         self.myEvent()
 
