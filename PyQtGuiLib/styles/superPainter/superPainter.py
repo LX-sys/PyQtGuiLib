@@ -316,6 +316,8 @@ class SuperPainterAttr(QPainter):
 
                 if virtual_object_name and vir_obj.isHide() is False:
                     func(*args, **kwargs)
+                else:
+                    func(*args, **kwargs)
                 self.__restorePrivateAttr(op, brush)
             return wrapper
 
@@ -359,6 +361,9 @@ class SuperPainterAttr(QPainter):
 
     def drawLines(self,*args,openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="")->None:
         super().drawLines(*args)
+
+    def drawPixmap(self,rect:QRect,pix):
+        super().drawPixmap(rect,pix)
 
 
 class SuperPainter(SuperPainterAttr):
