@@ -16,7 +16,8 @@ from PyQtGuiLib.header import (
     QWidget,
     QBrush,
     QVBoxLayout,
-    QRect
+    QRect,
+    QPen
 )
 
 # 移动圆圈类
@@ -67,7 +68,7 @@ class ColorABC(QWidget):
 
     def __init__(self,*args,**kwargs):
         # 移动点的大小
-        self._mouse = MousePoint(0, 0, 4)
+        self._mouse = MousePoint(0, 0, 5)
 
         super().__init__(*args,**kwargs)
 
@@ -106,6 +107,9 @@ class ColorABC(QWidget):
         painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform | qt.TextAntialiasing)
 
         self.__painter__(painter)
+        p = QPen()
+        p.setWidth(2)
+        painter.setPen(p)
         painter.drawEllipse(*self._mouse.size(), self._mouse.r() * 2, self._mouse.r() * 2)
         painter.end()
 
@@ -114,8 +118,12 @@ class ColorHsv(ColorABC):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
+        self.__radius = 5
         self.setFixedHeight(40)
         self.setUI()
+
+    def setRadius(self,r:int):
+        self.__radius = r
 
     def setUI(self):
         self.pix = QPixmap(self.size())
@@ -140,7 +148,7 @@ class ColorHsv(ColorABC):
         gradient.setColorAt(1, QColor.fromHsvF(0, 1, 1, 1))
         painter.setPen(qt.NoPen)
         painter.setBrush(gradient)
-        painter.drawRect(self.rect())
+        painter.drawRoundedRect(self.rect(),self.__radius,self.__radius)
 
 
 class ColorLump(ColorABC):
