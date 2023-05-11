@@ -8,7 +8,7 @@ from PyQtGuiLib.header import (
     Qt,
     QColor,
     QPoint,
-    QRect
+    QRect,
 )
 import typing
 
@@ -129,12 +129,13 @@ class VirtualObject:
     # 检测鼠标是否点在图形上
     def isClick(self,pos:QPoint)->bool:
         if patternClassification(self.type()) == "Rect":
-            x,y,w,h =self.getVirtualArgs()
+            x,y,w,h = self.getVirtualArgs()
             cx,cy = pos.x(),pos.y()
 
             if cx >= x and cx <= x+w and cy >= y and cy <= y+h:
                 return True
             return False
+
 
 # 虚拟图形对象管理类
 class VirtualObjectManagement:
@@ -287,9 +288,9 @@ class SuperPainterAttr(QPainter):
             def wrapper(*args, **kwargs):
                 op = self.open_()
                 brush = self.brush()
-
                 openAttr = kwargs.get("openAttr", None)
                 brushAttr = kwargs.get("brushAttr", None)
+
                 virtual_object_name = kwargs.get("virtualObjectName",None) or kwargs.get("vobj",None)
                 if virtual_object_name:
                     self.__virtualObject.appendVirtualObject(virtual_object_name,func=func,args=args,kwargs=kwargs,
@@ -298,6 +299,7 @@ class SuperPainterAttr(QPainter):
                     args = vir_obj.getVirtualArgs()
                     vir_openAttr = vir_obj.getVirtualOpenAttr()
                     vir_brushAttr = vir_obj.getVirtualBrushAttr()
+
                     if openAttr:openAttr = vir_openAttr
                     elif vir_openAttr:
                         openAttr = vir_openAttr
@@ -311,9 +313,9 @@ class SuperPainterAttr(QPainter):
                 if openAttr: del kwargs["openAttr"]
                 if brushAttr: del kwargs["brushAttr"]
                 if virtual_object_name: del kwargs["virtualObjectName"]
+
                 if virtual_object_name and vir_obj.isHide() is False:
-                    func(*args, **kwargs)
-                else:
+                    print(args,kwargs)
                     func(*args, **kwargs)
                 self.__restorePrivateAttr(op, brush)
             return wrapper
@@ -358,6 +360,7 @@ class SuperPainterAttr(QPainter):
 
     def drawLines(self,*args,openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str="")->None:
         super().drawLines(*args)
+
 
 class SuperPainter(SuperPainterAttr):
     def __init__(self,*args,**kwargs):
