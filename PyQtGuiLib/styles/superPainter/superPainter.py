@@ -315,7 +315,6 @@ class SuperPainterAttr(QPainter):
                 if virtual_object_name: del kwargs["virtualObjectName"]
 
                 if virtual_object_name and vir_obj.isHide() is False:
-                    print(args,kwargs)
                     func(*args, **kwargs)
                 self.__restorePrivateAttr(op, brush)
             return wrapper
