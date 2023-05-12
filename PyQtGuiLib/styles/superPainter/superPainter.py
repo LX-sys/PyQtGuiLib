@@ -113,6 +113,12 @@ class VirtualObject:
     def __getRect(self)->QRect:
         return QRect(*self.getVirtualArgs())
 
+    # 根据下标索引来修改
+    def updateIndexToArgs(self,i:int,value):
+        args = list(self.getVirtualArgs())
+        args[i] = value
+        self.updateArgs(*args)
+
     # 移动
     def move(self,x,y):
         if patternClassification(self.type()) == "Rect":
@@ -170,6 +176,9 @@ class SuperPainterAttr(QPainter):
 
     def virtualObj(self,vobj_name:str)->VirtualObject:
         return self.__virtualObject.virtualObjName(vobj_name)
+
+    def isVirtualObj(self,vobj_name:str)->bool:
+        return self.__virtualObject.isVirtualObject(vobj_name)
 
     def setPen(self, op:QPen):
         if not isinstance(op,QPen):
