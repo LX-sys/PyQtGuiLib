@@ -1,6 +1,6 @@
 import importlib
 
-# 当前python qt使用的版本
+# The current version of python qt used
 PYQT_VERSIONS = None
 
 VERSIONS = ["PyQt5","PySide2","PySide6","PyQt6"]
