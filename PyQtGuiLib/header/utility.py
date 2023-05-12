@@ -23,28 +23,34 @@ is_mac_sys = True if platform.system() == "Darwin" else False
 
 
 '''
-    这几个与屏幕有关的方法,只能在窗口中调用,否则报错
+    These several screen-related methods can only be called in the window,
+    otherwise an error will be reported
 '''
 
-# 获取单个桌面大小
+
+IS_Qt5 = PYQT_VERSIONS == "PyQt5"
+IS_QtIt = PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]
+
+
+# Gets the size of a single desktop
 def desktopSize() -> QSize:
-    if PYQT_VERSIONS == "PyQt5":
+    if IS_Qt5:
         from PyQt5.QtWidgets import QApplication
         size = QApplication.desktop().size()
         count = QApplication.desktop().screenCount()
         return QSize(size.width()//count,size.height())
-    elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
+    elif IS_QtIt:
         return DesktopWidget.primaryScreen().availableGeometry().size()
     else:
         return QSize(0,0)
 
 
-# 桌面居中位置
+# The desktop is in the middle
 def desktopCenter(parent) -> QPoint:
-    if PYQT_VERSIONS == "PyQt5":
+    if IS_Qt5:
         center = DesktopWidget().availableGeometry().center()
         return QPoint(center.x()-parent.width()//2,center.y()-parent.height()//2)
-    elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
+    elif IS_QtIt:
         center = DesktopWidget.primaryScreen().availableGeometry().center()
         return QPoint(center.x()-parent.width()//2,center.y()-parent.height()//2)
     else:
@@ -52,11 +58,11 @@ def desktopCenter(parent) -> QPoint:
 
 
 # 获取文字大小
-def textSize(font:QFont,text:str)->QSize:
+def textSize(font:QFont,text:str) -> QSize:
     fs = QFontMetricsF(font)
-    if PYQT_VERSIONS == "PyQt5":
+    if IS_Qt5:
         return QSize(int(fs.width(text)),int(fs.height()))
-    elif PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]:
+    elif IS_QtIt:
         return QSize(int(fs.horizontalAdvance(text)+1), int(fs.height()+1)) # +1 是为了补偿丢失的像素
     else:
         return QSize(0,0)
@@ -79,6 +85,20 @@ def rgbTohsv(r, g, b):
     v = mx
     return h, s, v
 
+# 加载UI文件
+def loadUic(ui_path:str) -> QWidget:
+    if PYQT_VERSIONS in ["PyQt5","PyQt6"]:
+        from PyQtGuiLib.header import uic
+        return uic.loadUi(ui_path)
+    elif PYQT_VERSIONS in ["PySide2","PySide6"]:
+        from PyQtGuiLib.header import QFile,QUiLoader
+        uif = QFile(ui_path)
+        loader = QUiLoader()
+        ui = loader.load(uif)
+        uif.close()
+        return ui
+
+
 
 # HSV 转 RGB
 def hsvTorgb(h, s, v):
@@ -100,20 +120,6 @@ def hsvTorgb(h, s, v):
     elif hi == 5: r, g, b = v, p, q
     r, g, b = int(r * 255), int(g * 255), int(b * 255)
     return r, g, b
-
-
-# 加载UI文件
-def loadUic(ui_path:str) -> QWidget:
-    if PYQT_VERSIONS in ["PyQt5","PyQt6"]:
-        from PyQtGuiLib.header import uic
-        return uic.loadUi(ui_path)
-    elif PYQT_VERSIONS in ["PySide2","PySide6"]:
-        from PyQtGuiLib.header import QFile,QUiLoader
-        uif = QFile(ui_path)
-        loader = QUiLoader()
-        ui = loader.load(uif)
-        uif.close()
-        return ui
 
 
 class Widget(QWidget,CustomStyle):
