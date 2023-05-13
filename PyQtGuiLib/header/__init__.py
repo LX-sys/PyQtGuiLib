@@ -12,7 +12,9 @@ from PyQtGuiLib.header.customStyle import CustomStyle
 from PyQtGuiLib.header.utility import (
     is_mac_sys,
     is_win_sys,
+    desktopCount,
     desktopSize,
+    desktopAllSize,
     desktopCenter,
     textSize,
     rgbTohsv,
