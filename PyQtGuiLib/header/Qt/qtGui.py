@@ -2,6 +2,7 @@ from PyQtGuiLib.header.versions import PYQT_VERSIONS
 
 if PYQT_VERSIONS == "PyQt5":
     from PyQt5.QtGui import *
+    from PyQt5.QtGui import QGuiApplication as DesktopWidget
 
 if PYQT_VERSIONS == "PyQt6":
     from PyQt6.QtGui import *
