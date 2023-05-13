@@ -32,7 +32,8 @@ from PyQtGuiLib.header import (
     QStackedWidget,
     QCursor,
     QTimer,
-    desktopSize
+    desktopAllSize,
+    QPoint
 )
 
 from random import randint
@@ -120,7 +121,6 @@ class ColorHsv(QFrame):
         self.suppainter.end()
 
 
-# 遮罩窗口
 class MaskWidget(QWidget):
     def __init__(self,timer):
         super().__init__()
@@ -135,7 +135,7 @@ class MaskWidget(QWidget):
         super().mousePressEvent(e)
 
 
-# 颜色板
+# Color plate
 class ColorBar(QFrame):
     rgbaChange = Signal(QColor)
     def __init__(self):
@@ -181,7 +181,7 @@ class ColorBar(QFrame):
         gradient.setColorAt(1, QColor("#000"))
         painter.setPen(qt.NoPen)
         painter.setBrush(gradient)
-        painter.drawRect(self.rect())
+        painter.drawRoundedRect(self.rect(),2,2)
 
     def createPixmap(self):
         painter = QPainter(self.pix)
@@ -194,8 +194,7 @@ class ColorBar(QFrame):
 
         painter.setPen(qt.NoPen)
         painter.setBrush(gradient)
-
-        painter.drawRect(self.rect())
+        painter.drawRoundedRect(self.rect(),2,2)
 
     def __updateCursorPos(self,pos):
         cursor = self.suppainter.virtualObj("cursor")
@@ -276,17 +275,16 @@ class ColorOperation(QFrame):
         self.setStyleSheet("border:1px solid red;")
 
 
-
 # 调色对话框
 class PaletteDialog(QWidget):
     clickColor = Signal(QColor)
     def __init__(self):
         super().__init__()
         self.setObjectName("widget")
-        self.setWindowTitle("调色板")
+        self.setWindowTitle("Palette")
         self.resize(500,400)
 
-        # 吸管定时器
+        # Pipette timer
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateColor)
 
@@ -446,7 +444,9 @@ color: rgb(209, 209, 209);
         ''')
 
     def updateColor(self):
-        # 实现吸管
+        if hasattr(self, "maskWidget"):
+            self.maskWidget.move(QCursor.pos()-QPoint(50,50))
+        # straw
         pos = QCursor.pos()
         screen = QApplication.primaryScreen()
         if screen is not None:
@@ -525,9 +525,12 @@ color: rgb(209, 209, 209);
         self.clickColor.emit(QColor(self.hex_line.text()))
 
     def straw_event(self):
-        self.temp_w = MaskWidget(self.timer)
-        self.temp_w.resize(desktopSize())
-        self.temp_w.show()
+        self.maskWidget = MaskWidget(self.timer)
+        size = desktopAllSize()
+        # self.maskWidget.move(-size.width()//2,0)
+        # self.maskWidget.resize(size)
+        self.maskWidget.resize(100,100)
+        self.maskWidget.show()
         self.timer.start(50)
 
     def myEvent(self):
@@ -544,6 +547,7 @@ color: rgb(209, 209, 209);
         self.colorButton.clicked.connect(self.__emit_color_event)
 
         self.color_straw_btn.clicked.connect(self.straw_event)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
