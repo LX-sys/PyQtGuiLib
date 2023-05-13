@@ -3,7 +3,9 @@ import math
 
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
+    sys,
     DesktopWidget,
+    QApplication,
     QPoint,
     QSize,
     QFontMetricsF,
@@ -32,29 +34,25 @@ IS_Qt5 = PYQT_VERSIONS == "PyQt5"
 IS_QtIt = PYQT_VERSIONS in ["PyQt6","PySide2","PySide6"]
 
 
+def desktopCount() -> int:
+    return len(DesktopWidget.screens())
+
+
 # Gets the size of a single desktop
 def desktopSize() -> QSize:
-    if IS_Qt5:
-        from PyQt5.QtWidgets import QApplication
-        size = QApplication.desktop().size()
-        count = QApplication.desktop().screenCount()
-        return QSize(size.width()//count,size.height())
-    elif IS_QtIt:
-        return DesktopWidget.primaryScreen().availableGeometry().size()
-    else:
-        return QSize(0,0)
+    return DesktopWidget.primaryScreen().size()
+
+
+# Total size of all screens
+def desktopAllSize() ->QSize:
+    size = desktopSize()
+    return QSize(size.width()*desktopCount(),size.height())
 
 
 # The desktop is in the middle
 def desktopCenter(parent) -> QPoint:
-    if IS_Qt5:
-        center = DesktopWidget().availableGeometry().center()
-        return QPoint(center.x()-parent.width()//2,center.y()-parent.height()//2)
-    elif IS_QtIt:
-        center = DesktopWidget.primaryScreen().availableGeometry().center()
-        return QPoint(center.x()-parent.width()//2,center.y()-parent.height()//2)
-    else:
-        return QPoint(0,0)
+    center = DesktopWidget.primaryScreen().availableGeometry().center()
+    return QPoint(center.x()-parent.width()//2,center.y()-parent.height()//2)
 
 
 # 获取文字大小
@@ -129,3 +127,14 @@ class Widget(QWidget,CustomStyle):
             CustomStyle.__init__(self, *args, **kwargs)
         else:
             super().__init__(*args, **kwargs)
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    win = Widget()
+    win.show()
+
+    if PYQT_VERSIONS in ["PyQt6","PySide6"]:
+        sys.exit(app.exec())
+    else:
+        sys.exit(app.exec_())
