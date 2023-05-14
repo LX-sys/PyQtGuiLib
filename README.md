@@ -3,7 +3,7 @@
 # 
 
 <p align="center">
-  <img width="40%" height="40%" align="center" src="https://github.com/LX-sys/PyQtGuiLib/blob/master/logo/2_2_512.png" alt="logo">
+  <img width="50%" height="50%" align="center" src="https://github.com/LX-sys/PyQtGuiLib/blob/master/logo/2_2_512.png" alt="logo">
 </p>
 
 
