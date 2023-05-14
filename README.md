@@ -1,6 +1,8 @@
 [TOC]
 
-# python-qt组件库
+# 
+
+![](https://github.com/LX-sys/PyQtGuiLib/blob/master/logo/2_2_512.png)
 
 ### 说明
 
