@@ -266,15 +266,70 @@ class Line(QFrame):
 
         self.suppainter.end()
 
+# -----------------------------
+
+class BtnAreaWidget(QFrame):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setFixedHeight(30)
+        self.setStyleSheet("border:1px solid yellow;")
+        self.suppainter = SuperPainter()
+
+    def paintEvent(self, e) -> None:
+        self.suppainter.begin(self)
+        self.suppainter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+
+        self.suppainter.drawRoundedRect(-10,5,20,20,10,10,openAttr={"c":"#fff","w":2},brushAttr={"c":qt.red})
+        self.suppainter.drawRoundedRect(self.width()-10,5,20,20,10,10,openAttr={"c":"#fff","w":2},brushAttr={"c":qt.red})
+
+        self.suppainter.end()
+
+
+class GradientWidget(QFrame):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__colors = [qt.red,qt.blue]
+
+    def paragraph(self)->float:
+        return round(1/len(self.__colors),2)
+
+    def paintEvent(self, e) -> None:
+        line_g = QLinearGradient(0,self.height()//2,self.width(),self.height()//2)
+        v = self.paragraph()
+        n = 0
+        for c in self.__colors[:-1]:
+            line_g.setColorAt(n,c)
+            n+=v
+        line_g.setColorAt(1,self.__colors[-1])
+
+        painter = QPainter(self)
+
+        painter.setBrush(line_g)
+        painter.drawRect(e.rect())
+
+        painter.end()
+
+
 
 # 渐变通用操作台
 class ColorOperation(QFrame):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.setFixedHeight(80)
-        self.setStyleSheet("border:1px solid red;")
 
+        self.setUI()
 
+    def setUI(self):
+        self._c_lay = QVBoxLayout(self)
+        self._c_lay.setContentsMargins(0,0,0,0)
+        self._c_lay.setSpacing(1)
+
+        self._btn_area = BtnAreaWidget()
+        self._gradient_area = GradientWidget()
+        self._c_lay.addWidget(self._btn_area)
+        self._c_lay.addWidget(self._gradient_area)
+
+# -------------------------------
 # 调色对话框
 class PaletteDialog(QWidget):
     clickColor = Signal(QColor)
