@@ -33,12 +33,17 @@ from PyQtGuiLib.header import (
     QCursor,
     QTimer,
     desktopAllSize,
-    QPoint
+    QPoint,
+    QMouseEvent,
+    QMenu,
+    QAction,
+    QColorDialog
 )
 
 from random import randint
 
-from PyQtGuiLib.styles.superPainter.superPainter import SuperPainter
+from PyQtGuiLib.styles.superPainter.superPainter import SuperPainter,VirtualObject
+
 
 
 class ColorHsv(QFrame):
@@ -268,33 +273,164 @@ class Line(QFrame):
 
 # -----------------------------
 
+
 class BtnAreaWidget(QFrame):
+    cursored = Signal(VirtualObject)
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.setFixedHeight(30)
-        self.setStyleSheet("border:1px solid yellow;")
+        self.setFixedHeight(24)
+
+        # Information about all cursors
+        self.cursors = [
+            {
+                "vobj":"cursor_1",
+                "args":(0,2,20,20,10,10),
+                "openAttr":{"c":"#000","w":2},
+                "brushAttr": {"c": qt.red}
+            },
+            {
+                "vobj": "cursor_2",
+                "args": (340,2,20,20,10,10),
+                "openAttr": {"c": "#000", "w": 2},
+                "brushAttr": {"c": qt.blue}
+            }
+        ]
+
         self.suppainter = SuperPainter()
+
+        self.cursor_flag = ""
+
+        # The ID of the virtual object name increases automatically
+        self.max_obj_id = 2
+
+        self._right_pressed_pos = None
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menu_event)
+
+    def getCursor(self,vname):
+        for info in self.cursors:
+            if info["vobj"] == vname:
+                return info
+        return None
+
+    def menu_event(self):
+        menu_ = QMenu(self)
+
+        new_cursor = QAction("新建游标", self)
+        del_cursor = QAction("删除游标", self)
+        new_cursor.triggered.connect(self.createCursor_event)
+        del_cursor.triggered.connect(self.delCursor_event)
+        menu_.addAction(new_cursor)
+        menu_.addAction(del_cursor)
+
+        menu_.popup(QCursor.pos())
+
+    def createCursor_event(self):
+        if not self._right_pressed_pos:
+            return
+
+        x = self._right_pressed_pos.x()
+
+        self.max_obj_id+=1
+        structure = {
+            "vobj": "cursor_{}".format(self.max_obj_id),
+            "args": (x, 2, 20, 20, 10, 10),
+            "openAttr": {"c": "#000", "w": 2},
+        }
+        col = QColorDialog.getColor()
+        if col.isValid():
+            structure["brushAttr"]={"c":col}
+            self.cursors.append(structure)
+            self.update()
+        self._right_pressed_pos = None
+
+    def delCursor_event(self):
+        if not self._right_pressed_pos:
+            return
+
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            if cursor.isClick(self._right_pressed_pos):
+                self.cursors.remove(self.getCursor(vname))
+                self.update()
+                self._right_pressed_pos = None
+                break
+
+    def vObjs(self)->list:
+        return [vname["vobj"] for vname in self.cursors]
+
+    def mouseMoveEvent(self, e:QMouseEvent) -> None:
+        if self.cursor_flag and e.buttons() == Qt.LeftButton:
+            cursor = self.suppainter.virtualObj(self.cursor_flag)
+            if e.x() + cursor.getWidth() // 2 >= cursor.getWidth() // 2 \
+                    and e.x() <= self.width():
+                cursor.move(e.x() - cursor.getWidth() // 2, cursor.getY())
+                # self.cursored.emit(QPoint(e.x() - cursor.getWidth() // 2, cursor.getY()))
+                self.cursored.emit(cursor)
+            self.update()
+        super().mouseMoveEvent(e)
+
+    def mousePressEvent(self, e:QMouseEvent) -> None:
+        if e.buttons() == Qt.LeftButton:
+            for vname in self.vObjs():
+                cursor = self.suppainter.virtualObj(vname)
+                if cursor.isClick(e):
+                    cursor.updateOpenAttr({"c": "#fff", "w": 3})
+                    self.cursor_flag = vname
+                    break
+                else:
+                    self.cursor_flag = ""
+            self.update()
+        elif e.buttons() == Qt.RightButton:
+            self._right_pressed_pos = QPoint(e.pos().x(),e.pos().y())
+        super().mousePressEvent(e)
+
+    def mouseReleaseEvent(self, e) -> None:
+        self.cursor_flag = ""
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            cursor.updateOpenAttr({"c":"#000","w":2})
+        self.update()
+        super().mousePressEvent(e)
 
     def paintEvent(self, e) -> None:
         self.suppainter.begin(self)
         self.suppainter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
 
-        self.suppainter.drawRoundedRect(-10,5,20,20,10,10,openAttr={"c":"#fff","w":2},brushAttr={"c":qt.red})
-        self.suppainter.drawRoundedRect(self.width()-10,5,20,20,10,10,openAttr={"c":"#fff","w":2},brushAttr={"c":qt.red})
-
+        for cursor in self.cursors:
+            self.suppainter.drawRoundedRect(*cursor["args"],
+                                            openAttr=cursor["openAttr"],
+                                            brushAttr = cursor["brushAttr"],
+                                            virtualObjectName=cursor["vobj"]
+                                            )
         self.suppainter.end()
 
 
 class GradientWidget(QFrame):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__colors = [qt.red,qt.blue]
+        self.__colors = [qt.red,qt.blue,qt.yellow]
+
+        self.btn_area = None #type:BtnAreaWidget
+
+        self.x = 0
+
+    def setBtnArea(self,obj):
+        self.btn_area = obj
+        self.btn_area.cursored.connect(self.updatePos)
+
+    def updatePos(self,vobj:VirtualObject):
+        # print(vobj.getX())
+        self.x = vobj.getX()
+        self.update()
 
     def paragraph(self)->float:
         return round(1/len(self.__colors),2)
 
     def paintEvent(self, e) -> None:
-        line_g = QLinearGradient(0,self.height()//2,self.width(),self.height()//2)
+        line_g = QLinearGradient(self.x,self.height()//2,self.width(),self.height()//2)
         v = self.paragraph()
         n = 0
         for c in self.__colors[:-1]:
@@ -308,7 +444,6 @@ class GradientWidget(QFrame):
         painter.drawRect(e.rect())
 
         painter.end()
-
 
 
 # 渐变通用操作台
@@ -326,6 +461,7 @@ class ColorOperation(QFrame):
 
         self._btn_area = BtnAreaWidget()
         self._gradient_area = GradientWidget()
+        self._gradient_area.setBtnArea(self._btn_area)
         self._c_lay.addWidget(self._btn_area)
         self._c_lay.addWidget(self._gradient_area)
 

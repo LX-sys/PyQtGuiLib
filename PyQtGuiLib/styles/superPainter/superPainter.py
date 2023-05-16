@@ -97,11 +97,11 @@ class VirtualObject:
 
     def updateOpenAttr(self,openAttr:dict):
         if openAttr:
-            self.getVirtualObjectAttr()["openAttr"] = openAttr
+            self.getVirtualObjectAttr()["openAttr"].update(openAttr)
 
     def updateBrushAttr(self,brushAttr:dict):
         if brushAttr:
-            self.getVirtualObjectAttr()["brushAttr"] = brushAttr
+            self.getVirtualObjectAttr()["brushAttr"].update(brushAttr)
 
     def updateDraw(self,*args,**kwargs):
         self.updateArgs(self.virtualObjName(),*args)
@@ -110,8 +110,33 @@ class VirtualObject:
         self.updateOpenAttr(self.virtualObjName(),openAttr)
         self.updateBrushAttr(self.virtualObjName(),brushAttr)
 
-    def __getRect(self)->QRect:
-        return QRect(*self.getVirtualArgs())
+    # ----------------------------------
+    def __isRect(self) ->bool:
+        if patternClassification(self.type()) == "Rect":
+            return True
+        return False
+    
+    def getRect(self)->list:
+        return self.getVirtualArgs()[:4]
+
+    def getPos(self)->list:
+        return self.getVirtualArgs()[:2]
+
+    def getSize(self)->list:
+        return self.getVirtualArgs()[2:4]
+
+    def getX(self)->int:
+        return self.getPos()[0]
+
+    def getY(self)->int:
+        return self.getPos()[1]
+
+    def getWidth(self)->int:
+        return self.getSize()[0]
+
+    def getHeight(self)->int:
+        return self.getSize()[1]
+    # --------------------------------------
 
     # 根据下标索引来修改
     def updateIndexToArgs(self,i:int,value):
@@ -121,23 +146,23 @@ class VirtualObject:
 
     # 移动
     def move(self,x,y):
-        if patternClassification(self.type()) == "Rect":
+        if self.__isRect():
             args = self.getVirtualArgs()[2:]
             self.updateArgs(x,y,*args)
 
     # 缩放
     def scale(self,proportion:float):
-        if patternClassification(self.type()) == "Rect":
-            x, y, w, h = self.getVirtualArgs()
+        if self.__isRect():
+            x, y, w, h = self.getRect()
+            args = self.getVirtualArgs()[4:]
             w,h = int(w*proportion),int(h*proportion)
-            self.updateArgs(x,y,w,h)
+            self.updateArgs(x,y,w,h,*args)
 
     # 检测鼠标是否点在图形上
     def isClick(self,pos:QPoint)->bool:
-        if patternClassification(self.type()) == "Rect":
-            x,y,w,h = self.getVirtualArgs()
+        if self.__isRect():
+            x,y,w,h = self.getRect()
             cx,cy = pos.x(),pos.y()
-
             if cx >= x and cx <= x+w and cy >= y and cy <= y+h:
                 return True
             return False

@@ -21,7 +21,9 @@ from PyQtGuiLib.header import (
     QPushButton,
     QMenu,
     QAction,
-    QCursor
+    QCursor,
+    QVBoxLayout,
+    QPen
 )
 
 import math
@@ -341,6 +343,10 @@ class Line(MyGradient):
         r = self._hand_r
 
         # 画出两个手柄
+        f = QPen()
+        f.setColor(Qt.white)
+        f.setWidth(2)
+        painter.setPen(f)
         painter.setBrush(Qt.blue)
         painter.drawEllipse(*self._handlePos["blue"], r, r)
 
@@ -506,6 +512,10 @@ class Repeat(MyGradient):
         r = self._hand_r
 
         # 画出两个手柄
+        f = QPen()
+        f.setColor(Qt.white)
+        f.setWidth(2)
+        painter.setPen(f)
         painter.setBrush(Qt.blue)
         painter.drawEllipse(*self._handlePos["blue"], r, r)
 
@@ -517,7 +527,10 @@ class Repeat(MyGradient):
         y = int(self._handlePos["blue"][1] - _out_r // 2 + self._hand_r // 2)
 
         # 画出外圈圆
-        painter.setPen(Qt.white)
+        f = QPen()
+        f.setColor(Qt.white)
+        f.setWidth(2)
+        painter.setPen(f)
         painter.setBrush(Qt.NoBrush)
         painter.drawEllipse(x, y,
                             _out_r, _out_r)
@@ -660,6 +673,10 @@ class Reflect(MyGradient):
 
     def handle(self, painter: QPainter):
         r = self._handle_r
+        f = QPen()
+        f.setColor(Qt.white)
+        f.setWidth(2)
+        painter.setPen(f)
         painter.setBrush(Qt.blue)
         painter.drawEllipse(self._handlePos["blue"][0],
                             self._handlePos["blue"][1],
@@ -669,7 +686,6 @@ class Reflect(MyGradient):
         r = self._out_handle_r
         x = int(self._handlePos["blue"][0] - r // 2 + self._handle_r // 2)
         y = int(self._handlePos["blue"][1] - r // 2 + self._handle_r // 2)
-        painter.setPen(Qt.white)
         painter.setBrush(Qt.NoBrush)
         painter.drawEllipse(x, y, r, r)
 
@@ -843,7 +859,7 @@ class GradientDialog(QWidget):
     # 控件的位置,大小
     CONTROL_POS = 40, 40
     # 鼠标右键列表
-    Right_Key_LIST = ['删除', '颜色']
+    Right_Key_LIST = ['DelColor', 'UpdateColor']
     # 渐变类型按钮样式
     BTN_TYPE_QSS = [
         "qlineargradient(spread:pad,x1:0.289,y1:0.51,x2:1.03,y2:0.5,stop:0.002 rgba(39, 178, 199, 255),stop:0.983 rgba(255, 248, 249, 255));",
@@ -888,6 +904,15 @@ class GradientDialog(QWidget):
     def createMenu(self):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.contextMenu = QMenu(self)
+        self.contextMenu.setStyleSheet('''
+QMenu{
+background-color:#0b4a2d;
+color: #ffffff;
+}
+QMenu:hover{
+color: #000;
+}
+        ''')
         for text in self.Right_Key_LIST:
             obj = self.contextMenu.addAction(text)
             obj.triggered.connect(lambda triggered: self.myMenu())
@@ -900,13 +925,13 @@ class GradientDialog(QWidget):
     # 菜单事件
     def myMenu(self):
         text = self.sender().text()
-        if text == "删除":
+        if text == "DelColor":
             n = self._g.getOldDragPosition()
             self._g.gradientStopColor.removeStopAtPosition(n)
             self.gradientObj().updateGradient()  # 提交更新渐变区域
             self._g.updateGradientStops()  # 提交更新渐变终止器
             self.update()  # 更新
-        if text == "颜色":
+        if text == "UpdateColor":
             if self._g.colorFlag():
                 self._g.color_palte.show()
                 self._g.colorFlag(False)
@@ -1022,14 +1047,16 @@ class Test(QWidget):
         self.myEvent()
 
     def setUI(self):
-        self.c = GradientDialog(self)
-        self.c.show()
+        self.v = QVBoxLayout(self)
+        self.c = GradientDialog()
+        self.v.addWidget(self.c)
+        # self.c.show()
 
     def myEvent(self):
         self.c.gradientChange[str].connect(self.test)
 
     def test(self, g: str):
-        print("background-color:" + g)
+        # print("background-color:" + g)
         self.c.setStyleSheet("background-color:" + g)
 
 
