@@ -162,10 +162,13 @@ class VirtualObject:
     def isClick(self,pos:QPoint)->bool:
         if self.__isRect():
             x,y,w,h = self.getRect()
-            cx,cy = pos.x(),pos.y()
-            if cx >= x and cx <= x+w and cy >= y and cy <= y+h:
-                return True
-            return False
+        else:
+            x, y, w, h = self.getVirtualArgs()[:4]
+
+        cx, cy = pos.x(), pos.y()
+        if cx >= x and cx <= x + w and cy >= y and cy <= y + h:
+            return True
+        return False
 
 
 # 虚拟图形对象管理类
@@ -191,6 +194,11 @@ class VirtualObjectManagement:
 
 
 class SuperPainterAttr(QPainter):
+    CurSor_Down = "down"
+    CurSor_UP = "up"
+    CurSor_Left = "left"
+    CurSor_Right = "right"
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
@@ -378,6 +386,8 @@ class SuperPainterAttr(QPainter):
         self.drawImage = decorator(self.drawImage)
         self.drawPixmapFragments = decorator(self.drawPixmapFragments)
         self.drawTiledPixmap = decorator(self.drawTiledPixmap)
+        # 自定义
+        self.drawCursor = decorator(self.drawCursor)
 
     # ------------下面代码是作为工具的提示代码------------
 
@@ -398,6 +408,20 @@ class SuperPainterAttr(QPainter):
 
     def drawPixmap(self,rect:QRect,pix):
         super().drawPixmap(rect,pix)
+
+    # --------------------------自定义图形---------------
+    # The method is called a "Cursor", but it functions more like a cursor
+    def drawCursor(self,x:int,y:int,w:int,h:int,r:int=10,lw:int=30,direction="down",
+                   openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str=""):
+        if direction == SuperPainter.CurSor_Left:
+            self.drawLine(x-lw,y+h//2,x+w//2,y+h//2)
+        elif direction == SuperPainter.CurSor_Right:
+            self.drawLine(x+w//2, y + w // 2, x + lw, y + h // 2)
+        elif direction == SuperPainter.CurSor_UP:
+            self.drawLine(x + w//2, h-lw, x + w // 2, y + h // 2)
+        else:
+            self.drawLine(x + w//2, y + h // 2, x + w // 2, lw)
+        self.drawRoundedRect(x,y,w,h,r,r)
 
 
 class SuperPainter(SuperPainterAttr):
