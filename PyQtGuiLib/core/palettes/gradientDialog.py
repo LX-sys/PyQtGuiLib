@@ -67,6 +67,9 @@ class GradientStopColor:
 
     # 删除创建的终止点
     def removeStopAtPosition(self, n: int) -> None:
+        if not n:
+            return
+
         if n >= 0 and n <= len(self._gradient_list) - 1:
             del self._gradient_list[n]
             self._sort_gradient()
@@ -373,7 +376,7 @@ class Repeat(MyGradient):
     def __init__(self, x: int, y: int, w: int, h: int):
         super(Repeat, self).__init__(x, y, w, h)
         self._hand_r = 16
-        self._out_hand_r = self.width()  # 外圆半径
+        self._out_hand_r = self.width()//2  # 外圆半径
         # 两个手柄位置,并初始化在两侧
         self._handlePos = {"blue": [x,
                                     y + self.height() // 2],
@@ -1030,6 +1033,7 @@ color: #000;
         w = e.size().width() - 30
         self.gradientObj().width(w)
         self._g.width(w)
+        self.gradientObj().updateGradient()
         self.update()
 
     def keyPressEvent(self, e) -> None:

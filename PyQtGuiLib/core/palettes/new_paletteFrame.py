@@ -37,7 +37,9 @@ from PyQtGuiLib.header import (
     QMouseEvent,
     QMenu,
     QAction,
-    QColorDialog
+    QColorDialog,
+    QPen,
+    QResizeEvent
 )
 
 from random import randint
@@ -416,6 +418,7 @@ class GradientWidget(QFrame):
         self.btn_area = None #type:BtnAreaWidget
 
         self.x = 0
+        self.createPix()
 
     def setBtnArea(self,obj):
         self.btn_area = obj
@@ -424,48 +427,215 @@ class GradientWidget(QFrame):
     def updatePos(self,vobj:VirtualObject):
         # print(vobj.getX())
         self.x = vobj.getX()
-        self.update()
+        self.updatePix()
 
     def paragraph(self)->float:
         return round(1/len(self.__colors),2)
 
+    def createPix(self):
+        self.pix = QPixmap(self.size())
+        self.pix.fill(qt.transparent)
+
+        h2 = self.height()//2
+        self.line_g = QLinearGradient(0,h2,self.width(),h2)
+        self.line_g.setColorAt(0.5,qt.red)
+        self.line_g.setColorAt(0.6,qt.blue)
+        self.line_g.setColorAt(1,qt.yellow)
+        # v = self.paragraph()
+        # n = 0
+        # for c in self.__colors[:-1]:
+        #     self.line_g.setColorAt(n,c)
+        #     n+=v
+        # self.line_g.setColorAt(1,self.__colors[-1])
+
+        painter = QPainter(self.pix)
+        painter.setPen(qt.NoPen)
+        painter.setBrush(self.line_g)
+        painter.drawRect(self.rect())
+
+    def updatePix(self):
+        self.line_g.setStart(self.x,self.height()//2)
+
+        self.pix = self.pix.scaled(self.size())
+        painter = QPainter(self.pix)
+        painter.setPen(qt.NoPen)
+        painter.setBrush(self.line_g)
+        painter.drawRect(self.rect())
+        self.update()
+
+
     def paintEvent(self, e) -> None:
-        line_g = QLinearGradient(self.x,self.height()//2,self.width(),self.height()//2)
-        v = self.paragraph()
-        n = 0
-        for c in self.__colors[:-1]:
-            line_g.setColorAt(n,c)
-            n+=v
-        line_g.setColorAt(1,self.__colors[-1])
-
         painter = QPainter(self)
-
-        painter.setBrush(line_g)
-        painter.drawRect(e.rect())
+        painter.drawPixmap(e.rect(),self.pix)
 
         painter.end()
 
+
+# 颜色句柄
+class Handle:
+    def __init__(self,x,y,w,h,r=10,lh=8):
+        '''
+
+        :param x:
+        :param y:
+        :param w:
+        :param h:
+        :param r: 圆角半径
+        :param lh: 游标线长
+        '''
+        self.x = x
+        self.y = y
+        self.w = w
+        self.h = h
+        self.r = r
+        self.lh = lh
+
+    def rect(self) -> QRect:
+        return QRect(self.x,self.y,self.w,self.h)
+
+    def getRect(self)->tuple:
+        return self.x,self.y,self.w,self.h,
+
+    def radius(self)->int:
+        return self.r
+
+    def lineH(self)->int:
+        return self.lh
 
 # 渐变通用操作台
 class ColorOperation(QFrame):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.setFixedHeight(80)
+        # self.setStyleSheet("border:1px solid red;")
 
-        self.setUI()
+        self.suppainter = SuperPainter()
 
-    def setUI(self):
-        self._c_lay = QVBoxLayout(self)
-        self._c_lay.setContentsMargins(0,0,0,0)
-        self._c_lay.setSpacing(1)
 
-        self._btn_area = BtnAreaWidget()
-        self._gradient_area = GradientWidget()
-        self._gradient_area.setBtnArea(self._btn_area)
-        self._c_lay.addWidget(self._btn_area)
-        self._c_lay.addWidget(self._gradient_area)
+        self.handle = Handle(5,5,20,20,20)
+        self.handle2 = Handle(335, 5, 20, 20, 20)
 
+        self.handles = [
+            {
+                "vobj":"handle_1",
+                "handle":Handle(5,5,20,20,10,40),
+                "openAttr":{"c":"#000","w":2},
+                "brushAttr": {"c": qt.red},
+                "colorScope":0,
+                "color":qt.red
+            },
+            {
+                "vobj": "handle_2",
+                "handle": Handle(335,5,20,20,10,40),
+                "openAttr": {"c": "#000", "w": 2},
+                "brushAttr": {"c": qt.blue},
+                "colorScope": 1,
+                "color":qt.blue
+            }
+        ]
+
+        self.cursor_flag = ""
+        self.createPix()
+
+    def vObjs(self)->list:
+        return [vname["vobj"] for vname in self.handles]
+
+    def createPix(self):
+        self.pix = QPixmap(self.size())
+        self.pix.fill(qt.transparent)
+
+        h2 = self.height()//2
+        self.linear = QLinearGradient(0,h2,self.width(),h2)
+
+        for cursor in self.handles:
+            self.linear.setColorAt(cursor["colorScope"],cursor["color"])
+
+        painter = QPainter(self.pix)
+        painter.setPen(qt.NoPen)
+        painter.setBrush(self.linear)
+        painter.drawRect(self.rect())
+
+    def updatePix(self):
+        self.pix = self.pix.scaled(self.size())
+
+        for cursor in self.handles:
+            self.linear.setColorAt(cursor["colorScope"],cursor["color"])
+
+        painter = QPainter(self.pix)
+        painter.setPen(qt.NoPen)
+        painter.setBrush(self.linear)
+        painter.drawRect(self.rect())
+
+    # 根据游标名称,更新colorScope
+    def updateColorScope(self,cursor_name,v):
+        for hand in self.handles:
+            if hand["vobj"] == cursor_name:
+                hand["colorScope"] = v
+                break
+
+    def mouseMoveEvent(self, e:QMouseEvent) -> None:
+        if self.cursor_flag and e.buttons() == Qt.LeftButton:
+            cursor = self.suppainter.virtualObj(self.cursor_flag)
+            if e.x() + cursor.getWidth() // 2 >= cursor.getWidth() // 2 \
+                    and e.x() <= self.width():
+                cursor.updateIndexToArgs(0,e.x() - cursor.getWidth() // 2)
+                # self.handles[0]["colorScope"]=1/self.width()*e.x()
+                self.updateColorScope(self.cursor_flag,1/self.width()*e.x())
+                # print(1/self.width()*e.x(),self.handles[0]["colorScope"])
+                self.createPix()
+            self.update()
+        super().mouseMoveEvent(e)
+
+    def mousePressEvent(self, e:QMouseEvent) -> None:
+        if e.buttons() == Qt.LeftButton:
+            for vname in self.vObjs():
+                cursor = self.suppainter.virtualObj(vname)
+                if cursor.isClick(e):
+                    cursor.updateOpenAttr({"c": "#fff", "w": 3})
+                    cursor.updateIndexToArgs(5,50)
+                    self.cursor_flag = vname
+                    break
+                else:
+                    self.cursor_flag = ""
+            self.update()
+        elif e.buttons() == Qt.RightButton:
+            self._right_pressed_pos = QPoint(e.pos().x(), e.pos().y())
+        super().mousePressEvent(e)
+
+    def mouseReleaseEvent(self, e:QMouseEvent) -> None:
+        self.cursor_flag = ""
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            cursor.updateOpenAttr({"c":"#000","w":2})
+            cursor.updateIndexToArgs(5, 40)
+        self.update()
+        super().mouseReleaseEvent(e)
+
+    def paintEvent(self, e):
+        self.suppainter.begin(self)
+        self.suppainter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+
+        self.suppainter.setPen(qt.NoPen)
+        self.suppainter.setBrush(self.linear)
+        rect = QRect(0,self.height()-50,self.width(),self.height())
+        self.suppainter.drawPixmap(rect,self.pix)
+
+        # 绘制句柄
+        for cursor in self.handles:
+            handle_obj = cursor["handle"]
+            self.suppainter.drawCursor(*handle_obj.getRect(),
+                                       handle_obj.radius(),
+                                       handle_obj.lineH(),
+                                       openAttr=cursor["openAttr"],
+                                       brushAttr = cursor["brushAttr"],
+                                       virtualObjectName=cursor["vobj"]
+                                       )
+        self.suppainter.end()
+
+    def resizeEvent(self, e:QResizeEvent) -> None:
+        super().resizeEvent(e)
 # -------------------------------
+
 # 调色对话框
 class PaletteDialog(QWidget):
     clickColor = Signal(QColor)
