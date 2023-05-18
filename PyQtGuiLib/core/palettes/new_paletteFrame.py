@@ -25,6 +25,8 @@ from PyQtGuiLib.header import (
     qt,
     QPainter,
     QLinearGradient,
+    QRadialGradient,
+    QConicalGradient,
     QColor,
     QRect,
     Signal,
@@ -45,7 +47,6 @@ from PyQtGuiLib.header import (
 from random import randint
 
 from PyQtGuiLib.styles.superPainter.superPainter import SuperPainter,VirtualObject
-
 
 
 class ColorHsv(QFrame):
@@ -257,220 +258,6 @@ class ColorBar(QFrame):
         super().resizeEvent(e)
 
 
-# 线性渐变板
-class Line(QFrame):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.setStyleSheet("border:1px solid yellow;")
-
-        self.suppainter = SuperPainter()
-
-        self.linear = QLinearGradient()
-
-    def paintEvent(self, e):
-        self.suppainter.begin(self)
-
-
-        self.suppainter.end()
-
-# -----------------------------
-
-
-class BtnAreaWidget(QFrame):
-    cursored = Signal(VirtualObject)
-
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.setFixedHeight(24)
-
-        # Information about all cursors
-        self.cursors = [
-            {
-                "vobj":"cursor_1",
-                "args":(0,2,20,20,10,10),
-                "openAttr":{"c":"#000","w":2},
-                "brushAttr": {"c": qt.red}
-            },
-            {
-                "vobj": "cursor_2",
-                "args": (340,2,20,20,10,10),
-                "openAttr": {"c": "#000", "w": 2},
-                "brushAttr": {"c": qt.blue}
-            }
-        ]
-
-        self.suppainter = SuperPainter()
-
-        self.cursor_flag = ""
-
-        # The ID of the virtual object name increases automatically
-        self.max_obj_id = 2
-
-        self._right_pressed_pos = None
-
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.menu_event)
-
-    def getCursor(self,vname):
-        for info in self.cursors:
-            if info["vobj"] == vname:
-                return info
-        return None
-
-    def menu_event(self):
-        menu_ = QMenu(self)
-
-        new_cursor = QAction("新建游标", self)
-        del_cursor = QAction("删除游标", self)
-        new_cursor.triggered.connect(self.createCursor_event)
-        del_cursor.triggered.connect(self.delCursor_event)
-        menu_.addAction(new_cursor)
-        menu_.addAction(del_cursor)
-
-        menu_.popup(QCursor.pos())
-
-    def createCursor_event(self):
-        if not self._right_pressed_pos:
-            return
-
-        x = self._right_pressed_pos.x()
-
-        self.max_obj_id+=1
-        structure = {
-            "vobj": "cursor_{}".format(self.max_obj_id),
-            "args": (x, 2, 20, 20, 10, 10),
-            "openAttr": {"c": "#000", "w": 2},
-        }
-        col = QColorDialog.getColor()
-        if col.isValid():
-            structure["brushAttr"]={"c":col}
-            self.cursors.append(structure)
-            self.update()
-        self._right_pressed_pos = None
-
-    def delCursor_event(self):
-        if not self._right_pressed_pos:
-            return
-
-        for vname in self.vObjs():
-            cursor = self.suppainter.virtualObj(vname)
-            if cursor.isClick(self._right_pressed_pos):
-                self.cursors.remove(self.getCursor(vname))
-                self.update()
-                self._right_pressed_pos = None
-                break
-
-    def vObjs(self)->list:
-        return [vname["vobj"] for vname in self.cursors]
-
-    def mouseMoveEvent(self, e:QMouseEvent) -> None:
-        if self.cursor_flag and e.buttons() == Qt.LeftButton:
-            cursor = self.suppainter.virtualObj(self.cursor_flag)
-            if e.x() + cursor.getWidth() // 2 >= cursor.getWidth() // 2 \
-                    and e.x() <= self.width():
-                cursor.move(e.x() - cursor.getWidth() // 2, cursor.getY())
-                # self.cursored.emit(QPoint(e.x() - cursor.getWidth() // 2, cursor.getY()))
-                self.cursored.emit(cursor)
-            self.update()
-        super().mouseMoveEvent(e)
-
-    def mousePressEvent(self, e:QMouseEvent) -> None:
-        if e.buttons() == Qt.LeftButton:
-            for vname in self.vObjs():
-                cursor = self.suppainter.virtualObj(vname)
-                if cursor.isClick(e):
-                    cursor.updateOpenAttr({"c": "#fff", "w": 3})
-                    self.cursor_flag = vname
-                    break
-                else:
-                    self.cursor_flag = ""
-            self.update()
-        elif e.buttons() == Qt.RightButton:
-            self._right_pressed_pos = QPoint(e.pos().x(),e.pos().y())
-        super().mousePressEvent(e)
-
-    def mouseReleaseEvent(self, e) -> None:
-        self.cursor_flag = ""
-        for vname in self.vObjs():
-            cursor = self.suppainter.virtualObj(vname)
-            cursor.updateOpenAttr({"c":"#000","w":2})
-        self.update()
-        super().mousePressEvent(e)
-
-    def paintEvent(self, e) -> None:
-        self.suppainter.begin(self)
-        self.suppainter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
-
-        for cursor in self.cursors:
-            self.suppainter.drawRoundedRect(*cursor["args"],
-                                            openAttr=cursor["openAttr"],
-                                            brushAttr = cursor["brushAttr"],
-                                            virtualObjectName=cursor["vobj"]
-                                            )
-        self.suppainter.end()
-
-
-class GradientWidget(QFrame):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.__colors = [qt.red,qt.blue,qt.yellow]
-
-        self.btn_area = None #type:BtnAreaWidget
-
-        self.x = 0
-        self.createPix()
-
-    def setBtnArea(self,obj):
-        self.btn_area = obj
-        self.btn_area.cursored.connect(self.updatePos)
-
-    def updatePos(self,vobj:VirtualObject):
-        # print(vobj.getX())
-        self.x = vobj.getX()
-        self.updatePix()
-
-    def paragraph(self)->float:
-        return round(1/len(self.__colors),2)
-
-    def createPix(self):
-        self.pix = QPixmap(self.size())
-        self.pix.fill(qt.transparent)
-
-        h2 = self.height()//2
-        self.line_g = QLinearGradient(0,h2,self.width(),h2)
-        self.line_g.setColorAt(0.5,qt.red)
-        self.line_g.setColorAt(0.6,qt.blue)
-        self.line_g.setColorAt(1,qt.yellow)
-        # v = self.paragraph()
-        # n = 0
-        # for c in self.__colors[:-1]:
-        #     self.line_g.setColorAt(n,c)
-        #     n+=v
-        # self.line_g.setColorAt(1,self.__colors[-1])
-
-        painter = QPainter(self.pix)
-        painter.setPen(qt.NoPen)
-        painter.setBrush(self.line_g)
-        painter.drawRect(self.rect())
-
-    def updatePix(self):
-        self.line_g.setStart(self.x,self.height()//2)
-
-        self.pix = self.pix.scaled(self.size())
-        painter = QPainter(self.pix)
-        painter.setPen(qt.NoPen)
-        painter.setBrush(self.line_g)
-        painter.drawRect(self.rect())
-        self.update()
-
-
-    def paintEvent(self, e) -> None:
-        painter = QPainter(self)
-        painter.drawPixmap(e.rect(),self.pix)
-
-        painter.end()
-
-
 # 颜色句柄
 class Handle:
     def __init__(self,x,y,w,h,r=10,lh=8):
@@ -502,18 +289,182 @@ class Handle:
     def lineH(self)->int:
         return self.lh
 
-# 渐变通用操作台
-class ColorOperation(QFrame):
+
+# 线性渐变板
+class GradientWidget(QFrame):
+    Handle_Linear = "linear"
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
-        self.setFixedHeight(80)
-        # self.setStyleSheet("border:1px solid red;")
+        self.setStyleSheet("border:1px solid yellow;")
 
         self.suppainter = SuperPainter()
 
+        self.grab_type = "linear"
+        self.grab_mode = ""
 
-        self.handle = Handle(5,5,20,20,20)
-        self.handle2 = Handle(335, 5, 20, 20, 20)
+        self.colors = {
+            "linear":[{
+              "colorScope":0,
+              "color":qt.red
+            },
+                {
+                    "colorScope": 1,
+                    "color": qt.blue
+                }
+            ]
+        }
+
+        self.linear = QLinearGradient(0,self.height()//2,self.width(),self.height()//2)
+
+        self.createLinearPix()
+        self.createHandle()
+
+    def setGrabType(self,g_type:str):
+        pass
+
+    def setGrabMode(self,mode:str):
+        pass
+
+    def createLinearPix(self):
+        if not hasattr(self,"linear_pix"):
+            self.linear_pix = QPixmap(self.size())
+        else:
+            self.linear_pix = self.linear_pix.scaled(self.size())
+        self.linear_pix.fill(qt.transparent)
+
+        s = self.linear.start()
+        e = self.linear.spread()
+
+        # self.linear = QLinearGradient()
+        # self.linear.setStart(s)
+        # self.linear.setSpread(e)
+
+        for c in self.colors["linear"]:
+            self.linear.setColorAt(c["colorScope"],c["color"])
+
+        if not hasattr("self", "linear_pix"):
+            painter = QPainter(self.linear_pix)
+            painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+
+            painter.setPen(qt.NoPen)
+            painter.setBrush(self.linear)
+            # painter.drawRoundedRect(self.rect(),5,5)
+            painter.drawRect(self.rect())
+
+    def createRadialPix(self):
+        if not hasattr(self,"radia_pix"):
+            self.radia_pix = QPixmap(self.size())
+        else:
+            self.radia_pix = self.pix.scaled(self.size())
+        self.radia_pix.fill(qt.transparent)
+
+    def createConicalPix(self):
+        if not hasattr(self,"conical_pix"):
+            self.conical_pix = QPixmap(self.size())
+        else:
+            self.conical_pix = self.pix.scaled(self.size())
+        self.radia_pix.fill(qt.transparent)
+
+
+    def createHandle(self):
+        if self.grab_type == GradientWidget.Handle_Linear:
+            self.handles =[
+                {
+                    "vobj": "linear_1",
+                    "handle": Handle(5, 5, 16, 16, 8, 40),
+                    "openAttr": {"c": "#000", "w": 2},
+                    "brushAttr": {"c": qt.red},
+                },
+                {
+                    "vobj": "linear_2",
+                    "handle": Handle(335, 5, 16, 16, 8, 40),
+                    "openAttr": {"c": "#000", "w": 2},
+                    "brushAttr": {"c": qt.blue},
+                }
+            ]
+            self.cur_checked_hand = None
+
+    def updateLinearPos(self,index,color_scope):
+        self.colors["linear"][index]["colorScope"] =color_scope
+        self.createLinearPix()
+        self.update()
+
+    def newLinearColor(self,colorScope,color):
+        self.colors["linear"].append(
+            {
+                "colorScope": colorScope,
+                "color": color
+            }
+        )
+        self.createLinearPix()
+        self.update()
+
+    def mouseMoveEvent(self, e:QMouseEvent) -> None:
+        if self.grab_type == GradientWidget.Handle_Linear and self.cur_checked_hand:
+            hand = self.cur_checked_hand # type:VirtualObject
+            x,y = e.x(),e.y()
+            hand.move(x-8,y-8)
+            if hand.virName() == "linear_1":
+                self.linear.setStart(e.pos())
+            elif hand.virName() == "linear_2":
+                self.linear.setFinalStop(e.pos())
+            self.createLinearPix()
+            self.update()
+        super().mouseMoveEvent(e)
+
+    def mousePressEvent(self, e:QMouseEvent) -> None:
+        if e.buttons() == Qt.LeftButton:
+            if self.grab_type == GradientWidget.Handle_Linear:
+                for hand in self.handles:
+                    c_hand = self.suppainter.virtualObj(hand["vobj"])
+                    if c_hand.isClick(e):
+                        c_hand.updateOpenAttr({"c": "#fff", "w": 3})
+                        self.update()
+                        self.cur_checked_hand = c_hand
+                        break
+        super().mousePressEvent(e)
+
+    def mouseReleaseEvent(self, e:QMouseEvent) -> None:
+        if self.grab_type == GradientWidget.Handle_Linear:
+            for hand in self.handles:
+                c_hand = self.suppainter.virtualObj(hand["vobj"])
+                c_hand.updateOpenAttr({"c": "#000", "w": 2})
+            self.update()
+            self.cur_checked_hand = None
+        super().mouseReleaseEvent(e)
+
+
+    def paintEvent(self, e):
+        self.suppainter.begin(self)
+        self.suppainter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+        self.suppainter.drawPixmap(e.rect(),self.linear_pix)
+
+        if self.grab_type == GradientWidget.Handle_Linear:
+            for hand in self.handles:
+                r = hand["handle"].radius()
+                self.suppainter.drawRoundedRect(*hand["handle"].getRect(),
+                                                r,r,
+                                                openAttr=hand["openAttr"],
+                                                brushAttr=hand["brushAttr"],
+                                                virtualObjectName=hand["vobj"]
+                                                )
+
+        self.suppainter.end()
+
+# -----------------------------
+
+
+# 渐变通用操作台
+class ColorOperation(QFrame):
+    # clickCurSorColored = Signal(QColor)
+    posed = Signal(int,float)
+    newColored = Signal(float,QColor)
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setFixedHeight(80)
+
+        self.suppainter = SuperPainter()
 
         self.handles = [
             {
@@ -534,37 +485,110 @@ class ColorOperation(QFrame):
             }
         ]
 
+        # The id only increases and does not decrease, maintaining uniqueness
+        self.max_handle_id = 2
+
         self.cursor_flag = ""
-        self.createPix()
+        self.updatePix()
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menu_event)
+
+    def menu_event(self):
+        menu_ = QMenu(self)
+
+        new_cursor = QAction("新建游标", self)
+        del_cursor = QAction("删除游标", self)
+        update_color = QAction("更新颜色",self)
+        new_cursor.triggered.connect(self.createCursor_event)
+        del_cursor.triggered.connect(self.delCursor_event)
+        update_color.triggered.connect(self.updateCursorColor_event)
+        menu_.addAction(new_cursor)
+        menu_.addAction(del_cursor)
+        menu_.addAction(update_color)
+
+        menu_.popup(QCursor.pos())
+
+    def createCursor_event(self):
+        if not self._right_pressed_pos:
+            return
+
+        x = self._right_pressed_pos.x()
+        self.max_handle_id+=1
+        structure = {
+            "vobj": "handle_{}".format(self.max_handle_id),
+            "handle": Handle(x, 5, 20, 20, 10, 40),
+            "openAttr": {"c": "#000", "w": 2},
+        }
+        col = QColorDialog.getColor()
+        if col.isValid():
+            structure["brushAttr"]={"c": col}
+            structure["colorScope"] = 1/self.width()*x
+            structure["color"]=col
+            self.handles.append(structure)
+            self.newColored.emit(1/self.width()*x,col)
+            self.updatePix()
+            self.update()
+        self._right_pressed_pos = None
+
+    def getHandle(self,vname:str):
+        for info in self.handles:
+            if info["vobj"] == vname:
+                return info
+        return None
+
+    def delCursor_event(self):
+        if not self._right_pressed_pos:
+            return
+
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            if cursor.isClick(self._right_pressed_pos):
+                self.handles.remove(self.getHandle(vname))
+                break
+
+        self.updatePix()
+        self.update()
+        self._right_pressed_pos = None
+
+    def updateCursorColor_event(self):
+        if not self._right_pressed_pos:
+            return
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            if cursor.isClick(self._right_pressed_pos):
+                col = QColorDialog.getColor()
+                if col.isValid():
+                    hand=self.getHandle(vname)
+                    hand["brushAttr"]["c"] = col
+                    hand["color"] = col
+                    break
+
+        self.updatePix()
+        self.update()
+        self._right_pressed_pos = None
 
     def vObjs(self)->list:
         return [vname["vobj"] for vname in self.handles]
 
-    def createPix(self):
-        self.pix = QPixmap(self.size())
+    def updatePix(self):
+        if not hasattr(self,"pix"):
+            self.pix = QPixmap(self.size())
+        else:
+            self.pix = self.pix.scaled(self.size())
         self.pix.fill(qt.transparent)
 
         h2 = self.height()//2
-        self.linear = QLinearGradient(0,h2,self.width(),h2)
+        linear = QLinearGradient(0,h2,self.width(),h2)
 
         for cursor in self.handles:
-            self.linear.setColorAt(cursor["colorScope"],cursor["color"])
+            linear.setColorAt(cursor["colorScope"],cursor["color"])
 
         painter = QPainter(self.pix)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
         painter.setPen(qt.NoPen)
-        painter.setBrush(self.linear)
-        painter.drawRect(self.rect())
-
-    def updatePix(self):
-        self.pix = self.pix.scaled(self.size())
-
-        for cursor in self.handles:
-            self.linear.setColorAt(cursor["colorScope"],cursor["color"])
-
-        painter = QPainter(self.pix)
-        painter.setPen(qt.NoPen)
-        painter.setBrush(self.linear)
-        painter.drawRect(self.rect())
+        painter.setBrush(linear)
+        painter.drawRoundedRect(self.rect(),5,5)
 
     # 根据游标名称,更新colorScope
     def updateColorScope(self,cursor_name,v):
@@ -579,10 +603,11 @@ class ColorOperation(QFrame):
             if e.x() + cursor.getWidth() // 2 >= cursor.getWidth() // 2 \
                     and e.x() <= self.width():
                 cursor.updateIndexToArgs(0,e.x() - cursor.getWidth() // 2)
-                # self.handles[0]["colorScope"]=1/self.width()*e.x()
                 self.updateColorScope(self.cursor_flag,1/self.width()*e.x())
-                # print(1/self.width()*e.x(),self.handles[0]["colorScope"])
-                self.createPix()
+                self.updatePix()
+                # 发送 游标信息
+                self.posed.emit(int(self.cursor_flag.split("_")[-1])-1,
+                                1/self.width()*e.x())
             self.update()
         super().mouseMoveEvent(e)
 
@@ -591,7 +616,9 @@ class ColorOperation(QFrame):
             for vname in self.vObjs():
                 cursor = self.suppainter.virtualObj(vname)
                 if cursor.isClick(e):
-                    cursor.updateOpenAttr({"c": "#fff", "w": 3})
+                    r,b,g,a =QColor(cursor.getVirtualBrushAttr()["c"]).getRgb()
+                    reverse_color = QColor(255-r,255-b,255-g)
+                    cursor.updateOpenAttr({"c": reverse_color, "w": 3})
                     cursor.updateIndexToArgs(5,50)
                     self.cursor_flag = vname
                     break
@@ -616,7 +643,6 @@ class ColorOperation(QFrame):
         self.suppainter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
 
         self.suppainter.setPen(qt.NoPen)
-        self.suppainter.setBrush(self.linear)
         rect = QRect(0,self.height()-50,self.width(),self.height())
         self.suppainter.drawPixmap(rect,self.pix)
 
@@ -633,8 +659,18 @@ class ColorOperation(QFrame):
         self.suppainter.end()
 
     def resizeEvent(self, e:QResizeEvent) -> None:
+        width = e.size().width()
+        for hand in self.handles:
+            if self.suppainter.isVirtualObj(hand["vobj"]):
+                cursor = self.suppainter.virtualObj(hand["vobj"])
+                new_pos = width * hand["colorScope"]
+                if new_pos >= width:
+                    new_pos -= 20
+                cursor.updateIndexToArgs(0,new_pos)
+        self.updatePix()
         super().resizeEvent(e)
 # -------------------------------
+
 
 # 调色对话框
 class PaletteDialog(QWidget):
@@ -842,9 +878,11 @@ color: rgb(209, 209, 209);
     # 线性面板
     def linearColorWidget(self):
         self.__line_vlay = QVBoxLayout(self.st_line_widget)
-        self.linear = Line()
+        self.linear = GradientWidget()
 
         self.operation_color  = ColorOperation()
+        self.operation_color.posed.connect(self.linear.updateLinearPos)
+        self.operation_color.newColored.connect(self.linear.newLinearColor)
 
         self.__line_vlay.addWidget(self.linear)
         self.__line_vlay.addWidget(self.operation_color)
@@ -887,7 +925,7 @@ color: rgb(209, 209, 209);
 
     def straw_event(self):
         self.maskWidget = MaskWidget(self.timer)
-        size = desktopAllSize()
+        # size = desktopAllSize()
         # self.maskWidget.move(-size.width()//2,0)
         # self.maskWidget.resize(size)
         self.maskWidget.resize(100,100)
