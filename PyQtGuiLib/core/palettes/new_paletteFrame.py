@@ -408,6 +408,7 @@ class GradientInfo:
 
                 ]
             }
+            self.__max_hand_id = 2
 
         def getPos(self)->tuple:
             return self.radial_info["pos"]
@@ -436,6 +437,17 @@ class GradientInfo:
             if color:
                 self.Colors()[hand_id]["color"] = color
 
+        def appendColor(self,colorScope,color):
+            self.__max_hand_id+=1
+            name = "handle_{}".format(self.__max_hand_id)
+            self.radial_info["gColor"][name]={
+                    "colorScope": colorScope,
+                    "color": color
+                }
+
+        def removeHanlde(self,hand_id):
+            del self.Colors()[hand_id]
+
     def __init__(self):
         self.__linear = self.Linear()
         self.__radial = self.Radial()
@@ -453,13 +465,13 @@ class GradientWidget(QFrame):
     Handle_Radial = "radial"
     Handle_Conical = "conical"
 
-    def __init__(self,*args,**kwargs):
+    def __init__(self,grab_type="linear",*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.setStyleSheet("border:1px solid yellow;")
 
         self.suppainter = SuperPainter()
 
-        self.grab_type = "radial"
+        self.grab_type = grab_type
         self.grab_mode = ""
 
         self.gradientInfo = GradientInfo()
@@ -469,7 +481,7 @@ class GradientWidget(QFrame):
         self.createHandle()
 
     def setGrabType(self,g_type:str):
-        pass
+        self.grab_type = g_type
 
     def setGrabMode(self,mode:str):
         pass
@@ -558,10 +570,27 @@ class GradientWidget(QFrame):
         self.update()
     # ------------线性渐变 外部事件 - 触发接口-----------
     # ------------径向渐变 外部事件 - 触发接口-----------
+    def updateRadiaPos(self,hand_id,color_scope):
+        self.gradientInfo.getRadial().updateColor(hand_id,colorScope=color_scope)
+        self.createRadialPix()
+        self.update()
+
     def updateRadialColor(self,hand_id,color):
         self.gradientInfo.getRadial().updateColor(hand_id,color=color)
         self.createRadialPix()
         self.update()
+
+    def newRadialColor(self,colorScope,color):
+        self.gradientInfo.getRadial().appendColor(colorScope,color)
+        self.createRadialPix()
+        self.update()
+
+    def delRadialColor(self,hand_id:str):
+        self.gradientInfo.getRadial().removeHanlde(hand_id)
+        self.createRadialPix()
+        self.update()
+
+    # ------------径向渐变 外部事件 - 触发接口-----------
 
     def mouseMoveEvent(self, e:QMouseEvent) -> None:
         if self.grab_type == GradientWidget.Handle_Linear and self.cur_checked_hand:
@@ -677,12 +706,15 @@ class GradientWidget(QFrame):
 
 # 渐变通用操作台
 class ColorOperation(QFrame):
-    linearUpdataPosed = Signal(str,float)
+    linearUpdatePosed = Signal(str,float)
     linearNewColored = Signal(float,QColor)
     linearDelColored = Signal(str)
     linearUpdateColor = Signal(str,QColor)
 
+    radialUpdatePosed = Signal(str, float)
     radialUpdateColor = Signal(str, QColor)
+    radialDelColored = Signal(str)
+    radialNewColored = Signal(float, QColor)
 
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -751,6 +783,7 @@ class ColorOperation(QFrame):
             structure["color"]=col
             self.handles.append(structure)
             self.linearNewColored.emit(1/self.width()*x,col)
+            self.radialNewColored.emit(1/self.width()*x,col)
             self.updatePix()
             self.update()
         self._right_pressed_pos = None
@@ -771,6 +804,7 @@ class ColorOperation(QFrame):
                 self.handles.remove(self.getHandle(vname))
                 #
                 self.linearDelColored.emit(vname)
+                self.radialDelColored.emit(vname)
                 break
 
         self.updatePix()
@@ -834,7 +868,9 @@ class ColorOperation(QFrame):
                 self.updateColorScope(self.cursor_flag,1/self.width()*e.x())
                 self.updatePix()
                 # 发送 游标信息
-                self.linearUpdataPosed.emit(self.cursor_flag,
+                self.linearUpdatePosed.emit(self.cursor_flag,
+                                1/self.width()*e.x())
+                self.radialUpdatePosed.emit(self.cursor_flag,
                                 1/self.width()*e.x())
             self.update()
         super().mouseMoveEvent(e)
@@ -913,10 +949,6 @@ class PaletteDialog(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateColor)
 
-        #
-        self.gradient_widget = GradientWidget()
-        self.operation_color = ColorOperation()
-
         self.setUI()
         self.myEvent()
 
@@ -969,13 +1001,13 @@ class PaletteDialog(QWidget):
         # 纯色,线性渐变,径向渐变,角度渐变
         self.st = QStackedWidget()
         self.st_pure_color_wideget = QWidget()
-        self.st_line_widget = QWidget()
-        self.st_repeat_widget = QWidget()
-        self.st_reflect_widget = QWidget()
+        self.st_linear_widget = QWidget()
+        self.st_radial_widget = QWidget()
+        self.st_conicalt_widget = QWidget()
         self.st.addWidget(self.st_pure_color_wideget)
-        self.st.addWidget(self.st_line_widget)
-        self.st.addWidget(self.st_repeat_widget)
-        self.st.addWidget(self.st_reflect_widget)
+        self.st.addWidget(self.st_linear_widget)
+        self.st.addWidget(self.st_radial_widget)
+        self.st.addWidget(self.st_conicalt_widget)
 
 
         self.pureColorWidget()
@@ -1122,19 +1154,20 @@ color: rgb(209, 209, 209);
 
     # 线性面板
     def linearColorWidget(self):
-        self.__line_vlay = QVBoxLayout(self.st_line_widget)
+        self.__line_vlay = QVBoxLayout(self.st_linear_widget)
+        
+        self.linearGradient_widget = GradientWidget("linear")
+        self.linearOperation_color = ColorOperation()
 
-        self.operation_color.linearUpdataPosed.connect(self.gradient_widget.updateLinearPos)
-        self.operation_color.linearNewColored.connect(self.gradient_widget.newLinearColor)
-        self.operation_color.linearDelColored.connect(self.gradient_widget.delLinearColor)
-        self.operation_color.linearUpdateColor.connect(self.gradient_widget.updateLinearColor)
+        self.linearOperation_color.linearUpdatePosed.connect(self.linearGradient_widget.updateLinearPos)
+        self.linearOperation_color.linearNewColored.connect(self.linearGradient_widget.newLinearColor)
+        self.linearOperation_color.linearDelColored.connect(self.linearGradient_widget.delLinearColor)
+        self.linearOperation_color.linearUpdateColor.connect(self.linearGradient_widget.updateLinearColor)
 
-        self.operation_color.radialUpdateColor.connect(self.gradient_widget.updateRadialColor)
+        self.__line_vlay.addWidget(self.linearGradient_widget)
+        self.__line_vlay.addWidget(self.linearOperation_color)
 
-        self.__line_vlay.addWidget(self.gradient_widget)
-        self.__line_vlay.addWidget(self.operation_color)
-
-    # 线性操作台
+    # 线性右侧操作区域
     def linearColorOperation(self):
         self._m_r_line_widget = QWidget()
         self._m_r_line_widget.setFixedWidth(100)
@@ -1146,7 +1179,19 @@ color: rgb(209, 209, 209);
 
     # 径向面板
     def radialColorWidget(self):
-        pass
+        self.__radial_vlay = QVBoxLayout(self.st_radial_widget)
+
+        self.radialGradient_widget = GradientWidget("radial")
+        self.radialOperation_color = ColorOperation()
+
+        self.radialOperation_color.radialUpdatePosed.connect(self.radialGradient_widget.updateRadiaPos)
+        self.radialOperation_color.radialUpdateColor.connect(self.radialGradient_widget.updateRadialColor)
+        self.radialOperation_color.radialNewColored.connect(self.radialGradient_widget.newRadialColor)
+        self.radialOperation_color.radialDelColored.connect(self.radialGradient_widget.delRadialColor)
+
+        self.__radial_vlay.addWidget(self.radialGradient_widget)
+        self.__radial_vlay.addWidget(self.radialOperation_color)
+
 
     def setLabelRGB(self,c:QColor):
         r,g,b,a = c.getRgb()
@@ -1197,6 +1242,7 @@ color: rgb(209, 209, 209);
         def change_btn_event(index):
             self.st.setCurrentIndex(index)
             self.operation_st.setCurrentIndex(index)
+
 
         self.pure_color_btn.clicked.connect(lambda :change_btn_event(0))
         self.line_btn.clicked.connect(lambda :change_btn_event(1))
