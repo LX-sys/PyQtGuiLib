@@ -41,7 +41,8 @@ from PyQtGuiLib.header import (
     QAction,
     QColorDialog,
     QPen,
-    QResizeEvent
+    QResizeEvent,
+    QWheelEvent
 )
 
 from random import randint
@@ -290,9 +291,167 @@ class Handle:
         return self.lh
 
 
-# 线性渐变板
+# 渐变信息类
+class GradientInfo:
+    Handle_Linear = "linear"
+
+    class Linear:
+        def __init__(self):
+            self.linear_info = {
+                "pos": QRect(0, 50, 0, 50),
+                "gColor": {
+                    # handle_n is the specified naming rule
+                    "handle_1": {
+                            "colorScope": 0,
+                            "color": qt.red
+                    },
+                    "handle_2": {
+                        "colorScope": 1,
+                        "color": qt.blue
+                    }
+                },
+                # The linear gradient has only two handles
+                "handle": [
+                    {
+                        "vobj": "linear_1",
+                        "handle": Handle(5, 5, 16, 16, 8, 40),
+                        "openAttr": {"c": "#000", "w": 2},
+                        "brushAttr": {"c": qt.red},
+                        "pos_percentage":(0.0,0.0)
+                    },
+                    {
+                        "vobj": "linear_2",
+                        "handle": Handle(335, 5, 16, 16, 8, 40),
+                        "openAttr": {"c": "#000", "w": 2},
+                        "brushAttr": {"c": qt.blue},
+                        "pos_percentage": (0.0,0.0)
+                    }
+                ]
+            }
+            self.__max_hand_id = 2
+
+        def updateHandPos(self,hand_vobj:str,pos_percentage):
+            if hand_vobj == "linear_1":
+                self.handle()[0]["pos_percentage"] = pos_percentage
+            if hand_vobj == "linear_2":
+                self.handle()[1]["pos_percentage"] = pos_percentage
+
+        def getRect(self)->tuple:
+            return self.linear_info["pos"].getRect()
+
+        def updateStart(self,e):
+            self.linear_info["pos"].setX(e.x())
+            self.linear_info["pos"].setY(e.y())
+
+            # self.linear_info["pos"].moveTo(e.pos())
+
+        def updateSpread(self,e):
+            self.linear_info["pos"].setWidth(e.x())
+            self.linear_info["pos"].setHeight(e.y())
+
+        def colorCount(self)->int:
+            return len(self.linear_info["gColor"])
+
+        def Colors(self)->dict:
+            return self.linear_info["gColor"]
+
+        def updateColor(self,hand_id:str,colorScope=None,color=None):
+            if colorScope:
+                self.Colors()[hand_id]["colorScope"] = colorScope
+            if color:
+                self.Colors()[hand_id]["color"] = color
+
+        def handle(self) -> list:
+            return self.linear_info["handle"]
+
+        def appendColor(self,colorScope,color):
+            self.__max_hand_id+=1
+            name = "handle_{}".format(self.__max_hand_id)
+            self.linear_info["gColor"][name]={
+                    "colorScope": colorScope,
+                    "color": color
+                }
+
+        def removeHanlde(self,hand_id):
+            del self.Colors()[hand_id]
+
+    class Radial:
+        def __init__(self):
+            self.radial_info ={
+                "pos":[100,100,50,80,80],
+                "gColor": {
+                    # handle_n is the specified naming rule
+                    "handle_1": {
+                        "colorScope": 0,
+                        "color": qt.red
+                    },
+                    "handle_2": {
+                        "colorScope": 1,
+                        "color": qt.white
+                    }
+                },
+                "handle":[
+                    {
+                        "vobj": "radial_1",
+                        "handle": Handle(100, 100, 16, 16, 8, 40),
+                        "openAttr": {"c": "#000", "w": 2},
+                        "brushAttr": {"c": qt.red},
+                        "pos_percentage":(0.0,0.0)
+                    },
+                    {
+                        "vobj": "radial_2",
+                        "handle": Handle(80, 80, 14, 14, 7, 40),
+                        "openAttr": {"c": "#000", "w": 2},
+                        "brushAttr": {"c": qt.blue},
+                        "pos_percentage": (0.0,0.0)
+                    }
+
+                ]
+            }
+
+        def getPos(self)->tuple:
+            return self.radial_info["pos"]
+
+        def Colors(self)->dict:
+            return self.radial_info["gColor"]
+
+        def handle(self) -> list:
+            return self.radial_info["handle"]
+
+        def updateCenterPos(self,e):
+            self.radial_info["pos"][0]=e.pos().x()
+            self.radial_info["pos"][1]=e.pos().y()
+
+        def updateCenterPos2(self,e):
+            self.radial_info["pos"][3] = e.pos().x()
+            self.radial_info["pos"][4] = e.pos().y()
+
+        # 更新外圈大小
+        def updateOuterSize(self,n:int):
+            self.radial_info["pos"][2] = n
+
+        def updateColor(self,hand_id:str,colorScope=None,color=None):
+            if colorScope:
+                self.Colors()[hand_id]["colorScope"] = colorScope
+            if color:
+                self.Colors()[hand_id]["color"] = color
+
+    def __init__(self):
+        self.__linear = self.Linear()
+        self.__radial = self.Radial()
+
+    def getLinear(self)->Linear:
+        return self.__linear
+
+    def getRadial(self)->Radial:
+        return self.__radial
+
+
+# 渐变变板
 class GradientWidget(QFrame):
     Handle_Linear = "linear"
+    Handle_Radial = "radial"
+    Handle_Conical = "conical"
 
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -300,24 +459,13 @@ class GradientWidget(QFrame):
 
         self.suppainter = SuperPainter()
 
-        self.grab_type = "linear"
+        self.grab_type = "radial"
         self.grab_mode = ""
 
-        self.colors = {
-            "linear":[{
-              "colorScope":0,
-              "color":qt.red
-            },
-                {
-                    "colorScope": 1,
-                    "color": qt.blue
-                }
-            ]
-        }
-
-        self.linear = QLinearGradient(0,self.height()//2,self.width(),self.height()//2)
+        self.gradientInfo = GradientInfo()
 
         self.createLinearPix()
+        self.createRadialPix()
         self.createHandle()
 
     def setGrabType(self,g_type:str):
@@ -333,71 +481,86 @@ class GradientWidget(QFrame):
             self.linear_pix = self.linear_pix.scaled(self.size())
         self.linear_pix.fill(qt.transparent)
 
-        s = self.linear.start()
-        e = self.linear.spread()
+        # There is no way to clean the tween object, only to recreate the object
+        linear = QLinearGradient(*self.gradientInfo.getLinear().getRect())
+        for c in self.gradientInfo.getLinear().Colors().values():
+            linear.setColorAt(c["colorScope"],c["color"])
 
-        # self.linear = QLinearGradient()
-        # self.linear.setStart(s)
-        # self.linear.setSpread(e)
+        painter = QPainter(self.linear_pix)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
 
-        for c in self.colors["linear"]:
-            self.linear.setColorAt(c["colorScope"],c["color"])
-
-        if not hasattr("self", "linear_pix"):
-            painter = QPainter(self.linear_pix)
-            painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
-
-            painter.setPen(qt.NoPen)
-            painter.setBrush(self.linear)
-            # painter.drawRoundedRect(self.rect(),5,5)
-            painter.drawRect(self.rect())
+        painter.setPen(qt.NoPen)
+        painter.setBrush(linear)
+        # painter.drawRoundedRect(self.rect(),5,5)
+        painter.drawRect(self.rect())
 
     def createRadialPix(self):
         if not hasattr(self,"radia_pix"):
             self.radia_pix = QPixmap(self.size())
+            self.radia_outer_pix = QPixmap(self.size())
         else:
-            self.radia_pix = self.pix.scaled(self.size())
+            self.radia_pix = self.radia_pix.scaled(self.size())
+            self.radia_outer_pix = self.radia_outer_pix.scaled(self.size())
         self.radia_pix.fill(qt.transparent)
+        self.radia_outer_pix.fill(qt.transparent)
+
+        radial = QRadialGradient(*self.gradientInfo.getRadial().getPos())
+        for c in self.gradientInfo.getRadial().Colors().values():
+            radial.setColorAt(c["colorScope"], c["color"])
+
+        painter = QPainter(self.radia_pix)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+
+        painter.setPen(qt.NoPen)
+        painter.setBrush(radial)
+        # painter.drawRoundedRect(self.rect(),5,5)
+        painter.drawRect(self.rect())
+
+        # 外圈
+        # painter_outer = QPainter(self.radia_outer_pix)
+        # painter_outer.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+        # f= QPen()
+        # f.setWidth(2)
+        # f.setColor(qt.white)
+        # painter_outer.setPen(f)
+        # painter_outer.drawEllipse(100,100,100,100)
 
     def createConicalPix(self):
         if not hasattr(self,"conical_pix"):
             self.conical_pix = QPixmap(self.size())
         else:
-            self.conical_pix = self.pix.scaled(self.size())
-        self.radia_pix.fill(qt.transparent)
-
+            self.conical_pix = self.conical_pix.scaled(self.size())
+        self.conical_pix.fill(qt.transparent)
 
     def createHandle(self):
         if self.grab_type == GradientWidget.Handle_Linear:
-            self.handles =[
-                {
-                    "vobj": "linear_1",
-                    "handle": Handle(5, 5, 16, 16, 8, 40),
-                    "openAttr": {"c": "#000", "w": 2},
-                    "brushAttr": {"c": qt.red},
-                },
-                {
-                    "vobj": "linear_2",
-                    "handle": Handle(335, 5, 16, 16, 8, 40),
-                    "openAttr": {"c": "#000", "w": 2},
-                    "brushAttr": {"c": qt.blue},
-                }
-            ]
             self.cur_checked_hand = None
-
-    def updateLinearPos(self,index,color_scope):
-        self.colors["linear"][index]["colorScope"] =color_scope
+            
+    # ----------------线性渐变 外部事件 - 触发接口---------------
+    def updateLinearPos(self,hand_id,color_scope):
+        self.gradientInfo.getLinear().updateColor(hand_id,colorScope=color_scope)
         self.createLinearPix()
         self.update()
 
     def newLinearColor(self,colorScope,color):
-        self.colors["linear"].append(
-            {
-                "colorScope": colorScope,
-                "color": color
-            }
-        )
+        self.gradientInfo.getLinear().appendColor(colorScope,color)
         self.createLinearPix()
+        self.update()
+
+    def delLinearColor(self,hand_id:str):
+        self.gradientInfo.getLinear().removeHanlde(hand_id)
+        self.createLinearPix()
+        self.update()
+    
+    def updateLinearColor(self,hand_id,color):
+        self.gradientInfo.getLinear().updateColor(hand_id,color=color)
+        self.createLinearPix()
+        self.update()
+    # ------------线性渐变 外部事件 - 触发接口-----------
+    # ------------径向渐变 外部事件 - 触发接口-----------
+    def updateRadialColor(self,hand_id,color):
+        self.gradientInfo.getRadial().updateColor(hand_id,color=color)
+        self.createRadialPix()
         self.update()
 
     def mouseMoveEvent(self, e:QMouseEvent) -> None:
@@ -405,18 +568,40 @@ class GradientWidget(QFrame):
             hand = self.cur_checked_hand # type:VirtualObject
             x,y = e.x(),e.y()
             hand.move(x-8,y-8)
-            if hand.virName() == "linear_1":
-                self.linear.setStart(e.pos())
-            elif hand.virName() == "linear_2":
-                self.linear.setFinalStop(e.pos())
-            self.createLinearPix()
-            self.update()
+            if self.rect().contains(e.pos()):
+                p_x,p_y = round(x / self.width(),2), round(y / self.height(),2)
+                if hand.virName() == "linear_1":
+                    self.gradientInfo.getLinear().updateStart(e)
+                elif hand.virName() == "linear_2":
+                    self.gradientInfo.getLinear().updateSpread(e)
+
+                self.gradientInfo.getLinear().updateHandPos(hand.virName(), (p_x, p_y))
+                self.createLinearPix()
+        elif self.grab_type == GradientWidget.Handle_Radial and self.cur_checked_hand:
+            hand = self.cur_checked_hand # type:VirtualObject
+            x,y = e.x(),e.y()
+            hand.move(x-8,y-8)
+            if self.rect().contains(e.pos()):
+                if hand.virName() == "radial_1":
+                    self.gradientInfo.getRadial().updateCenterPos(e)
+                if hand.virName() == "radial_2":
+                    self.gradientInfo.getRadial().updateCenterPos2(e)
+                self.createRadialPix()
+        self.update()
         super().mouseMoveEvent(e)
 
     def mousePressEvent(self, e:QMouseEvent) -> None:
         if e.buttons() == Qt.LeftButton:
             if self.grab_type == GradientWidget.Handle_Linear:
-                for hand in self.handles:
+                for hand in self.gradientInfo.getLinear().handle():
+                    c_hand = self.suppainter.virtualObj(hand["vobj"])
+                    if c_hand.isClick(e):
+                        c_hand.updateOpenAttr({"c": "#fff", "w": 3})
+                        self.update()
+                        self.cur_checked_hand = c_hand
+                        break
+            elif self.grab_type == GradientWidget.Handle_Radial:
+                for hand in self.gradientInfo.getRadial().handle():
                     c_hand = self.suppainter.virtualObj(hand["vobj"])
                     if c_hand.isClick(e):
                         c_hand.updateOpenAttr({"c": "#fff", "w": 3})
@@ -427,21 +612,26 @@ class GradientWidget(QFrame):
 
     def mouseReleaseEvent(self, e:QMouseEvent) -> None:
         if self.grab_type == GradientWidget.Handle_Linear:
-            for hand in self.handles:
+            for hand in self.gradientInfo.getLinear().handle():
+                c_hand = self.suppainter.virtualObj(hand["vobj"])
+                c_hand.updateOpenAttr({"c": "#000", "w": 2})
+            self.update()
+            self.cur_checked_hand = None
+        elif self.grab_type == GradientWidget.Handle_Radial:
+            for hand in self.gradientInfo.getRadial().handle():
                 c_hand = self.suppainter.virtualObj(hand["vobj"])
                 c_hand.updateOpenAttr({"c": "#000", "w": 2})
             self.update()
             self.cur_checked_hand = None
         super().mouseReleaseEvent(e)
 
-
     def paintEvent(self, e):
         self.suppainter.begin(self)
         self.suppainter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
-        self.suppainter.drawPixmap(e.rect(),self.linear_pix)
 
         if self.grab_type == GradientWidget.Handle_Linear:
-            for hand in self.handles:
+            self.suppainter.drawPixmap(e.rect(), self.linear_pix)
+            for hand in self.gradientInfo.getLinear().handle():
                 r = hand["handle"].radius()
                 self.suppainter.drawRoundedRect(*hand["handle"].getRect(),
                                                 r,r,
@@ -449,17 +639,51 @@ class GradientWidget(QFrame):
                                                 brushAttr=hand["brushAttr"],
                                                 virtualObjectName=hand["vobj"]
                                                 )
-
+        elif self.grab_type == GradientWidget.Handle_Radial:
+            self.suppainter.drawPixmap(e.rect(), self.radia_pix)
+            # self.suppainter.drawPixmap(e.rect(), self.radia_outer_pix)
+            for hand in self.gradientInfo.getRadial().handle():
+                r = hand["handle"].radius()
+                self.suppainter.drawRoundedRect(*hand["handle"].getRect(),
+                                                r,r,
+                                                openAttr=hand["openAttr"],
+                                                brushAttr=hand["brushAttr"],
+                                                virtualObjectName=hand["vobj"]
+                                                )
         self.suppainter.end()
 
+    def wheelEvent(self,e:QWheelEvent):
+        if self.grab_type == GradientWidget.Handle_Radial:
+            print(e.angleDelta().y()/120)
+        super().wheelEvent(e)
+
+    def resizeEvent(self, e:QResizeEvent):
+        w = e.size().width()
+        h = e.size().height()
+        if self.grab_type == GradientWidget.Handle_Linear:
+            for hand in self.gradientInfo.getLinear().handle():
+                vobj = hand["vobj"]
+                if self.suppainter.isVirtualObj(vobj):
+                    p_x,p_y = hand["pos_percentage"]
+                    cursor = self.suppainter.virtualObj(vobj)
+                    cursor.move(round(w*p_x,2),round(h*p_y,2))
+            self.createLinearPix()
+        elif self.grab_type == GradientWidget.Handle_Radial:
+            self.createRadialPix()
+        self.update()
+        super().resizeEvent(e)
 # -----------------------------
 
 
 # 渐变通用操作台
 class ColorOperation(QFrame):
-    # clickCurSorColored = Signal(QColor)
-    posed = Signal(int,float)
-    newColored = Signal(float,QColor)
+    linearUpdataPosed = Signal(str,float)
+    linearNewColored = Signal(float,QColor)
+    linearDelColored = Signal(str)
+    linearUpdateColor = Signal(str,QColor)
+
+    radialUpdateColor = Signal(str, QColor)
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.setFixedHeight(80)
@@ -526,7 +750,7 @@ class ColorOperation(QFrame):
             structure["colorScope"] = 1/self.width()*x
             structure["color"]=col
             self.handles.append(structure)
-            self.newColored.emit(1/self.width()*x,col)
+            self.linearNewColored.emit(1/self.width()*x,col)
             self.updatePix()
             self.update()
         self._right_pressed_pos = None
@@ -545,6 +769,8 @@ class ColorOperation(QFrame):
             cursor = self.suppainter.virtualObj(vname)
             if cursor.isClick(self._right_pressed_pos):
                 self.handles.remove(self.getHandle(vname))
+                #
+                self.linearDelColored.emit(vname)
                 break
 
         self.updatePix()
@@ -562,6 +788,8 @@ class ColorOperation(QFrame):
                     hand=self.getHandle(vname)
                     hand["brushAttr"]["c"] = col
                     hand["color"] = col
+                    self.linearUpdateColor.emit(vname,col)
+                    self.radialUpdateColor.emit(vname,col)
                     break
 
         self.updatePix()
@@ -606,7 +834,7 @@ class ColorOperation(QFrame):
                 self.updateColorScope(self.cursor_flag,1/self.width()*e.x())
                 self.updatePix()
                 # 发送 游标信息
-                self.posed.emit(int(self.cursor_flag.split("_")[-1])-1,
+                self.linearUpdataPosed.emit(self.cursor_flag,
                                 1/self.width()*e.x())
             self.update()
         super().mouseMoveEvent(e)
@@ -685,6 +913,10 @@ class PaletteDialog(QWidget):
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateColor)
 
+        #
+        self.gradient_widget = GradientWidget()
+        self.operation_color = ColorOperation()
+
         self.setUI()
         self.myEvent()
 
@@ -745,42 +977,20 @@ class PaletteDialog(QWidget):
         self.st.addWidget(self.st_repeat_widget)
         self.st.addWidget(self.st_reflect_widget)
 
+
         self.pureColorWidget()
         self.linearColorWidget()
+        self.radialColorWidget()
         # -----
 
+        # 不同颜色的操作太区域
+        self.operation_st = QStackedWidget()
+        self.operation_st.setFixedWidth(100)
 
-        self._m_r_widget = QWidget()
-        self._m_r_lay = QVBoxLayout(self._m_r_widget)
-        self._m_r_widget.setFixedWidth(100)
+        # 操作台
+        self.pureColorOperation()
+        self.linearColorOperation()
 
-        self.label_r,self.label_g,self.label_b,self.label_a = [
-            QLabel("红(R)"),
-            QLabel("绿(G)"),
-            QLabel("蓝(B)"),
-            QLabel("透(A)"),
-        ]
-        self.lineedit_r, self.lineedit_g, self.lineedit_b, self.lineedit_a = [
-            QLineEdit(),QLineEdit(),
-            QLineEdit(),QLineEdit()
-        ]
-        for line in [self.lineedit_r,self.lineedit_g,self.lineedit_b,self.lineedit_a]:
-            line.setText("255")
-        self.lineedit_a.setText("255")
-        self.formLayout = QFormLayout()
-        self.formLayout.addRow(self.label_r,self.lineedit_r)
-        self.formLayout.addRow(self.label_g,self.lineedit_g)
-        self.formLayout.addRow(self.label_b,self.lineedit_b)
-        self.formLayout.addRow(self.label_a,self.lineedit_a)
-        self.colorButton = QPushButton("获取颜色")
-        self.colorButton.setFixedSize(90,30)
-        self.colorButton.setObjectName("colorButton")
-        self.formLayout.setWidget(self.formLayout.rowCount(),QFormLayout.SpanningRole,self.colorButton)
-
-        self._m_r_lay.addLayout(self.formLayout)
-
-
-        self.__middle_lay.addWidget(self._m_r_widget)
 
         self.__lay.addLayout(self.__top_lay)
         self.__lay.addLayout(self.__middle_lay)
@@ -875,17 +1085,68 @@ color: rgb(209, 209, 209);
 
         self.__middle_lay.addWidget(self.st)
 
+    # 纯色操作台
+    def pureColorOperation(self):
+        self._m_r_widget = QWidget()
+        self._m_r_lay = QVBoxLayout(self._m_r_widget)
+        self._m_r_widget.setFixedWidth(100)
+
+        self.operation_st.addWidget(self._m_r_widget)
+
+        self.label_r, self.label_g, self.label_b, self.label_a = [
+            QLabel("红(R)"),
+            QLabel("绿(G)"),
+            QLabel("蓝(B)"),
+            QLabel("透(A)"),
+        ]
+        self.lineedit_r, self.lineedit_g, self.lineedit_b, self.lineedit_a = [
+            QLineEdit(), QLineEdit(),
+            QLineEdit(), QLineEdit()
+        ]
+        for line in [self.lineedit_r, self.lineedit_g, self.lineedit_b, self.lineedit_a]:
+            line.setText("255")
+        self.lineedit_a.setText("255")
+        self.formLayout = QFormLayout()
+        self.formLayout.addRow(self.label_r, self.lineedit_r)
+        self.formLayout.addRow(self.label_g, self.lineedit_g)
+        self.formLayout.addRow(self.label_b, self.lineedit_b)
+        self.formLayout.addRow(self.label_a, self.lineedit_a)
+        self.colorButton = QPushButton("获取颜色")
+        self.colorButton.setFixedSize(90, 30)
+        self.colorButton.setObjectName("colorButton")
+        self.formLayout.setWidget(self.formLayout.rowCount(), QFormLayout.SpanningRole, self.colorButton)
+
+        self._m_r_lay.addLayout(self.formLayout)
+
+        self.__middle_lay.addWidget(self.operation_st)
+
     # 线性面板
     def linearColorWidget(self):
         self.__line_vlay = QVBoxLayout(self.st_line_widget)
-        self.linear = GradientWidget()
 
-        self.operation_color  = ColorOperation()
-        self.operation_color.posed.connect(self.linear.updateLinearPos)
-        self.operation_color.newColored.connect(self.linear.newLinearColor)
+        self.operation_color.linearUpdataPosed.connect(self.gradient_widget.updateLinearPos)
+        self.operation_color.linearNewColored.connect(self.gradient_widget.newLinearColor)
+        self.operation_color.linearDelColored.connect(self.gradient_widget.delLinearColor)
+        self.operation_color.linearUpdateColor.connect(self.gradient_widget.updateLinearColor)
 
-        self.__line_vlay.addWidget(self.linear)
+        self.operation_color.radialUpdateColor.connect(self.gradient_widget.updateRadialColor)
+
+        self.__line_vlay.addWidget(self.gradient_widget)
         self.__line_vlay.addWidget(self.operation_color)
+
+    # 线性操作台
+    def linearColorOperation(self):
+        self._m_r_line_widget = QWidget()
+        self._m_r_line_widget.setFixedWidth(100)
+        self._m_r_line_widget.setStyleSheet("border:1px solid red;")
+
+        # 待写
+
+        self.operation_st.addWidget(self._m_r_line_widget)
+
+    # 径向面板
+    def radialColorWidget(self):
+        pass
 
     def setLabelRGB(self,c:QColor):
         r,g,b,a = c.getRgb()
@@ -933,8 +1194,12 @@ color: rgb(209, 209, 209);
         self.timer.start(50)
 
     def myEvent(self):
-        self.pure_color_btn.clicked.connect(lambda :self.st.setCurrentIndex(0))
-        self.line_btn.clicked.connect(lambda :self.st.setCurrentIndex(1))
+        def change_btn_event(index):
+            self.st.setCurrentIndex(index)
+            self.operation_st.setCurrentIndex(index)
+
+        self.pure_color_btn.clicked.connect(lambda :change_btn_event(0))
+        self.line_btn.clicked.connect(lambda :change_btn_event(1))
         self.repeat_btn.clicked.connect(lambda :self.st.setCurrentIndex(2))
         self.reflect_btn.clicked.connect(lambda :self.st.setCurrentIndex(3))
 
