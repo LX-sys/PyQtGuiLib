@@ -282,6 +282,105 @@ class ColorBar(QFrame):
         super().resizeEvent(e)
 
 
+class Code:
+    QSS = "qss"
+    PythonQt = "pythonqt"
+    CPP = "cpp"
+
+    def __init__(self,code_type="qss"):
+        self.code_type = code_type
+        self.grab_type = Handle_Linear
+        self.grab_mode = "pad"
+
+        self.structure = {
+            "head":"qlineargradient({}",
+            "pos":"",
+            "color":""
+        }
+
+        # self._qss_linear = {"pad": {"template": "qlineargradient(spread:pad,x1:{},y1:{},x2:{},y2:{},",
+        #                      "qss": ""},
+        #              "repeat": {"template": "qlineargradient(spread:repeat,x1:{},y1:{},x2:{},y2:{},",
+        #                         "qss": ""},
+        #              "reflect": {"template": "qlineargradient(spread:reflect,x1:{},y1:{},x2:{},y2:{},",
+        #                          "qss": ""}
+        #              }
+        #
+        # self._qss_radial = {"pad": {"template": "qradialgradient(spread:pad,cx:{},cy:{},radius:{},fx:{},fy:{},",
+        #                      "qss": ""},
+        #              "repeat": {"template": "qradialgradient(spread:repeat,cx:{},cy:{},radius:{},fx:{},fy:{},",
+        #                         "qss": ""},
+        #              "reflect": {"template": "qradialgradient(spread:reflect,cx:{},cy:{},radius:{},fx:{},fy:{},",
+        #                          "qss": ""}
+        #              }
+        #
+        # self._qss_conical = {"template": "qconicalgradient(cx:{}, cy:{}, angle:{} ",
+        #              "qss": ""
+        #              }
+
+    def setGrab(self,g_type):
+        self.grab_type = g_type
+
+    def setGrabMode(self,mode):
+        self.grab_mode = mode
+
+    def posArgc(self)->str:
+        return self.structure["pos"]
+
+    def setColorCompound(self,g_color)->str:
+        temp = ""
+        for i, c in enumerate(g_color):
+            color = QColor(g_color[c]["color"])
+            temp += "stop: {} rgba({},{},{},{}),".format(i, *color.getRgb())
+        self.structure["color"] = temp[:-1] + ");"
+
+    def colorCompound(self)->str:
+        return self.structure["color"]
+
+    def build(self)->str:
+        if self.grab_type != Handle_Conical:
+            if self.grab_mode == QGradient.RepeatSpread:
+                mode = "repeat"
+            elif self.grab_mode == QGradient.ReflectSpread:
+                mode = "reflect"
+            else:
+                mode ="pad"
+            head=self.structure["head"].format("spread:"+mode+",")
+        else:
+            head = self.structure["head"].format("")
+        pos = self.posArgc()+","
+        return head+pos+self.colorCompound()
+
+
+class CodeQSSLinear(Code):
+    def __init__(self):
+        super().__init__()
+
+    def setPosArgc(self, x1, y1, x2, y2):
+        t = "x1:{},y1:{},x2:{},y2:{}"
+        self.structure["pos"] = t.format(x1, y1, x2, y2)
+
+
+class CodeQSSRadial(Code):
+    def __init__(self):
+        super().__init__()
+        self.structure["head"]="qradialgradient({}"
+
+    def setPosArgc(self,cx,cy,r,fx,fy):
+        t = "cx:{},cy:{},radius:{},fx:{},fy:{}"
+        self.structure["pos"]=t.format(cx,cy,r,fx,fy)
+
+
+class CodeQSSConical(Code):
+    def __init__(self):
+        super().__init__()
+        self.grab_type = Handle_Conical
+        self.structure["head"]="qconicalgradient({}"
+
+    def setPosArgc(self,cx,cy,angle):
+        t = "cx:{},cy:{},angle:{}"
+        self.structure["pos"]=t.format(cx,cy,angle)
+
 # 颜色句柄
 class Handle:
     def __init__(self,x,y,w,h,r=10,lh=8):
@@ -572,6 +671,11 @@ class GradientWidget(QFrame):
 
         self.isHideHand = False
 
+        #
+        self.code_linear = CodeQSSLinear()
+        self.code_radial = CodeQSSRadial()
+        self.code_conical = CodeQSSConical()
+
         self.createLinearPix()
         self.createRadialPix()
         self.createConicalPix()
@@ -724,6 +828,16 @@ class GradientWidget(QFrame):
                     elif hand.virName() == "linear_2":
                         self.gradientInfo.getLinear().updateSpread(e)
                     self.gradientInfo.getLinear().updateHandPos(hand.virName(), (p_x, p_y))
+
+                    # 生成QSS代码
+                    self.code_linear.setGrabMode(self.grab_mode)
+                    x1,y1,x2,y2 = self.gradientInfo.getLinear().getPos()
+                    x1,y1 = round(x1/self.width(),3),round(y1/self.height(),3)
+                    x2,y2 = round(x2/self.width(),3),round(y2/self.height(),3)
+                    self.code_linear.setPosArgc(x1,y1,x2,y2)
+                    self.code_linear.setColorCompound(self.gradientInfo.getLinear().Colors())
+                    # print(self.code_linear.build())
+                    # ---
                     self.createLinearPix()
                 elif self.grab_type == Handle_Radial:
                     if hand.virName() == "radial_1":
@@ -735,6 +849,16 @@ class GradientWidget(QFrame):
                         x1,y1 = self.gradientInfo.getRadial().getPos()[:2]
                         sqrt_n = int(math.sqrt(math.pow(x-x1,2)+math.pow(y-y1,2)))
                         self.gradientInfo.getRadial().updateOuterSize(sqrt_n)
+                    # 生成QSS代码? 有问题待解决
+                    self.code_radial.setGrabMode(self.grab_mode)
+                    cx,cy,r,fx,fy = self.gradientInfo.getRadial().getPos()
+                    cx,cy = round(cx/self.width(),3),round(cy/self.height(),3)
+                    fx,fy = round(fx/self.width(),3),round(fy/self.height(),3)
+                    # print("r:",r,self.width(),round(r/self.width(),3))
+                    self.code_radial.setPosArgc(cx, cy, r, fx, fy)
+                    self.code_radial.setColorCompound(self.gradientInfo.getRadial().Colors())
+                    # print(self.code_radial.build())
+
                     self.createRadialPix()
                 elif self.grab_type == Handle_Conical:
                     if hand.virName() == "conical_1":
@@ -744,7 +868,16 @@ class GradientWidget(QFrame):
                         x1,y1 = self.gradientInfo.getConical().getPos()[:2]
                         angle_arc = math.atan2(y-y1,x-x1)
                         angle = angle_arc*180/math.pi
-                        self.gradientInfo.getConical().updateAngle(-angle)
+                        self.gradientInfo.getConical().updateAngle(int(-angle))
+                    # 生成QSS代码
+                    self.code_conical.setGrabMode(self.grab_mode)
+                    cx,cy,angle = self.gradientInfo.getConical().getPos()
+                    cx, cy = round(cx / self.width(), 3), round(cy / self.height(), 3)
+                    # angle = -angle
+                    self.code_conical.setPosArgc(cx,cy,int(math.fabs(angle)))
+                    self.code_conical.setColorCompound(self.gradientInfo.getConical().Colors())
+                    print(self.code_conical.build())
+
                     self.createConicalPix()
                 self.update()
         super().mouseMoveEvent(e)
@@ -829,7 +962,6 @@ class GradientWidget(QFrame):
         w = e.size().width()
         h = e.size().height()
         if self.grab_type == Handle_Linear:
-            # self.gradientInfo.getLinear().updateSize(w,h)
             for hand in self.gradientInfo.getLinear().handle():
                 vobj = hand["vobj"]
                 if self.suppainter.isVirtualObj(vobj):
