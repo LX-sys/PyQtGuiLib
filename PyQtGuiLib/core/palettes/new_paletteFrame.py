@@ -24,6 +24,7 @@ from PyQtGuiLib.header import (
     QPixmap,
     qt,
     QPainter,
+    QGradient,
     QLinearGradient,
     QRadialGradient,
     QConicalGradient,
@@ -47,6 +48,7 @@ from PyQtGuiLib.header import (
 import math
 from random import randint
 from PyQtGuiLib.styles.superPainter.superPainter import SuperPainter,VirtualObject
+from PyQtGuiLib.core.switchButtons.swButton import SwitchButton
 
 Handle_Linear = "linear"
 Handle_Radial = "radial"
@@ -167,6 +169,9 @@ class ColorBar(QFrame):
         self.colorLayer()
 
     def setBgColor(self,color:QColor):
+        # Synchronous transparency
+        old_a = self.__bgcolor.getRgb()[-1]
+        color.setAlpha(old_a)
         self.__bgcolor = color
         self.colorLayer()
 
@@ -465,6 +470,13 @@ class GradientInfo:
                         "openAttr": {"c": "#000", "w": 2},
                         "brushAttr": {"c": qt.blue},
                         "pos_percentage": (0.0,0.0)
+                    },
+                    {
+                        "vobj": "radial_3",
+                        "handle": Handle(120, 80, 14, 14, 7, 40),
+                        "openAttr": {"c": "#000", "w": 2},
+                        "brushAttr": {"c": qt.gray},
+                        "pos_percentage": (0.0, 0.0)
                     }
 
                 ]
@@ -554,9 +566,11 @@ class GradientWidget(QFrame):
         self.suppainter = SuperPainter()
 
         self.grab_type = grab_type
-        self.grab_mode = ""
+        self.grab_mode = QGradient.PadSpread
 
         self.gradientInfo = GradientInfo()
+
+        self.isHideHand = False
 
         self.createLinearPix()
         self.createRadialPix()
@@ -566,8 +580,21 @@ class GradientWidget(QFrame):
     def setGrabType(self,g_type:str):
         self.grab_type = g_type
 
+    def grabType(self)->str:
+        return self.grab_type
+
     def setGrabMode(self,mode:str):
-        pass
+        if mode == "pad":
+            self.grab_mode = QGradient.PadSpread
+        if mode == "repeat":
+            self.grab_mode = QGradient.RepeatSpread
+        if mode == "reflect":
+            self.grab_mode = QGradient.ReflectSpread
+
+        self.createLinearPix()
+        self.createRadialPix()
+        self.createConicalPix()
+        self.update()
 
     def createLinearPix(self):
         if not hasattr(self,"linear_pix"):
@@ -578,6 +605,7 @@ class GradientWidget(QFrame):
 
         # There is no way to clean the tween object, only to recreate the object
         linear = QLinearGradient(*self.gradientInfo.getLinear().getPos())
+        linear.setSpread(self.grab_mode)
         for c in self.gradientInfo.getLinear().Colors().values():
             linear.setColorAt(c["colorScope"],c["color"])
 
@@ -599,6 +627,7 @@ class GradientWidget(QFrame):
         self.radia_outer_pix.fill(qt.transparent)
 
         radial = QRadialGradient(*self.gradientInfo.getRadial().getPos())
+        radial.setSpread(self.grab_mode)
         for c in self.gradientInfo.getRadial().Colors().values():
             radial.setColorAt(c["colorScope"], c["color"])
 
@@ -608,15 +637,6 @@ class GradientWidget(QFrame):
         painter.setPen(qt.NoPen)
         painter.setBrush(radial)
         painter.drawRect(self.rect())
-
-        # 外圈
-        # painter_outer = QPainter(self.radia_outer_pix)
-        # painter_outer.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
-        # f= QPen()
-        # f.setWidth(2)
-        # f.setColor(qt.white)
-        # painter_outer.setPen(f)
-        # painter_outer.drawEllipse(100,100,100,100)
 
     def createConicalPix(self):
         if not hasattr(self,"conical_pix"):
@@ -691,7 +711,7 @@ class GradientWidget(QFrame):
     # --------同步  渐变 外部事件 - 触发接口 ---
 
     def mouseMoveEvent(self, e:QMouseEvent) -> None:
-        if self.cur_checked_hand:
+        if self.cur_checked_hand and self.isHideHand is False:
             hand = self.cur_checked_hand  # type:VirtualObject
             x, y = e.x(), e.y()
             hand.move(x - 8, y - 8)
@@ -710,6 +730,11 @@ class GradientWidget(QFrame):
                         self.gradientInfo.getRadial().updateCenterPos(e)
                     if hand.virName() == "radial_2":
                         self.gradientInfo.getRadial().updateCenterPos2(e)
+                    if hand.virName() == "radial_3":
+                        # The distance between any two points on the rectangle
+                        x1,y1 = self.gradientInfo.getRadial().getPos()[:2]
+                        sqrt_n = int(math.sqrt(math.pow(x-x1,2)+math.pow(y-y1,2)))
+                        self.gradientInfo.getRadial().updateOuterSize(sqrt_n)
                     self.createRadialPix()
                 elif self.grab_type == Handle_Conical:
                     if hand.virName() == "conical_1":
@@ -735,7 +760,7 @@ class GradientWidget(QFrame):
             else:
                 hand_obj = None
 
-            if hand_obj:
+            if hand_obj and self.isHideHand is False:
                 for hand in hand_obj:
                     c_hand = self.suppainter.virtualObj(hand["vobj"])
                     if c_hand.isClick(e):
@@ -755,13 +780,17 @@ class GradientWidget(QFrame):
         else:
             hand_obj = None
 
-        if hand_obj:
+        if hand_obj and self.isHideHand is False:
             for hand in hand_obj:
                 c_hand = self.suppainter.virtualObj(hand["vobj"])
                 c_hand.updateOpenAttr({"c": "#000", "w": 2})
             self.update()
             self.cur_checked_hand = None
         super().mouseReleaseEvent(e)
+
+    def setHideHand(self,b:bool):
+        self.isHideHand = b
+        self.update()
 
     def paintEvent(self, e):
         self.suppainter.begin(self)
@@ -772,7 +801,6 @@ class GradientWidget(QFrame):
             handle = self.gradientInfo.getLinear().handle()
         elif self.grab_type == Handle_Radial:
             self.suppainter.drawPixmap(e.rect(), self.radia_pix)
-            # self.suppainter.drawPixmap(e.rect(), self.radia_outer_pix)
             handle = self.gradientInfo.getRadial().handle()
         elif self.grab_type == Handle_Conical:
             self.suppainter.drawPixmap(e.rect(), self.conical_pix)
@@ -780,7 +808,7 @@ class GradientWidget(QFrame):
         else:
             handle = None
 
-        if handle:
+        if handle and self.isHideHand is False:
             for hand in handle:
                 r = hand["handle"].radius()
                 self.suppainter.drawRoundedRect(*hand["handle"].getRect(),
@@ -1057,7 +1085,7 @@ class PaletteDialog(QWidget):
         super().__init__()
         self.setObjectName("widget")
         self.setWindowTitle("Palette")
-        self.resize(500,400)
+        self.resize(600,400)
 
         # Pipette timer
         self.timer = QTimer()
@@ -1073,16 +1101,24 @@ class PaletteDialog(QWidget):
         self.__top_lay.setSpacing(20)
         self.pure_color_btn = QPushButton()  # 纯色按钮
         self.line_btn = QPushButton() # 线性渐变按钮
-        self.repeat_btn = QPushButton() # 径向渐变按钮
-        self.reflect_btn = QPushButton() # 角度渐变按钮
+        self.radial_btn = QPushButton() # 径向渐变按钮
+        self.conical_btn = QPushButton() # 角度渐变按钮
         self.pure_color_btn.setObjectName("pure_color_btn")
         self.line_btn.setObjectName("line_btn")
-        self.repeat_btn.setObjectName("repeat_btn")
-        self.reflect_btn.setObjectName("reflect_btn")
+        self.radial_btn.setObjectName("repeat_btn")
+        self.conical_btn.setObjectName("reflect_btn")
         self.pure_color_btn.setToolTip("纯色")
         self.line_btn.setToolTip("线性渐变")
-        self.repeat_btn.setToolTip("径向渐变")
-        self.reflect_btn.setToolTip("角度渐变")
+        self.radial_btn.setToolTip("径向渐变")
+        self.conical_btn.setToolTip("角度渐变")
+
+        #
+        self.pad_btn = QPushButton()
+        self.rep_btn = QPushButton()
+        self.ref_btn = QPushButton()
+        self.pad_btn.setObjectName("Pad")
+        self.rep_btn.setObjectName("Rep")
+        self.ref_btn.setObjectName("Ref")
 
         self.__spacer = QSpacerItem(0,0,QSizePolicy.Expanding,QSizePolicy.Minimum)
         self.demonstration_color_l = QLabel()
@@ -1092,17 +1128,25 @@ class PaletteDialog(QWidget):
         self.color_straw_btn.setObjectName("color_straw_btn")
         self.color_straw_btn.setText("吸")
         self.color_straw_btn.setFixedSize(24,24)
+        self.hand_btn = SwitchButton()
+        self.hand_btn.setShape(SwitchButton.Shape_Square)
+        self.hand_btn.setFixedSize(50,24)
         self.hex_line = QLineEdit()
         self.hex_line.setFixedSize(100,24)
         self.hex_line.setText("#00ff00")
 
-        for btn in [self.pure_color_btn,self.line_btn,self.repeat_btn,self.reflect_btn]:
+        for btn in [self.pure_color_btn,self.line_btn,self.radial_btn,self.conical_btn]:
             btn.setFixedSize(24,24)
+            self.__top_lay.addWidget(btn,)
+
+        for btn in [self.pad_btn,self.rep_btn,self.ref_btn]:
+            btn.setFixedSize(48,24)
             self.__top_lay.addWidget(btn,)
 
         self.__top_lay.addItem(self.__spacer)
         self.__top_lay.addWidget(self.demonstration_color_l)
         self.__top_lay.addWidget(self.color_straw_btn)
+        self.__top_lay.addWidget(self.hand_btn)
         self.__top_lay.addWidget(self.hex_line)
 
         # 中间层
@@ -1195,6 +1239,24 @@ border:none;
 background-color: rgba(23, 154, 93,100);
 color: rgb(209, 209, 209);
 }
+
+#Pad:hover,#Rep:hover,#Ref:hover{
+border:2px solid white;
+}
+#Pad,#Rep,#Ref,#Pad:pressed,#Rep:pressed,#Ref:pressed{
+border:2px solid back;
+border-radius:3px;
+}
+#Pad{
+background-color: qlineargradient(spread:pad, x1:0.001, y1:0.471, x2:1, y2:0.482955, stop:0 rgba(232, 200, 97, 255), stop:1 rgba(174, 174, 174, 255));
+}
+#Rep{
+background-color:qlineargradient(spread:repeat, x1:0.33, y1:0.482364, x2:0.63, y2:0.477273, stop:0 rgba(232, 200, 97, 255), stop:1 rgba(174, 174, 174, 255));
+}
+#Ref{
+background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2:0.477273, stop:0 rgba(232, 200, 97, 255), stop:1 rgba(174, 174, 174, 255));
+}
+
         ''')
 
     def updateColor(self):
@@ -1289,6 +1351,8 @@ color: rgb(209, 209, 209);
         self._m_r_line_widget.setStyleSheet("border:1px solid red;")
 
         # 待写
+        self.hide_handle = QPushButton(self._m_r_line_widget)
+        self.hide_handle.setText("隐藏句柄")
 
         self.operation_st.addWidget(self._m_r_line_widget)
 
@@ -1341,14 +1405,14 @@ color: rgb(209, 209, 209);
         self.setDemonstrationColor(c)
         self.update()
 
-    # 更新色块 rgb 事件
+    # Updates the color block rgb event
     def __update_rgb_event(self,c:QColor):
         self.color_bar.setBgColor(QColor(c))
         self.setLabelRGB(self.color_bar.curColor())
         self.setDemonstrationColor(self.color_bar.curColor())
         self.update()
 
-    # 更新透明度
+    # Update transparency
     def update_a_event(self,value:int):
         self.color_bar.setAlpha(value)
         self.lineedit_a.setText(str(value))
@@ -1373,11 +1437,27 @@ color: rgb(209, 209, 209);
             self.st.setCurrentIndex(index)
             self.operation_st.setCurrentIndex(index)
 
-
         self.pure_color_btn.clicked.connect(lambda :change_btn_event(0))
         self.line_btn.clicked.connect(lambda :change_btn_event(1))
-        self.repeat_btn.clicked.connect(lambda :change_btn_event(2))
-        self.reflect_btn.clicked.connect(lambda :change_btn_event(3))
+        self.radial_btn.clicked.connect(lambda :change_btn_event(2))
+        self.conical_btn.clicked.connect(lambda :change_btn_event(3))
+
+        # mode change
+        def change_mode(mode):
+            self.linearGradient_widget.setGrabMode(mode)
+            self.radialGradient_widget.setGrabMode(mode)
+            self.conicalGradient_widget.setGrabMode(mode)
+
+        self.pad_btn.clicked.connect(lambda :change_mode("pad"))
+        self.rep_btn.clicked.connect(lambda :change_mode("repeat"))
+        self.ref_btn.clicked.connect(lambda :change_mode("reflect"))
+
+        #
+        def hide_hand_event(b):
+            self.linearGradient_widget.setHideHand(b)
+            self.radialGradient_widget.setHideHand(b)
+            self.conicalGradient_widget.setHideHand(b)
+        self.hand_btn.clicked.connect(hide_hand_event)
 
         self.hsv.rgbaChange.connect(self.__update_rgb_event)
         self.color_bar.rgbaChange.connect(self.__update_color_event)
