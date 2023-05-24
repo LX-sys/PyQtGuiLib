@@ -45,7 +45,8 @@ from PyQtGuiLib.header import (
     QResizeEvent,
     QWheelEvent,
     QTabWidget,
-    QTextBrowser
+    QTextBrowser,
+    QTextEdit
 )
 import math
 from random import randint
@@ -402,7 +403,6 @@ class PLCode:
                 return "QRadialGradient radial"
             elif self.g_type == Handle_Conical:
                 return "QConicalGradient conical"
-
         return ""
 
     def getMode(self)->str:
@@ -418,7 +418,6 @@ class PLCode:
             return "QGradient{}RepeatSpread".format(symbol)
         elif self.grab_mode == QGradient.ReflectSpread:
             return "QGradient{}ReflectSpread".format(symbol)
-
         return ""
 
     def setArgc(self,argc:str):
@@ -440,13 +439,11 @@ class PLCode:
         return self.structure["color"]
 
     def build(self)->str:
-        if self.programming_language == "python":
-            code = "{}({})\n".format(self.head(),self.getArgc())
-            if self.g_type != Handle_Conical:
-                code += "{}.setSpread({})\n".format(self.varName(),self.getMode())
-            code += self.colorCompound()
-            # print(code)
-            return code
+        code = "{}({})\n".format(self.head(),self.getArgc())
+        if self.g_type != Handle_Conical:
+            code += "{}.setSpread({})\n".format(self.varName(),self.getMode())
+        code += self.colorCompound()
+        return code
 
 
 # 展示代码的面板
@@ -472,7 +469,7 @@ class VideCode(QTabWidget):
         self.update()
 
     def setPyCode(self,code:str):
-        # self.__py_widget.clear()
+        self.__py_widget.clear()
         self.__py_widget.setText(code)
         self.update()
 
@@ -771,7 +768,6 @@ class GradientWidget(QFrame):
 
         self.isHideHand = False
 
-
         # -- QSS or Programming language Generate
         self.code_linear = CodeQSSLinear()
         self.code_radial = CodeQSSRadial()
@@ -954,19 +950,29 @@ class GradientWidget(QFrame):
             obj.setColorCompound(colors)
             self.view_code.setQSSCode(obj.build())
 
-
-    def buildCodePL(self,obj,grab_type):
-        self.pl_code_py.setGrab(grab_type)
-        self.pl_code_py.setGrabMode(self.grab_mode)
-        if grab_type == Handle_Conical:
-            argc = "{},{},{}".format(*obj.getPos())
-        elif grab_type == Handle_Radial:
-            argc = "{},{},{},{},{}".format(*obj.getPos())
+    def buildCodePL(self,pl,obj,grab_type):
+        if pl == "python":
+            code_obj = self.pl_code_py
+        elif pl == "cpp":
+            code_obj = self.pl_code_cpp
         else:
-            argc = "{},{},{},{}".format(*obj.getPos())
-        self.pl_code_py.setArgc(argc)
-        self.pl_code_py.setColorCompound(obj.Colors())
-        self.view_code.setPyCode(self.pl_code_py.build())
+            code_obj = None
+
+        if code_obj:
+            code_obj.setGrab(grab_type)
+            code_obj.setGrabMode(self.grab_mode)
+            if grab_type == Handle_Conical:
+                argc = "{},{},{}".format(*obj.getPos())
+            elif grab_type == Handle_Radial:
+                argc = "{},{},{},{},{}".format(*obj.getPos())
+            else:
+                argc = "{},{},{},{}".format(*obj.getPos())
+            code_obj.setArgc(argc)
+            code_obj.setColorCompound(obj.Colors())
+            if pl == "python":
+                self.view_code.setPyCode(code_obj.build())
+            elif pl == "cpp":
+                self.view_code.setCppCode(self.pl_code_cpp.build())
 
 
     def mouseMoveEvent(self, e:QMouseEvent) -> None:
@@ -986,7 +992,9 @@ class GradientWidget(QFrame):
                     # qss code
                     self.buildCodeQSS(self.grab_type)
                     # pl
-                    self.buildCodePL(self.gradientInfo.getLinear(),self.grab_type)
+                    self.buildCodePL("python",self.gradientInfo.getLinear(),self.grab_type)
+                    self.buildCodePL("cpp",self.gradientInfo.getLinear(),self.grab_type)
+
                     # ---
                     self.createLinearPix()
                 elif self.grab_type == Handle_Radial:
@@ -1002,7 +1010,8 @@ class GradientWidget(QFrame):
                     # 生成QSS代码? 有问题待解决
                     self.buildCodeQSS(self.grab_type)
                     # pl
-                    self.buildCodePL(self.gradientInfo.getRadial(), self.grab_type)
+                    self.buildCodePL("python",self.gradientInfo.getRadial(), self.grab_type)
+                    self.buildCodePL("cpp",self.gradientInfo.getRadial(), self.grab_type)
                     self.createRadialPix()
                 elif self.grab_type == Handle_Conical:
                     if hand.virName() == "conical_1":
@@ -1016,7 +1025,8 @@ class GradientWidget(QFrame):
                     # qss code
                     self.buildCodeQSS(self.grab_type)
                     #
-                    self.buildCodePL(self.gradientInfo.getConical(), self.grab_type)
+                    self.buildCodePL("python",self.gradientInfo.getConical(), self.grab_type)
+                    self.buildCodePL("cpp",self.gradientInfo.getConical(), self.grab_type)
                     self.createConicalPix()
                 self.update()
         super().mouseMoveEvent(e)
@@ -1738,9 +1748,7 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
 
         # view
         def __view():
-            if not hasattr(self,"code_view"):
-                self.code_view = VideCode()
-            self.code_view.show()
+            self.view_code.show()
 
 
         self.linear_view.clicked.connect(__view)
