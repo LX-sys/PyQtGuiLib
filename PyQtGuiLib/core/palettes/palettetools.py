@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # @time:2023/5/1111:00
 # @author:LX
-# @file:new_paletteFrame.py
+# @file:palettetools.py
 # @software:PyCharm
 
 import math
@@ -116,6 +116,8 @@ class ColorHsv(QFrame):
         cursor.move(e.pos().x(), y)
         cursor.updateIndexToArgs(2, 4)
         self.update()
+        color = self.pix.toImage().pixelColor(e.pos().x(), y)
+        self.rgbaChange.emit(color)
         super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e) -> None:
@@ -167,6 +169,7 @@ class ColorBar(QFrame):
     def setAlpha(self, a: int):
         self.__bgcolor.setAlpha(a)
         self.colorLayer()
+        self.rgbaChange.emit(self.__bgcolor)
 
     def setBgColor(self, color: QColor):
         # Synchronous transparency
@@ -174,6 +177,7 @@ class ColorBar(QFrame):
         color.setAlpha(old_a)
         self.__bgcolor = color
         self.colorLayer()
+        self.rgbaChange.emit(color)
 
     def bgColor(self) -> QColor:
         return self.__bgcolor
@@ -1333,10 +1337,10 @@ class ColorOperation(QFrame):
 # -------------------------------
 
 
-# 调色对话框
-class PaletteDialog(QWidget):
+# 调色工具
+class PaletteTools(QWidget):
     clickColor = Signal(QColor)
-    gradientQSSCoded = Signal(str)
+    qssColored = Signal(str)
 
     def __init__(self):
         super().__init__()
@@ -1611,10 +1615,9 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
             gradient_widget = self.conicalGradient_widget
             operation_color = self.conicalOperation_color
 
-        # emit
-        gradient_widget.gradientQSSCoded.connect(self.gradientQSSCoded.emit)
-
         gradient_widget.setViewCode(self.view_code)
+
+        gradient_widget.gradientQSSCoded.connect(self.gradientQSSCoded.emit)
 
         operation_color.syncPosed.connect(
             lambda p_type, hand_id, color_scope: gradient_widget.syncPos(p_type, hand_id, color_scope))
@@ -1638,6 +1641,10 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
         self.linear_view.setObjectName("linear_view")
         self.linear_view.resize(100,24)
         self.linear_view.setText("显示代码")
+        self.linear_qss = QPushButton(self._m_r_line_widget)
+        self.linear_qss.resize(100,24)
+        self.linear_qss.setText("QSS")
+        self.linear_qss.move(5,30)
 
         self.operation_st.addWidget(self._m_r_line_widget)
 
@@ -1758,8 +1765,7 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = PaletteDialog()
-    win.gradientQSSCoded.connect(print)
+    win = PaletteTools()
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
