@@ -81,8 +81,7 @@ class ColorHsv(QFrame):
     def mouseMoveEvent(self, e) -> None:
         x = e.pos().x()
         cursor = self.suppainter.virtualObj("cursor")  # 获取虚拟对象
-        y = cursor.getVirtualArgs()[1]
-        w = cursor.getVirtualArgs()[2]
+        y,w = cursor.getVirtualArgs()[1:3]
         if 0 <= x and x <= self.width() - w:
             cursor.move(x, y)
             self.update()
@@ -243,7 +242,8 @@ class ColorBar(QFrame):
         super().mouseMoveEvent(e)
 
     def curColor(self) -> QColor:
-        return self.pix.toImage().pixelColor(*self.__cur_pos)
+        # return self.pix.toImage().pixelColor(*self.__cur_pos)
+        return self.bgColor()
 
     def mousePressEvent(self, e):
         cursor = self.suppainter.virtualObj("cursor")
@@ -253,7 +253,7 @@ class ColorBar(QFrame):
         self.__updateCursorPos(e.pos())
         super().mousePressEvent(e)
 
-    def mouseReleaseEvent(self, e):
+    def mouseReleaseEvent(self, e:QResizeEvent):
         cursor = self.suppainter.virtualObj("cursor")
         data = [(2, 10), (3, 10), (4, 5), (5, 5)]
         for i,v in data:
@@ -275,8 +275,7 @@ class ColorBar(QFrame):
         self.grayLayer()
         self.colorLayer()
         if self.suppainter.isVirtualObj("cursor"):
-            w = e.size().width()
-            h = e.size().height()
+            w,h = e.size().width(),e.size().height()
             cursor = self.suppainter.virtualObj("cursor")
             cursor.move(self.__cur_pos_percentage[0] * w,
                         self.__cur_pos_percentage[1] * h)
@@ -1617,8 +1616,6 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
 
         gradient_widget.setViewCode(self.view_code)
 
-        gradient_widget.gradientQSSCoded.connect(self.gradientQSSCoded.emit)
-
         operation_color.syncPosed.connect(
             lambda p_type, hand_id, color_scope: gradient_widget.syncPos(p_type, hand_id, color_scope))
         operation_color.syncColor.connect(
@@ -1681,8 +1678,8 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
     def setDemonstrationColor(self, color: QColor):
         self.demonstration_color_l.setStyleSheet('''
         border-radius:3px;
-        background-color:{};
-        '''.format(color.name()))
+        background-color:rgba({},{},{},{});
+        '''.format(*color.getRgb()))
 
     def __update_color_event(self, c):
         self.setLabelRGB(c)
@@ -1766,6 +1763,7 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     win = PaletteTools()
+    # win = ColorBar()
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:

@@ -27,7 +27,6 @@ class Test(QWidget):
         self.ptools = PaletteTools()
         self.ptools.show()
         self.ptools.clickColor.connect(self.updateColor)
-        self.ptools.gradientQSSCoded.connect(self.updateGColor)
 
     def updateColor(self,color:QColor):
         self.setStyleSheet('''
