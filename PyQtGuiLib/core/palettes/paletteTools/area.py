@@ -425,7 +425,7 @@ class RadialInfo(GradientInfo):
         super().__init__()
         self.info = {
             "pos": [100, 100, 50, 80, 80],
-            "pos_percentage": [],
+            "pos_percentage": {"x":0.0,"y":0.0,"x1":0.0,"y1":0.0},
             "gColor": {
                 # handle_n is the specified naming rule
                 "handle_1": {
@@ -602,7 +602,7 @@ class GradientWidget(QWidget):
 
         self.suppainter.end()
 
-    def fckResize(self,hand):
+    def fckResize(self,vname,pos,pos_dict):
         # 渐变随窗口的变化而变化,由子类实现
         pass
 
@@ -669,20 +669,25 @@ class RadialWidget(GradientWidget):
 
     def fckResize(self,vname,pos,pos_dict):
         if vname == "radial_1":
-            pass
+            pos[0] = int(pos_dict["x"] * self.width())
+            pos[1] = int(pos_dict["y"] * self.height())
         elif vname == "radial_2":
-            pass
+            pos[3] = int(pos_dict["x1"] * self.width())
+            pos[4] = int(pos_dict["y1"] * self.height())
         elif vname == "radial_3":
             pass
 
     def fckGradient(self,vname,e):
-        print(vname)
         if vname == "radial_1":
             self.ginfo.pos()[0] = e.x()
             self.ginfo.pos()[1] = e.y()
+            self.ginfo.info["pos_percentage"]["x"] = round(e.x()/self.width(),2)
+            self.ginfo.info["pos_percentage"]["y"] = round(e.y()/self.height(),2)
         elif vname == "radial_2":
             self.ginfo.pos()[3] = e.x()
             self.ginfo.pos()[4] = e.y()
+            self.ginfo.info["pos_percentage"]["x1"] = round(e.x() / self.width(), 2)
+            self.ginfo.info["pos_percentage"]["y1"] = round(e.y() / self.height(), 2)
         elif vname == "radial_3":
             x1,y1 = self.ginfo.pos()[:2]
             sqrt_n = int(math.sqrt(math.pow(e.x() - x1, 2) + math.pow(e.y() - y1, 2)))
