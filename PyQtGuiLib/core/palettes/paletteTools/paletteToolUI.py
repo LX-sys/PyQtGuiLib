@@ -4,6 +4,7 @@
 # @file:paletteToolUI.py
 # @software:PyCharm
 from PyQtGuiLib.header import (
+    QApplication,
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
@@ -214,6 +215,15 @@ class ItActionBarUI(QWidget):
 
         self.defaultStyle()
 
+        self.myEvent()
+
+    # 复制颜色到鼠标
+    def copyColorButton(self)->str:
+        copy_color = QApplication.clipboard()
+        copy_color.setText(self.hex_btn.text())
+        # 缺少通知动画
+        # .....
+
     def defaultStyle(self):
         self.setStyleSheet('''
 #color_view{
@@ -245,6 +255,9 @@ font: 10pt "等线";
 font-size:11pt;
 }
         ''')
+
+    def myEvent(self):
+        self.hex_btn.clicked.connect(self.copyColorButton)
 
 
 class PaletteToolsUI(QWidget):

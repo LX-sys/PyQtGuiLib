@@ -33,11 +33,16 @@ from PyQtGuiLib.core.palettes.paletteTools.paletteToolUI import (
     G_Mode_Reflect
 )
 
+from PyQtGuiLib.core.palettes.paletteTools.area import PureColorWidget
+
 
 class PaletteTools(PaletteToolsUI):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
+        self.pureColorWidget = PureColorWidget()
+
+        self.addColorWidget(self.pureColorWidget)
 
 
 if __name__ == '__main__':
