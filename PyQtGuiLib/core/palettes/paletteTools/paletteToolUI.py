@@ -15,7 +15,8 @@ from PyQtGuiLib.header import (
     QPainter,
     QSpacerItem,
     QSizePolicy,
-    Qt
+    Qt,
+    QFormLayout
 )
 
 from PyQtGuiLib.core.switchButtons.swButton import SwitchButton
@@ -128,7 +129,6 @@ class GradientModeActionBarUI(QWidget):
         self.repeat_btn = QPushButton()
         self.reflect_btn = QPushButton()
 
-
         for btn in [self.pad_btn,self.repeat_btn,self.reflect_btn]:
             btn.setFixedSize(48,24)
             self.core_hlay.addWidget(btn)
@@ -178,6 +178,7 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
 
 # 其他部件类
 class ItActionBarUI(QWidget):
+    switchClicked = Signal(bool)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -196,11 +197,12 @@ class ItActionBarUI(QWidget):
         self.hand_btn = SwitchButton()
         self.hand_btn.setToolTip("渐变句柄 显示/隐藏 开关")
         self.hand_btn.setShape(SwitchButton.Shape_Square)
+        self.hand_btn.clicked.connect(self.switchClicked.emit)
         self.hand_btn.setFixedSize(50, 24)
         # 六十进制颜色显示
         self.hex_btn = QPushButton()
         self.hex_btn.setToolTip("点击可以复制")
-        self.hex_btn.setFixedSize(60, 24)
+        self.hex_btn.setFixedSize(65, 24)
         self.hex_btn.setText("#00ff00")
 
         self.color_view.setObjectName("color_view")
@@ -243,7 +245,10 @@ background-color:rgb(14, 95, 56)
 #straw_btn:hover{
 border-color:white;
 }
-#hex_btn{
+#hex_btn:hover{
+font-size:11pt;
+}
+#hex_btn,#hex_btn:pressed{
 border:none;
 color:white;
 border-radius:2px;
@@ -251,13 +256,77 @@ border-bottom-left-radius:2px;
 background-color: rgb(20, 134, 79);
 font: 10pt "等线";
 }
-#hex_btn:hover{
-font-size:11pt;
-}
         ''')
+
+    def updateViewLabel(self,color):
+        self.color_view.setStyleSheet('''
+        background-color:rgba({},{},{},{});
+        '''.format(*color.getRgb()))
+
+    def updateHexColor(self,color):
+        self.hex_btn.setText(color.name())
+
+    def updateHexView(self,color):
+        self.updateViewLabel(color)
+        self.updateHexColor(color)
 
     def myEvent(self):
         self.hex_btn.clicked.connect(self.copyColorButton)
+
+
+# -----------------------------
+
+# 纯色的操作台
+class PureColorOperationUI(QWidget):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        self.vlay = QVBoxLayout(self)
+        self.vlay.setAlignment(Qt.AlignTop)
+
+        self.labels = [QLabel() for _ in range(4)]
+        self.lines = [QLineEdit() for _ in range(4)]
+
+        for i,text in enumerate(["红(R)","绿(G)","蓝(B)","透(A)"]):
+            self.labels[i].setText(text)
+            self.lines[i].setText("255")
+
+        self.flay = QFormLayout()
+        self.flay.setSpacing(3)
+        for i in range(4):
+            self.flay.addRow(self.labels[i],self.lines[i])
+            self.lines[i].setReadOnly(True)
+
+        self.colorButton = QPushButton("获取颜色")
+        self.colorButton.setFixedSize(90, 30)
+        self.colorButton.setObjectName("colorButton")
+        self.flay.setWidget(self.flay.rowCount(),QFormLayout.SpanningRole,self.colorButton)
+
+        self.vlay.addLayout(self.flay)
+
+        self.defaultStyle()
+
+    def defaultStyle(self):
+        self.setStyleSheet('''
+QLabel{
+color: rgb(108, 210, 171);
+font: 11pt "等线";
+}
+QLineEdit{
+border:none;
+background-color: rgba(23, 154, 93,100);
+color: rgb(209, 209, 209);
+}
+#colorButton:hover{
+background-color: rgb(74, 120, 108);
+}
+#colorButton,#colorButton:pressed{
+border-radius:3px;
+background-color: rgb(88, 142, 128);
+color: rgb(255, 255, 255);
+font: 11pt "等线";
+}
+        ''')
 
 
 class PaletteToolsUI(QWidget):
@@ -281,8 +350,6 @@ class PaletteToolsUI(QWidget):
         # 主要小部件
         self.state_action_bar = StateColorActionBarUI()
         self.gm_action_bar = GradientModeActionBarUI()
-        self.state_action_bar.clicked.connect(print)
-        self.gm_action_bar.clicked.connect(print)
         self.action_top_hlay.addWidget(self.state_action_bar)
         self.action_top_hlay.addWidget(self.gm_action_bar)
 
@@ -298,6 +365,7 @@ class PaletteToolsUI(QWidget):
 
     def createBodyUI(self):
         self.body_hlay = QHBoxLayout()
+        self.body_hlay.setSpacing(0)
 
         # 绘制区域
         self.body_st_widget = SlideShow()
@@ -305,16 +373,25 @@ class PaletteToolsUI(QWidget):
         self.body_st_widget.setButtonsHide(True)
 
         # 操作区域
-        self.body_op_hlay = QWidget()
-        self.body_op_hlay.setFixedWidth(100)
-        self.body_op_hlay.setStyleSheet("border:1px solid red;")
+        self.body_op_widget = PureColorOperationUI()
+        self.body_op_widget.setFixedWidth(100)
+        # self.body_op_widget.setStyleSheet("border:1px solid red;")
 
         self.body_hlay.addWidget(self.body_st_widget)
-        self.body_hlay.addWidget(self.body_op_hlay)
+        self.body_hlay.addWidget(self.body_op_widget)
         self.core_vlay.addLayout(self.body_hlay)
 
     def addColorWidget(self,widget:QWidget):
         self.body_st_widget.addWidget(widget)
+
+    def setCurrentIndex(self,g_type):
+        state_dict = {
+            Handle_pure:0,
+            Handle_Linear:1,
+            Handle_Radial:2,
+            Handle_Conical:3
+        }
+        self.body_st_widget.setCurrentIndex(state_dict[g_type])
 
     def myEvent(self):
         pass

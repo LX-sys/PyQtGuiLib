@@ -28,7 +28,12 @@ from PyQtGuiLib.header import (
     QResizeEvent,
     QSize,
     QWindowStateChangeEvent,
-    QImage,
+    QPoint,
+    QMenu,
+    QAction,
+    QCursor,
+    QColorDialog,
+    QFrame
 )
 import math
 
@@ -155,12 +160,17 @@ class ColorBar(QWidget):
 
         self.__bgColor = QColor(0, 255, 0, 255)
 
+        self.is_hide_hand = False
+
         self.percentage_pos = {
             "x":0.0,
             "y":0.0
         }
 
         self.updateLinear()
+
+    def setHideHand(self,b:bool):
+        self.is_hide_hand = b
 
     def updateBgColor(self,color:QColor):
         self.__bgColor = color
@@ -226,33 +236,36 @@ class ColorBar(QWidget):
             cursor.updateOpenAttr({"color": "black", "w": 2})
 
     def mouseMoveEvent(self, e) -> None:
-        cursor = self.suppainter.virtualObj("cursor")
-        x,y = e.x()-8,e.y()-8
-        cursor.move(x,y)
-        self.updatePercentagePos(x,y)
-        self.heightTo2Discoloration(cursor,y)
-        self.sendEMitColor(x,y)
-        self.update()
+        if self.is_hide_hand is False:
+            cursor = self.suppainter.virtualObj("cursor")
+            x,y = e.x()-8,e.y()-8
+            cursor.move(x,y)
+            self.updatePercentagePos(x,y)
+            self.heightTo2Discoloration(cursor,y)
+            self.sendEMitColor(x,y)
+            self.update()
         super().mouseMoveEvent(e)
 
     def mousePressEvent(self, e):
-        cursor = self.suppainter.virtualObj("cursor")
-        data = [(2, 16),(3, 16),(4, 8),(5, 8)]
-        for i,v in data:
-            cursor.updateIndexToArgs(i, v)
-        x, y = e.x()-8, e.y()-8
-        cursor.move(x, y)
-        self.heightTo2Discoloration(cursor, y)
-        self.sendEMitColor(x,y)
-        self.update()
+        if self.is_hide_hand is False:
+            cursor = self.suppainter.virtualObj("cursor")
+            data = [(2, 16),(3, 16),(4, 8),(5, 8)]
+            for i,v in data:
+                cursor.updateIndexToArgs(i, v)
+            x, y = e.x()-8, e.y()-8
+            cursor.move(x, y)
+            self.heightTo2Discoloration(cursor, y)
+            self.sendEMitColor(x,y)
+            self.update()
         super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e:QResizeEvent):
-        cursor = self.suppainter.virtualObj("cursor")
-        data = [(2, 10), (3, 10), (4, 5), (5, 5)]
-        for i,v in data:
-            cursor.updateIndexToArgs(i, v)
-        self.update()
+        if self.is_hide_hand is False:
+            cursor = self.suppainter.virtualObj("cursor")
+            data = [(2, 10), (3, 10), (4, 5), (5, 5)]
+            for i,v in data:
+                cursor.updateIndexToArgs(i, v)
+            self.update()
         super().mouseReleaseEvent(e)
 
     def paintEvent(self, e) -> None:
@@ -261,8 +274,9 @@ class ColorBar(QWidget):
         rect = e.rect()
         self.suppainter.drawPixmap(rect, self.pix)
         self.suppainter.drawPixmap(rect, self.gray_pix)
-        self.suppainter.drawRoundedRect(20, 20, 10, 10, 5, 5, openAttr={"color": "black", "w": 2},
-                                        virtualObjectName="cursor")
+        if self.is_hide_hand is False:
+            self.suppainter.drawRoundedRect(20, 20, 10, 10, 5, 5, openAttr={"color": "black", "w": 2},
+                                            virtualObjectName="cursor")
         self.suppainter.end()
 
     def resizeLinearPos(self,w,h):
@@ -305,6 +319,9 @@ class PureColorWidget(QWidget):
         self.vlay.addWidget(self.hsv)
 
         self.colorbar.rgbaChange.connect(self.rgbaChange.emit)
+
+    def setHideHand(self,b:bool):
+        self.colorbar.setHideHand(b)
 
     def getColor(self)->QColor:
         return self.colorbar.getColor()
@@ -511,8 +528,34 @@ class GradientWidget(QWidget):
 
         self.suppainter = SuperPainter()
 
+        self.spread = QGradient.PadSpread
+
+        self.is_hide_hand = False
         # 当前鼠标左键选择的句柄
         self.cur_click_hand = None  # type:VirtualObject
+
+    def updateColorScope(self,hand_id,colorScope):
+        self.ginfo.updateColorScope(hand_id,colorScope)
+        self.updateLayer()
+        self.update()
+
+    def updateColor(self,hand_id,color):
+        self.ginfo.updateColor(hand_id,color)
+        self.updateLayer()
+        self.update()
+
+    def appendColor(self,colorScope,color):
+        self.ginfo.appendColor(colorScope,color)
+        self.updateLayer()
+        self.update()
+
+    def delColor(self,hand_id):
+        self.ginfo.delColor(hand_id)
+        self.updateLayer()
+        self.update()
+
+    def setHideHand(self,b:bool):
+        self.is_hide_hand = b
 
     def createPix(self):
         if not hasattr(self,"obj_pix"):
@@ -520,6 +563,16 @@ class GradientWidget(QWidget):
         else:
             self.obj_pix = self.obj_pix.scaled(self.size())
         self.obj_pix.fill(qt.transparent)
+
+    def setSpread(self,spread):
+        spread_dict = {
+            "pad":QGradient.PadSpread,
+            "repeat":QGradient.RepeatSpread,
+            "reflect":QGradient.ReflectSpread
+        }
+        self.spread = spread_dict[spread]
+        self.updateLayer()
+        self.update()
 
     def drawLayer(self):
         type_dict = {
@@ -529,6 +582,8 @@ class GradientWidget(QWidget):
         }
 
         self.g_obj = type_dict[self.g_type](*self.ginfo.pos())
+        if self.g_type in [Handle_Linear,Handle_Radial]:
+            self.g_obj.setSpread(self.spread)
 
         for c in self.ginfo.colors().values():
             self.g_obj.setColorAt(c["colorScope"], c["color"])
@@ -565,7 +620,7 @@ class GradientWidget(QWidget):
         super().mouseMoveEvent(e)
 
     def mousePressEvent(self, e) -> None:
-        if e.buttons() == Qt.LeftButton:
+        if e.buttons() == Qt.LeftButton and self.is_hide_hand is False:
             for hand in self.ginfo.handles():
                 c_hand = self.suppainter.virtualObj(hand["vobj"])
                 if c_hand.isClick(e):
@@ -579,12 +634,13 @@ class GradientWidget(QWidget):
         super().mousePressEvent(e)
 
     def mouseReleaseEvent(self, e) -> None:
-        for hand in self.ginfo.handles():
-            c_hand = self.suppainter.virtualObj(hand["vobj"])
-            if c_hand.isClick(e):
-                c_hand.updateOpenAttr({"c": "#000", "w": 2})
-        self.cur_click_hand = None
-        self.update()
+        if self.is_hide_hand is False:
+            for hand in self.ginfo.handles():
+                c_hand = self.suppainter.virtualObj(hand["vobj"])
+                if c_hand.isClick(e):
+                    c_hand.updateOpenAttr({"c": "#000", "w": 2})
+            self.cur_click_hand = None
+            self.update()
         super().mouseReleaseEvent(e)
 
     def paintEvent(self, e) -> None:
@@ -593,12 +649,13 @@ class GradientWidget(QWidget):
 
         self.suppainter.drawPixmap(e.rect(),self.obj_pix)
 
-        for hand in self.ginfo.handles():
-            rect = hand["handle"][:4]
-            rs = hand["handle"][4],hand["handle"][4]
-            self.suppainter.drawRoundedRect(*rect,*rs,openAttr=hand["openAttr"],
-                                            brushAttr=hand["brushAttr"],
-                                            virtualObjectName=hand["vobj"])
+        if self.is_hide_hand is False:
+            for hand in self.ginfo.handles():
+                rect = hand["handle"][:4]
+                rs = hand["handle"][4],hand["handle"][4]
+                self.suppainter.drawRoundedRect(*rect,*rs,openAttr=hand["openAttr"],
+                                                brushAttr=hand["brushAttr"],
+                                                virtualObjectName=hand["vobj"])
 
         self.suppainter.end()
 
@@ -703,7 +760,6 @@ class ConicalWidget(GradientWidget):
         self.updateLayer()
 
     def fckResize(self,vname,pos,pos_dict):
-        print(vname,pos,pos_dict)
         if vname == "conical_1":
             pos[0] = int(pos_dict["x"]*self.width())
             pos[1] = int(pos_dict["y"]*self.height())
@@ -722,10 +778,293 @@ class ConicalWidget(GradientWidget):
             angle = angle_arc * 180 / math.pi
             self.ginfo.pos()[2] = -int(angle)
 
+# ----------------------------以上是绘制渐变图形--------------------------------
+
+
+HAND_ID_TYPE = str
+
+
+class ColorOperation(QWidget):
+    colorScoped = Signal(HAND_ID_TYPE,float)
+    colored = Signal(HAND_ID_TYPE,QColor)
+    newColored = Signal(float,QColor)
+    delColored = Signal(HAND_ID_TYPE)
+
+    def __init__(self,g_type="linear",*args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.setFixedHeight(60)
+
+        self.suppainter = SuperPainter()
+
+        if g_type == Handle_Radial:
+            handle1_color = qt.white
+            handle2_color = qt.black
+        else:
+            handle1_color = qt.red
+            handle2_color = qt.blue
+
+        self.handles = [
+            {
+                "vobj": "handle_1",
+                "handle": [5, 5, 20, 20, 10, 40],
+                "openAttr": {"c": "#000", "w": 2},
+                "brushAttr": {"c": handle1_color},
+                "colorScope": 0,
+                "color": handle1_color
+            },
+            {
+                "vobj": "handle_2",
+                "handle": [335, 5, 20, 20, 10, 40],
+                "openAttr": {"c": "#000", "w": 2},
+                "brushAttr": {"c": handle2_color},
+                "colorScope": 1,
+                "color": handle2_color
+            }
+        ]
+
+        # The id only increases and does not decrease, maintaining uniqueness
+        self.max_handle_id = 2
+
+        self.g_type = g_type
+
+        self.cursor_flag = None
+
+        self._right_pressed_pos = QPoint(0,0)
+
+        self.updatePix()
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.menu_event)
+
+    def menu_event(self):
+        menu_ = QMenu(self)
+
+        new_cursor = QAction("新建游标", self)
+        del_cursor = QAction("删除游标", self)
+        update_color = QAction("更新颜色", self)
+        new_cursor.triggered.connect(self.createCursor_event)
+        del_cursor.triggered.connect(self.delCursor_event)
+        update_color.triggered.connect(self.updateCursorColor_event)
+        menu_.addAction(new_cursor)
+        menu_.addAction(del_cursor)
+        menu_.addAction(update_color)
+
+        menu_.popup(QCursor.pos())
+
+    def getHandle(self, vname: str):
+        for info in self.handles:
+            if info["vobj"] == vname:
+                return info
+        return None
+
+    def createCursor_event(self):
+        if not self._right_pressed_pos:
+            return
+
+        x = self._right_pressed_pos.x()
+        self.max_handle_id += 1
+
+        structure = {
+            "vobj": "handle_{}".format(self.max_handle_id),
+            "handle": [x, 5, 20, 20, 10, 40],
+            "openAttr": {"c": "#000", "w": 2},
+        }
+
+        color = QColorDialog.getColor()
+        if color.isValid():
+            v = round(1 / self.width() * x,2)
+            structure["brushAttr"] = {"c": color}
+            structure["colorScope"] = v
+            structure["color"] = color
+            self.handles.append(structure)
+            self.newColored.emit(v,color)
+            self.updatePix()
+            self.update()
+        self._right_pressed_pos = None
+
+    def updateCursorColor_event(self):
+        if not self._right_pressed_pos:
+            return
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            if cursor.isClick(self._right_pressed_pos):
+                color = QColorDialog.getColor()
+                if color.isValid():
+                    hand = self.getHandle(vname)
+                    hand["brushAttr"]["c"] = color
+                    hand["color"] = color
+                    self.colored.emit(vname,color)
+                    break
+        self.updatePix()
+        self.update()
+        self._right_pressed_pos = None
+
+    def delCursor_event(self):
+        if not self._right_pressed_pos:
+            return
+
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            if cursor.isClick(self._right_pressed_pos):
+                self.handles.remove(self.getHandle(vname))
+                self.delColored.emit(vname)
+                break
+
+        self.updatePix()
+        self.update()
+        self._right_pressed_pos = None
+
+    def vObjs(self) -> list:
+        return [vname["vobj"] for vname in self.handles]
+
+    def updatePix(self):
+        if not hasattr(self, "pix"):
+            self.pix = QPixmap(self.size())
+        else:
+            self.pix = self.pix.scaled(self.size())
+        self.pix.fill(qt.transparent)
+
+        h2 = self.height() // 2
+        linear = QLinearGradient(0, h2, self.width(), h2)
+
+        for cursor in self.handles:
+            linear.setColorAt(cursor["colorScope"], cursor["color"])
+
+        painter = QPainter(self.pix)
+        painter.setRenderHints(qt.Antialiasing | qt.SmoothPixmapTransform)
+        painter.setPen(qt.NoPen)
+        painter.setBrush(linear)
+        painter.drawRoundedRect(self.rect(), 5, 5)
+
+    def updateColorScope(self, cursor_name, v):
+        for hand in self.handles:
+            if hand["vobj"] == cursor_name:
+                hand["colorScope"] = v
+                break
+
+    def mouseMoveEvent(self, e) -> None:
+        if self.cursor_flag and e.buttons() == Qt.LeftButton:
+            cursor = self.suppainter.virtualObj(self.cursor_flag)
+            if e.x() + cursor.getWidth() // 2 >= cursor.getWidth() // 2 \
+                    and e.x() <= self.width():
+                cursor.updateIndexToArgs(0, e.x() - cursor.getWidth() // 2)
+                v = round(1 / self.width() * e.x(),2)
+                self.updateColorScope(self.cursor_flag, v)
+                self.colorScoped.emit(self.cursor_flag, v)
+                self.updatePix()
+            self.update()
+        super().mouseMoveEvent(e)
+
+    def mousePressEvent(self, e) -> None:
+        if e.buttons() == Qt.LeftButton:
+            for vname in self.vObjs():
+                cursor = self.suppainter.virtualObj(vname)
+                if cursor.isClick(e):
+                    color = QColor(cursor.getVirtualBrushAttr()["c"])
+                    reverse_color = QColor(255 - color.red(), 255 - color.green(), 255 - color.blue())
+                    cursor.updateOpenAttr({"c": reverse_color, "w": 3})
+                    cursor.updateIndexToArgs(5, self.height()-10)
+                    self.cursor_flag = vname
+                    break
+                else:
+                    self.cursor_flag = ""
+            self.update()
+        elif e.buttons() == Qt.RightButton:
+            self._right_pressed_pos = QPoint(e.pos().x(), e.pos().y())
+        super().mousePressEvent(e)
+
+    def mouseReleaseEvent(self, e) -> None:
+        self.cursor_flag = ""
+        for vname in self.vObjs():
+            cursor = self.suppainter.virtualObj(vname)
+            cursor.updateOpenAttr({"c": "#000", "w": 2})
+            cursor.updateIndexToArgs(5, 40)
+        self.update()
+        super().mouseReleaseEvent(e)
+
+    def paintEvent(self, e) -> None:
+        self.suppainter.begin(self)
+        self.suppainter.setRenderHints(qt.Antialiasing)
+
+        self.suppainter.drawPixmap(e.rect(),self.pix)
+
+        for hand in self.handles:
+            rect = hand["handle"][:4]
+            rs = hand["handle"][4]
+            line_h =hand["handle"][5]
+            self.suppainter.drawCursor(*rect,rs,line_h,
+                                        openAttr=hand["openAttr"],
+                                        brushAttr=hand["brushAttr"],
+                                        virtualObjectName=hand["vobj"]
+                                       )
+
+        self.suppainter.end()
+
+    def resizeEvent(self, e: QResizeEvent) -> None:
+        width = e.size().width()
+        for hand in self.handles:
+            if self.suppainter.isVirtualObj(hand["vobj"]):
+                cursor = self.suppainter.virtualObj(hand["vobj"])
+                new_pos = int(width * hand["colorScope"])
+                if new_pos >= width:
+                    new_pos -= 20
+                cursor.updateIndexToArgs(0, new_pos)
+        self.updatePix()
+        super().resizeEvent(e)
+
+# ----------------------------渐变图形 通用的操作台--------------------------------
+
+
+class CombinationFigure(QWidget):
+    def __init__(self,g_type,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.resize(600,500)
+        self.vlay = QVBoxLayout(self)
+
+        if g_type == Handle_Linear:
+            self.widget = LinearWidget()
+        elif g_type == Handle_Radial:
+            self.widget = RadialWidget()
+        elif g_type == Handle_Conical:
+            self.widget = ConicalWidget()
+        else:
+            raise Exception("no!")
+
+        self.cop = ColorOperation()
+
+        self.vlay.addWidget(self.widget)
+        self.vlay.addWidget(self.cop)
+
+        self.cop.colorScoped.connect(self.widget.updateColorScope)
+        self.cop.colored.connect(self.widget.updateColor)
+        self.cop.newColored.connect(self.widget.appendColor)
+        self.cop.delColored.connect(self.widget.delColor)
+
+    def setHideHand(self,b:bool):
+        self.widget.setHideHand(b)
+
+    def setSpread(self,spread):
+        self.widget.setSpread(spread)
+
+
+class Linear(CombinationFigure):
+    def __init__(self,*args,**kwargs):
+        super().__init__(Handle_Linear,*args,**kwargs)
+
+
+class Radial(CombinationFigure):
+    def __init__(self,*args,**kwargs):
+        super().__init__(Handle_Radial,*args,**kwargs)
+
+
+class Conical(CombinationFigure):
+    def __init__(self,*args,**kwargs):
+        super().__init__(Handle_Conical,*args,**kwargs)
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    win = RadialWidget()
+    win = Linear()
     win.show()
 
     if PYQT_VERSIONS in ["PyQt6", "PySide6"]:

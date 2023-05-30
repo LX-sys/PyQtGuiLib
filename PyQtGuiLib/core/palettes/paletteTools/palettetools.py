@@ -33,7 +33,7 @@ from PyQtGuiLib.core.palettes.paletteTools.paletteToolUI import (
     G_Mode_Reflect
 )
 
-from PyQtGuiLib.core.palettes.paletteTools.area import PureColorWidget
+from PyQtGuiLib.core.palettes.paletteTools.area import PureColorWidget,Linear,Radial,Conical
 
 
 class PaletteTools(PaletteToolsUI):
@@ -41,8 +41,32 @@ class PaletteTools(PaletteToolsUI):
         super().__init__(*args,**kwargs)
 
         self.pureColorWidget = PureColorWidget()
+        self.linearWidget = Linear()
+        self.radialWidget = Radial()
+        self.conicalWidget = Conical()
 
         self.addColorWidget(self.pureColorWidget)
+        self.addColorWidget(self.linearWidget)
+        self.addColorWidget(self.radialWidget)
+        self.addColorWidget(self.conicalWidget)
+
+        self.state_action_bar.clicked.connect(self.setCurrentIndex)
+        self.gm_action_bar.clicked.connect(self.switchSpread_event)
+        self.it_action_bar.switchClicked.connect(self.hide_hand_event)
+
+        self.pureColorWidget.rgbaChange.connect(self.it_action_bar.updateHexView)
+
+    def switchSpread_event(self,spread):
+        self.linearWidget.setSpread(spread)
+        self.radialWidget.setSpread(spread)
+        self.conicalWidget.setSpread(spread)
+
+    def hide_hand_event(self,b):
+        self.pureColorWidget.setHideHand(b)
+        self.linearWidget.setHideHand(b)
+        self.radialWidget.setHideHand(b)
+        self.conicalWidget.setHideHand(b)
+        self.update()
 
 
 if __name__ == '__main__':
