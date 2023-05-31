@@ -16,7 +16,13 @@ from PyQtGuiLib.header import (
     QSpacerItem,
     QSizePolicy,
     Qt,
-    QFormLayout
+    QFormLayout,
+    QStackedWidget,
+    QColor,
+    qt,
+    QTimer,
+    QCursor,
+    QPoint
 )
 
 from PyQtGuiLib.core.switchButtons.swButton import SwitchButton
@@ -33,6 +39,42 @@ Handle_Conical = "conical"
 G_Mode_Pad = "pad"
 G_Mode_Repeat = "repeat"
 G_Mode_Reflect = "reflect"
+
+
+class MaskWidget(QWidget):
+    clickColor = Signal(QColor)
+
+    def __init__(self):
+        super().__init__()
+        self.size = 150
+        self.half_size = self.size//2
+
+        self.resize(self.size, self.size)
+        self.setWindowFlags(qt.FramelessWindowHint)
+        self.setWindowOpacity(0.01)
+
+        self.setCursor(Qt.CrossCursor)
+
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.updatePos)
+
+    def updatePos(self):
+        self.move(QCursor.pos()-QPoint(self.half_size, self.half_size))
+        screen = QApplication.primaryScreen()
+        if screen is not None:
+            pos = QCursor.pos()
+            pixmap = screen.grabWindow(0, pos.x(), pos.y(), 1, 1)
+            color = pixmap.toImage().pixelColor(0, 0)
+            self.clickColor.emit(color)
+
+    def show(self) -> None:
+        self.timer.start(15)
+        super().show()
+
+    def mousePressEvent(self, e) -> None:
+        self.timer.stop()
+        self.close()
+        super().mousePressEvent(e)
 
 
 # 纯色,渐变,径向,辐射(角度)渐变 的 切换 部件类
@@ -179,6 +221,8 @@ background-color:qlineargradient(spread:reflect, x1:0.554, y1:0.475, x2:0.63, y2
 # 其他部件类
 class ItActionBarUI(QWidget):
     switchClicked = Signal(bool)
+    strawColored = Signal(QColor)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -215,6 +259,8 @@ class ItActionBarUI(QWidget):
         self.core_hlay.addWidget(self.hand_btn)
         self.core_hlay.addWidget(self.hex_btn)
 
+        self.straw_btn.clicked.connect(self.straw)
+
         self.defaultStyle()
 
         self.myEvent()
@@ -225,6 +271,14 @@ class ItActionBarUI(QWidget):
         copy_color.setText(self.hex_btn.text())
         # 缺少通知动画
         # .....
+
+    # 吸管功能
+    def straw(self):
+        if not hasattr(self,"straw_widget"):
+            self.straw_widget = MaskWidget()
+            self.straw_widget.clickColor.connect(self.strawColored.emit)
+            self.straw_widget.clickColor.connect(self.updateHexView)
+        self.straw_widget.show()
 
     def defaultStyle(self):
         self.setStyleSheet('''
@@ -278,6 +332,8 @@ font: 10pt "等线";
 
 # 纯色的操作台
 class PureColorOperationUI(QWidget):
+    clickColor = Signal()
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
@@ -300,11 +356,21 @@ class PureColorOperationUI(QWidget):
         self.colorButton = QPushButton("获取颜色")
         self.colorButton.setFixedSize(90, 30)
         self.colorButton.setObjectName("colorButton")
-        self.flay.setWidget(self.flay.rowCount(),QFormLayout.SpanningRole,self.colorButton)
+        self.flay.setWidget(self.flay.rowCount(), QFormLayout.SpanningRole, self.colorButton)
 
         self.vlay.addLayout(self.flay)
 
+        self.colorButton.clicked.connect(self.clickColor.emit)
+
         self.defaultStyle()
+
+    def updateRGB(self,color):
+        self.lines[0].setText(str(color.red()))
+        self.lines[1].setText(str(color.green()))
+        self.lines[2].setText(str(color.blue()))
+
+    def updateAlpha(self, v:int):
+        self.lines[3].setText(str(v))
 
     def defaultStyle(self):
         self.setStyleSheet('''
@@ -327,6 +393,56 @@ color: rgb(255, 255, 255);
 font: 11pt "等线";
 }
         ''')
+
+
+# 渐变操作台
+class GradientOperationUI(QWidget):
+    clickQSS = Signal()
+
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        self.vlay = QVBoxLayout(self)
+        self.vlay.setAlignment(Qt.AlignTop)
+
+        self.qss = QPushButton()
+        self.qss.setObjectName("qss")
+        self.qss.setText("获取QSS")
+        self.qss.setFixedSize(90,30)
+
+        self.qss.clicked.connect(self.clickQSS.emit)
+
+        self.vlay.addWidget(self.qss)
+
+        self.defaultStyle()
+
+    def defaultStyle(self):
+        self.setStyleSheet('''
+#qss{
+border-radius:3px;
+background-color: rgb(88, 142, 128);
+color: rgb(255, 255, 255);
+font: 11pt "等线";
+}
+#qss:hover{
+background-color: rgb(74, 120, 108);
+}
+        ''')
+
+
+class LinearOperationUI(GradientOperationUI):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+
+class RadialOperationUI(GradientOperationUI):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+
+class ConicalOperationUI(GradientOperationUI):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
 
 
 class PaletteToolsUI(QWidget):
@@ -373,9 +489,8 @@ class PaletteToolsUI(QWidget):
         self.body_st_widget.setButtonsHide(True)
 
         # 操作区域
-        self.body_op_widget = PureColorOperationUI()
+        self.body_op_widget = QStackedWidget()
         self.body_op_widget.setFixedWidth(100)
-        # self.body_op_widget.setStyleSheet("border:1px solid red;")
 
         self.body_hlay.addWidget(self.body_st_widget)
         self.body_hlay.addWidget(self.body_op_widget)
@@ -384,6 +499,9 @@ class PaletteToolsUI(QWidget):
     def addColorWidget(self,widget:QWidget):
         self.body_st_widget.addWidget(widget)
 
+    def addOperationWidget(self,widget:QWidget):
+        self.body_op_widget.addWidget(widget)
+
     def setCurrentIndex(self,g_type):
         state_dict = {
             Handle_pure:0,
@@ -391,7 +509,9 @@ class PaletteToolsUI(QWidget):
             Handle_Radial:2,
             Handle_Conical:3
         }
-        self.body_st_widget.setCurrentIndex(state_dict[g_type])
+        i = state_dict[g_type]
+        self.body_st_widget.setCurrentIndex(i)
+        self.body_op_widget.setCurrentIndex(i)
 
     def myEvent(self):
         pass

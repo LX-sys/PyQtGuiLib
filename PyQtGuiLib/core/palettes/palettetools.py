@@ -139,7 +139,7 @@ class MaskWidget(QWidget):
     def __init__(self, timer):
         super().__init__()
         self.setWindowFlags(qt.FramelessWindowHint)
-        self.setWindowOpacity(0.01)
+        self.setWindowOpacity(0.1)
         self.__timer = timer
         self.setCursor(Qt.CrossCursor)
 

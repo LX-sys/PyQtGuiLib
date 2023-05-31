@@ -5,7 +5,6 @@
 # @software:PyCharm
 from PyQtGuiLib.header import (
     QApplication,
-    PYQT_VERSIONS,
     sys,
     QWidget,
     QVBoxLayout,
@@ -301,6 +300,7 @@ class ColorBar(QWidget):
 
 class PureColorWidget(QWidget):
     rgbaChange = Signal(QColor)
+    hsvRgbaChange = Signal(QColor)
 
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
@@ -319,6 +319,7 @@ class PureColorWidget(QWidget):
         self.vlay.addWidget(self.hsv)
 
         self.colorbar.rgbaChange.connect(self.rgbaChange.emit)
+        self.hsv.rgbaChange.connect(self.hsvRgbaChange.emit)
 
     def setHideHand(self,b:bool):
         self.colorbar.setHideHand(b)
@@ -519,7 +520,87 @@ class ConicalInfo(GradientInfo):
 # ----------------------------以上是绘制渐变图形所需的信息--------------------------------
 
 
+class CodeQSS:
+    def __init__(self, code_type="qss"):
+        self.code_type = code_type
+        self.grab_type = Handle_Linear
+        self.grab_mode = "pad"
+
+        self.structure = {
+            "head": "qlineargradient({}",
+            "pos": "",
+            "color": ""
+        }
+
+    def setGrab(self, g_type):
+        self.grab_type = g_type
+
+    def setGrabMode(self, mode):
+        self.grab_mode = mode
+
+    def posArgc(self) -> str:
+        return self.structure["pos"]
+
+    def setColorCompound(self, g_color):
+        temp = ""
+        for hand_id, value in g_color.items():
+            colorScope = value["colorScope"]
+            color = QColor(value["color"])
+            temp += "stop: {} rgba({},{},{},{}),".format(colorScope, *color.getRgb())
+        self.structure["color"] = temp[:-1] + ");"
+
+    def colorCompound(self) -> str:
+        return self.structure["color"]
+
+    def build(self) -> str:
+        if self.grab_type != Handle_Conical:
+            if self.grab_mode == QGradient.RepeatSpread:
+                mode = "repeat"
+            elif self.grab_mode == QGradient.ReflectSpread:
+                mode = "reflect"
+            else:
+                mode = "pad"
+            head = self.structure["head"].format("spread:" + mode + ",")
+        else:
+            head = self.structure["head"].format("")
+        pos = self.posArgc() + ","
+        return head + pos + self.colorCompound()
+
+
+class CodeQSSLinear(CodeQSS):
+    def __init__(self):
+        super().__init__()
+
+    def setPosArgc(self, x1, y1, x2, y2):
+        t = "x1:{},y1:{},x2:{},y2:{}"
+        self.structure["pos"] = t.format(x1, y1, x2, y2)
+
+
+class CodeQSSRadial(CodeQSS):
+    def __init__(self):
+        super().__init__()
+        self.structure["head"] = "qradialgradient({}"
+
+    def setPosArgc(self, cx, cy, r, fx, fy):
+        t = "cx:{},cy:{},radius:{},fx:{},fy:{}"
+        self.structure["pos"] = t.format(cx, cy, r, fx, fy)
+
+
+class CodeQSSConical(CodeQSS):
+    def __init__(self):
+        super().__init__()
+        self.grab_type = Handle_Conical
+        self.structure["head"] = "qconicalgradient({}"
+
+    def setPosArgc(self, cx, cy, angle):
+        t = "cx:{},cy:{},angle:{}"
+        self.structure["pos"] = t.format(cx, cy, angle)
+# ----------------------------以上是生成渐变QSS类--------------------------------
+
+
 class GradientWidget(QWidget):
+    qssed = Signal(str)
+
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
@@ -534,25 +615,31 @@ class GradientWidget(QWidget):
         # 当前鼠标左键选择的句柄
         self.cur_click_hand = None  # type:VirtualObject
 
-    def updateColorScope(self,hand_id,colorScope):
-        self.ginfo.updateColorScope(hand_id,colorScope)
+        self.code_obj = None
+
+    def setCodeObj(self,code):
+        self.code_obj = code
+
+    def __updateAll(self):
+        self.qssed.emit(self.qss())
         self.updateLayer()
         self.update()
+
+    def updateColorScope(self,hand_id,colorScope):
+        self.ginfo.updateColorScope(hand_id,colorScope)
+        self.__updateAll()
 
     def updateColor(self,hand_id,color):
         self.ginfo.updateColor(hand_id,color)
-        self.updateLayer()
-        self.update()
+        self.__updateAll()
 
     def appendColor(self,colorScope,color):
         self.ginfo.appendColor(colorScope,color)
-        self.updateLayer()
-        self.update()
+        self.__updateAll()
 
     def delColor(self,hand_id):
         self.ginfo.delColor(hand_id)
-        self.updateLayer()
-        self.update()
+        self.__updateAll()
 
     def setHideHand(self,b:bool):
         self.is_hide_hand = b
@@ -617,6 +704,7 @@ class GradientWidget(QWidget):
             self.updatePercentagePos(x,y)
             self.updateLayer()
             self.update()
+        self.qssed.emit(self.qss())
         super().mouseMoveEvent(e)
 
     def mousePressEvent(self, e) -> None:
@@ -686,12 +774,21 @@ class GradientWidget(QWidget):
                 self.updateLayer()
         super().changeEvent(e)
 
+    def qss(self):
+        self.code_obj.setGrab(self.g_type)
+        self.code_obj.setGrabMode(self.spread)
+        self.code_obj.setColorCompound(self.ginfo.colors())
+        return self.code_obj.build()
+
 
 class LinearWidget(GradientWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.g_type = Handle_Linear
         self.ginfo = LinearInfo()
+
+        self.code = CodeQSSLinear()
+        self.setCodeObj(self.code)
 
         self.updateLayer()
 
@@ -715,12 +812,21 @@ class LinearWidget(GradientWidget):
             self.ginfo.info["pos_percentage"]["x1"] = round(e.x() / self.width(), 2)
             self.ginfo.info["pos_percentage"]["y1"] = round(e.y() / self.height(), 2)
 
+        x,y,x1,y1 = self.ginfo.pos()
+        if x and y and x1 and y1:
+            x,y = round(x/self.width(),3),round(y/self.height(),3)
+            x1,y1 = round(x1/self.width(),3),round(y1/self.height(),3)
+            self.code.setPosArgc(x,y,x1,y1)
+
 
 class RadialWidget(GradientWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.g_type = Handle_Radial
         self.ginfo = RadialInfo()
+
+        self.code = CodeQSSRadial()
+        self.setCodeObj(self.code)
 
         self.updateLayer()
 
@@ -750,12 +856,22 @@ class RadialWidget(GradientWidget):
             sqrt_n = int(math.sqrt(math.pow(e.x() - x1, 2) + math.pow(e.y() - y1, 2)))
             self.ginfo.pos()[2] = sqrt_n
 
+        x, y, r, x1, y1 = self.ginfo.pos()
+        if x and y and x1 and y1:
+            r = round(r/ self.width(), 3)*2
+            x,y = round(x/self.width(),3),round(y/self.height(),3)
+            x1,y1 = round(x1/self.width(),3),round(y1/self.height(),3)
+            self.code.setPosArgc(x,y,r,x1,y1)
+
 
 class ConicalWidget(GradientWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.g_type = Handle_Conical
         self.ginfo = ConicalInfo()
+
+        self.code = CodeQSSConical()
+        self.setCodeObj(self.code)
 
         self.updateLayer()
 
@@ -777,6 +893,11 @@ class ConicalWidget(GradientWidget):
             angle_arc = math.atan2(e.y() - y, e.x() - x)
             angle = angle_arc * 180 / math.pi
             self.ginfo.pos()[2] = -int(angle)
+
+        x,y,a = self.ginfo.pos()
+        if x and y:
+            x,y = round(x/self.width(),3),round(y/self.height(),3)
+            self.code.setPosArgc(x,y,a)
 
 # ----------------------------以上是绘制渐变图形--------------------------------
 
@@ -1016,6 +1137,8 @@ class ColorOperation(QWidget):
 
 
 class CombinationFigure(QWidget):
+    qssed = Signal(str)
+
     def __init__(self,g_type,*args,**kwargs):
         super().__init__(*args,**kwargs)
         self.resize(600,500)
@@ -1035,6 +1158,8 @@ class CombinationFigure(QWidget):
         self.vlay.addWidget(self.widget)
         self.vlay.addWidget(self.cop)
 
+        self.widget.qssed.connect(self.qssed.emit)
+
         self.cop.colorScoped.connect(self.widget.updateColorScope)
         self.cop.colored.connect(self.widget.updateColor)
         self.cop.newColored.connect(self.widget.appendColor)
@@ -1045,6 +1170,9 @@ class CombinationFigure(QWidget):
 
     def setSpread(self,spread):
         self.widget.setSpread(spread)
+
+    def getQSS(self) -> str:
+        return self.widget.qss()
 
 
 class Linear(CombinationFigure):
@@ -1060,14 +1188,3 @@ class Radial(CombinationFigure):
 class Conical(CombinationFigure):
     def __init__(self,*args,**kwargs):
         super().__init__(Handle_Conical,*args,**kwargs)
-
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    win = Linear()
-    win.show()
-
-    if PYQT_VERSIONS in ["PyQt6", "PySide6"]:
-        sys.exit(app.exec())
-    else:
-        sys.exit(app.exec_())
