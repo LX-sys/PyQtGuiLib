@@ -19,7 +19,8 @@ from PyQtGuiLib.header import (
     QLineEdit,
     QLabel,
     QTextBrowser,
-    QFontMetricsF
+    QFontMetricsF,
+    QSizePolicy
 )
 import time
 
@@ -67,30 +68,35 @@ class Message:
     def setBGTemplate(self,obj):
         self.bgTemplate = obj
 
+    def getMaxStr(self,text_list)->str:
+        max_len = 0
+        data = ""
+        for text in text_list:
+            n = len(text)
+            if n > max_len:
+                max_len = n
+                data = text
+        return data
+
     def analysisText(self):
         text = self.data()
         period_text = text.split("\n")
-
         newline_character_number = 1
 
         if "\n" in text:
             newline_character_number = len(period_text)
 
-        max_period_text = max(period_text)
+        max_period_text = self.getMaxStr(period_text)
+        print(max_period_text)
 
         f = QFont(max_period_text)
         f.setPointSize(11)
         fsize = textSize(f,max_period_text)
-        metr = QFontMetricsF(f)
-        fsize = metr.size(Qt.TextWordWrap,max_period_text)
-        print(fsize)
-        # metrics = QFontMetricsF(font)
-        # bounding_rect = metrics.boundingRect(0, 0, self.width(), self.height(), Qt.TextWordWrap, max_period_text)
-        w,h = fsize.width(), fsize.height()*newline_character_number+10
+
+        w,h = fsize.width()+8, fsize.height()*newline_character_number+10
         if h < 30:
             h = 30
         print(w,h)
-
         self.__data["BGTemplate_Height"] = h+self.bgTemplate.profile_btn.height()+self.bgTemplate.profile_btn.pos().y()
         self.__data["MessageBody_Size"] = w,h
 
@@ -107,18 +113,16 @@ class MessageBody(QLabel):
         super().__init__(*args,**kwargs)
 
         self.mes = None  # type:Message
-        self.resize(200, 70)
-        self.setAlignment(Qt.AlignCenter)
+        # self.resize(200, 70)
+        self.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
 
         self.setOpenExternalLinks(True)
         self.setWordWrap(True)
+        self.setTextInteractionFlags(Qt.LinksAccessibleByMouse|Qt.TextSelectableByMouse)
 
-        self.setStyleSheet('''
-    border:1px solid rgb(184, 184, 184);
-    border-radius:5px;
-    font: 11pt "等线";
-    padding-left:0;
-            ''')
+        f = QFont()
+        f.setPointSize(12)
+        self.setFont(f)
 
     def setMes(self, mes: Message):
         self.mes = mes
@@ -129,6 +133,36 @@ class MessageBody(QLabel):
         else:
             self.setText("{}".format(mes.data()))
 
+# 消息内容主体
+class MessageBody2(QTextBrowser):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+
+        self.mes = None  # type:Message
+        self.resize(200, 70)
+        # self.setAlignment(Qt.AlignCenter)
+
+        self.setOpenExternalLinks(True)
+        # self.setWordWrap(True)
+
+        self.setStyleSheet('''
+    border:1px solid rgb(184, 184, 184);
+    border-radius:5px;
+    font: 11pt "等线";
+    padding-left:0;
+            ''')
+
+    def setMes(self, mes: Message):
+        self.mes = mes
+        # self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed))
+        self.resize(*mes.messageBodySize())
+        text = mes.data()
+        if "http" in text or "https" in text:
+            self.setHtml("<a href=\"{}\">{}</a>".format(text,text))
+        else:
+            for t in text.split("\n"):
+                self.insertHtml("{}".format(t))
+                self.insertHtml("\n")
 
 # 单条消息模板
 class BGTemplate(QFrame):
