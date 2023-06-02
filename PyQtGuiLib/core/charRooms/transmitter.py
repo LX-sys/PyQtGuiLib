@@ -16,7 +16,8 @@ from PyQtGuiLib.header import (
     QLineEdit,
     Qt,
     Signal,
-    QFileDialog
+    QFileDialog,
+    QTextEdit
 )
 
 
@@ -51,13 +52,10 @@ class Transmitter(QWidget):
         self.st.setMaximumWidth(200)
         # self.st.setStyleSheet("border:1px solid red;")
         self.ac_widget = QWidget()
-        self.send_btn = QPushButton()
-        self.send_btn.setText("发送")
-        self.send_btn.setObjectName("send_btn")
-        self.send_btn.setFixedSize(55,50)
+        self.btn_widget = QWidget()
 
         self.st.addWidget(self.ac_widget)
-        self.st.addWidget(self.send_btn)
+        self.st.addWidget(self.btn_widget)
 
         self.hlay.addWidget(self.emo)
         self.hlay.addWidget(self.line)
@@ -68,10 +66,9 @@ class Transmitter(QWidget):
 
         self.st.setCurrentIndex(0)
         self.acWidget()
+        self.sendWidget()
 
         self.line.textChanged.connect(self.switchSt_event)
-
-        self.send_btn.clicked.connect(self.sendEmit)
         self.line.returnPressed.connect(self.sendEmit)
 
         self.defaultStyle()
@@ -98,6 +95,20 @@ class Transmitter(QWidget):
         self.st_hlay.addWidget(self.it_dia)
 
         self.file_dia.clicked.connect(self.file_event)
+
+    def sendWidget(self):
+        self.send_hlay = QHBoxLayout(self.btn_widget)
+        self.send_hlay.setContentsMargins(9,0,0,0)
+        self.send_hlay.setAlignment(Qt.AlignLeft)
+
+        self.send_btn = QPushButton()
+        self.send_btn.setText("发送")
+        self.send_btn.setObjectName("send_btn")
+        self.send_btn.setFixedSize(40,40)
+
+        self.send_hlay.addWidget(self.send_btn)
+
+        self.send_btn.clicked.connect(self.sendEmit)
 
     def switchSt_event(self,text:str):
         if text:
@@ -137,7 +148,7 @@ background-color: rgb(65, 130, 195);
 border-radius:20%;
 border:none;
 background-color:#55aaff;
-margin-left:5px;
+font: 10pt "等线";
 }
 
         ''')
