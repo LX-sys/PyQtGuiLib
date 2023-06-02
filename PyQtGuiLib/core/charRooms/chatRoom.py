@@ -9,22 +9,17 @@ from PyQtGuiLib.header import (
     sys,
     QWidget,
     QFrame,
-    QListWidget,
-    QListWidgetItem,
     QPushButton,
-    QStyledItemDelegate,
     QPainter,
-    QStyleOptionViewItem,
     textSize,
     QFont,
     QScrollArea,
     QVBoxLayout,
     Qt,
     QLineEdit,
-    QFormLayout,
     QLabel,
-    QEvent,
-    QTextBrowser
+    QTextBrowser,
+    QFontMetricsF
 )
 import time
 
@@ -55,6 +50,8 @@ class Message:
             "head_picture":""
         }
 
+        self.bgTemplate = None
+
     def name(self) -> str:
         return self.__data["name"]+" {}".format(time.strftime("%H:%M:%S",time.localtime()))
 
@@ -67,63 +64,70 @@ class Message:
     def length(self) -> int:
         return len(self.data())
 
+    def setBGTemplate(self,obj):
+        self.bgTemplate = obj
+
+    def analysisText(self):
+        text = self.data()
+        period_text = text.split("\n")
+
+        newline_character_number = 1
+
+        if "\n" in text:
+            newline_character_number = len(period_text)
+
+        max_period_text = max(period_text)
+
+        f = QFont(max_period_text)
+        f.setPointSize(11)
+        fsize = textSize(f,max_period_text)
+        metr = QFontMetricsF(f)
+        fsize = metr.size(Qt.TextWordWrap,max_period_text)
+        print(fsize)
+        # metrics = QFontMetricsF(font)
+        # bounding_rect = metrics.boundingRect(0, 0, self.width(), self.height(), Qt.TextWordWrap, max_period_text)
+        w,h = fsize.width(), fsize.height()*newline_character_number+10
+        if h < 30:
+            h = 30
+        print(w,h)
+
+        self.__data["BGTemplate_Height"] = h+self.bgTemplate.profile_btn.height()+self.bgTemplate.profile_btn.pos().y()
+        self.__data["MessageBody_Size"] = w,h
+
+    def bgTemplateHeight(self) -> int:
+        return self.__data["BGTemplate_Height"]
+    
+    def messageBodySize(self)->tuple:
+        return self.__data["MessageBody_Size"]
+
 
 # 消息内容主体
-class MessageBody2(QFrame):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-
-        self.mes = None  # type:Message
-        self.resize(200,70)
-
-        self.setStyleSheet('''
-border:1px solid rgb(184, 184, 184);
-border-radius:5px;
-font: 11pt "等线";
-        ''')
-
-    def setMes(self,mes:Message):
-        self.mes = mes
-
-    def paintEvent(self, e) -> None:
-        painter = QPainter(self)
-
-        painter.setPen(Qt.blue)
-
-        text = self.mes.data()
-        f = QFont(text)
-        fsize = textSize(f, text)
-        x = self.width()//2 - fsize.width()//2+5
-        y = self.height()//2 - fsize.height()//2+5
-
-        painter.drawText(x,y,text)
-
-        painter.end()
-
-
-class MessageBody(QTextBrowser):
+class MessageBody(QLabel):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
         self.mes = None  # type:Message
         self.resize(200, 70)
+        self.setAlignment(Qt.AlignCenter)
 
-        self.setOpenLinks(True)
         self.setOpenExternalLinks(True)
+        self.setWordWrap(True)
 
         self.setStyleSheet('''
     border:1px solid rgb(184, 184, 184);
     border-radius:5px;
     font: 11pt "等线";
+    padding-left:0;
             ''')
 
     def setMes(self, mes: Message):
         self.mes = mes
+        self.resize(*mes.messageBodySize())
         text = mes.data()
         if "http" in text or "https" in text:
-            self.setHtml("<a href=\"{}\">{}</a>".format(text,text))
+            self.setText("<a href=\"{}\">{}</a>".format(text,text))
         else:
-            self.setHtml("<h3>{}</h3>".format(mes.data()))
+            self.setText("{}".format(mes.data()))
 
 
 # 单条消息模板
@@ -132,12 +136,15 @@ class BGTemplate(QFrame):
         super().__init__(*args,**kwargs)
         self.parent = parent
 
-        self.setFixedHeight(140)
         self.setStyleSheet("background-color:#fff;")
 
         self.profile_btn = QPushButton(self)
         self.profile_btn.setFixedSize(50,50)
         self.profile_btn.setText("头像")
+
+        mes.setBGTemplate(self)
+        mes.analysisText()
+        self.setFixedHeight(mes.bgTemplateHeight())
 
         #
         self.mes = MessageBody(self)
@@ -274,23 +281,6 @@ class Test(QWidget):
 
         self.chat = ChatRoom()
 
-        # self.flay = QFormLayout()
-        # self.rl = QLineEdit()
-        # self.rbtn = QPushButton()
-        # self.rbtn.setText("发送(R)")
-        #
-        # self.ll = QLineEdit()
-        # self.lbtn = QPushButton()
-        # self.lbtn.setText("发送(L)")
-        #
-        # self.flay.addRow(self.rl,self.rbtn)
-        # self.flay.addRow(self.ll,self.lbtn)
-        #
-        # self.vlay.addWidget(self.chat)
-        # self.vlay.addLayout(self.flay)
-        #
-        # self.rbtn.clicked.connect(self.send_event)
-        # self.lbtn.clicked.connect(self.receive_event)
         self.rb = Transmitter()
         self.lb = Transmitter()
 
