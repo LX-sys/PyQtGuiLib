@@ -8,223 +8,16 @@ from PyQtGuiLib.header import (
     QApplication,
     sys,
     QWidget,
-    QFrame,
-    QPushButton,
-    QPainter,
-    textSize,
-    QFont,
     QScrollArea,
     QVBoxLayout,
-    Qt,
-    QLineEdit,
-    QLabel,
-    QTextBrowser,
-    QFontMetricsF,
-    QSizePolicy
+    Qt
 )
-import time
 
 from PyQtGuiLib.core.charRooms.transmitter import Transmitter
-
-Left = "left"
-Right = "right"
-
-Type_Text = "text"
-Type_Image = "image"
-
-
-class Message:
-    def __init__(self,name,data,type="text"):
-        '''
-        {
-            "data":xxxx
-            "name":xxx
-            "type":xxxx
-        }
-
-        :param data:
-        '''
-        self.__data = {
-            "name":name,
-            "data":data,
-            "type":type,
-            "head_picture":""
-        }
-
-        self.bgTemplate = None
-
-    def name(self) -> str:
-        return self.__data["name"]+" {}".format(time.strftime("%H:%M:%S",time.localtime()))
-
-    def dataType(self) -> str:
-        return self.__data["type"]
-
-    def data(self):
-        return self.__data["data"]
-
-    def length(self) -> int:
-        return len(self.data())
-
-    def setBGTemplate(self,obj):
-        self.bgTemplate = obj
-
-    def getMaxStr(self,text_list)->str:
-        max_len = 0
-        data = ""
-        for text in text_list:
-            n = len(text)
-            if n > max_len:
-                max_len = n
-                data = text
-        return data
-
-    def analysisText(self):
-        text = self.data()
-        period_text = text.split("\n")
-        newline_character_number = 1
-
-        if "\n" in text:
-            newline_character_number = len(period_text)
-
-        max_period_text = self.getMaxStr(period_text)
-        print(max_period_text)
-
-        f = QFont(max_period_text)
-        f.setPointSize(11)
-        fsize = textSize(f,max_period_text)
-
-        w,h = fsize.width()+8, fsize.height()*newline_character_number+10
-        if h < 30:
-            h = 30
-        print(w,h)
-        self.__data["BGTemplate_Height"] = h+self.bgTemplate.profile_btn.height()+self.bgTemplate.profile_btn.pos().y()
-        self.__data["MessageBody_Size"] = w,h
-
-    def bgTemplateHeight(self) -> int:
-        return self.__data["BGTemplate_Height"]
-    
-    def messageBodySize(self)->tuple:
-        return self.__data["MessageBody_Size"]
-
-
-# 消息内容主体
-class MessageBody(QLabel):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-
-        self.mes = None  # type:Message
-        # self.resize(200, 70)
-        self.setAlignment(Qt.AlignLeft|Qt.AlignVCenter)
-
-        self.setOpenExternalLinks(True)
-        self.setWordWrap(True)
-        self.setTextInteractionFlags(Qt.LinksAccessibleByMouse|Qt.TextSelectableByMouse)
-
-        f = QFont()
-        f.setPointSize(12)
-        self.setFont(f)
-
-    def setMes(self, mes: Message):
-        self.mes = mes
-        self.resize(*mes.messageBodySize())
-        text = mes.data()
-        if "http" in text or "https" in text:
-            self.setText("<a href=\"{}\">{}</a>".format(text,text))
-        else:
-            self.setText("{}".format(mes.data()))
-
-# 消息内容主体
-class MessageBody2(QTextBrowser):
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-
-        self.mes = None  # type:Message
-        self.resize(200, 70)
-        # self.setAlignment(Qt.AlignCenter)
-
-        self.setOpenExternalLinks(True)
-        # self.setWordWrap(True)
-
-        self.setStyleSheet('''
-    border:1px solid rgb(184, 184, 184);
-    border-radius:5px;
-    font: 11pt "等线";
-    padding-left:0;
-            ''')
-
-    def setMes(self, mes: Message):
-        self.mes = mes
-        # self.setSizePolicy(QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed))
-        self.resize(*mes.messageBodySize())
-        text = mes.data()
-        if "http" in text or "https" in text:
-            self.setHtml("<a href=\"{}\">{}</a>".format(text,text))
-        else:
-            for t in text.split("\n"):
-                self.insertHtml("{}".format(t))
-                self.insertHtml("\n")
-
-# 单条消息模板
-class BGTemplate(QFrame):
-    def __init__(self,parent,direction,mes:Message,*args,**kwargs):
-        super().__init__(*args,**kwargs)
-        self.parent = parent
-
-        self.setStyleSheet("background-color:#fff;")
-
-        self.profile_btn = QPushButton(self)
-        self.profile_btn.setFixedSize(50,50)
-        self.profile_btn.setText("头像")
-
-        mes.setBGTemplate(self)
-        mes.analysisText()
-        self.setFixedHeight(mes.bgTemplateHeight())
-
-        #
-        self.mes = MessageBody(self)
-        self.mes.setMes(mes)
-        self.mes.setStyleSheet('''
-border:1px solid rgb(184, 184, 184);
-border-radius:5px;
-font: 11pt "等线";
-background-color: rgb(255, 170, 127);
-        ''')
-
-        self.direction = direction
-
-        if direction == Left:
-            self.moveLeft()
-            self.name = QLabel(self)
-            self.name.setText(mes.name())
-            self.name.setStyleSheet('font: 25 10pt "等线 Light";')
-            self.name.move(self.profile_btn.width()+15,self.profile_btn.height()//2-10)
-
-        elif direction == Right:
-            self.moveRight()
-
-        self.defaultStyle()
-
-    def moveLeft(self):
-        self.profile_btn.move(0,10)
-        self.mes.move(self.profile_btn.width()+15,self.profile_btn.height()//2+10)
-
-    def moveRight(self):
-        self.profile_btn.move(self.parent.width()-self.profile_btn.width()-20, 10)
-        self.mes.move(self.width()-self.mes.width()-self.profile_btn.width()-25, self.profile_btn.height()//2+10)
-
-    def defaultStyle(self):
-        self.profile_btn.setStyleSheet('''
-border:1px solid rgb(184, 184, 184);
-background-color: rgb(85, 255, 255);
-border-radius:25px;
-font: 11pt "等线";
-        ''')
-
-    def resizeEvent(self, e) -> None:
-        if self.direction == Right:
-            self.moveRight()
-        super().resizeEvent(e)
-
+from PyQtGuiLib.core.charRooms.message import (
+    MessageBody,BGTemplate,Message,
+    Left,Right,Type_Text,Type_Image
+)
 
 '''
     聊天对话框组件
@@ -257,21 +50,27 @@ class ChatRoom(QScrollArea):
     def createBGWidget(self,direction,mes:Message):
         widget = BGTemplate(self,direction,mes)
         self.addWidget(widget)
-        self.scrollBottom()
+        self.scrollBottom(widget.height())
 
     # 滚动条置底
-    def scrollBottom(self):
+    def scrollBottom(self,h=140):
         dif = self.verticalScrollBar().height()-self.body.height()
         dif = abs(dif)
         if dif:
-            self.verticalScrollBar().setMaximum(dif+140)
-            self.verticalScrollBar().setValue(dif+140)
+            self.verticalScrollBar().setMaximum(dif+h)
+            self.verticalScrollBar().setValue(dif+h)
 
-    def sendText(self,mes:Message):
-        self.createBGWidget(Right,mes)
+    def sendText(self,mes:Message) -> bool:
+        if len(mes.data()) > mes.getMaxMesNum():
+            return False
+        self.createBGWidget(Right, mes)
+        return True
 
-    def receiveText(self,mes:Message):
+    def receiveText(self,mes:Message) -> bool:
+        if len(mes.data()) > mes.getMaxMesNum():
+            return False
         self.createBGWidget(Left, mes)
+        return True
 
     def resizeEvent(self, e) -> None:
         self.scrollBottom()
@@ -286,12 +85,12 @@ padding:2px;
 }
 QScrollBar:vertical{
 padding:0px;
-max-width:12px;
+max-width:10px;
 padding:2px;
 }
 QScrollBar::handle{
 background-color: rgb(39, 39, 39);
-border-radius:4%;
+border-radius:2px;
 }
 QScrollBar::handle:hover{
 background-color: rgb(72, 72, 72);
@@ -329,11 +128,13 @@ class Test(QWidget):
     def send_event(self,text):
         if text:
             mes = Message(None,text)
+            mes.setHeadImage(r"C:\Users\Administrator\Downloads\机器小狗-removebg-preview.png",(40,40))
             self.chat.sendText(mes)
 
     def receive_event(self,text):
         if text:
             mes = Message("铁蛋",text)
+            mes.setHeadImage(r"C:\Users\Administrator\Downloads\1-removebg-preview.png",(40,40))
             self.chat.receiveText(mes)
 
 
