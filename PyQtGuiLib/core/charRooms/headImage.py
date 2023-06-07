@@ -24,18 +24,18 @@ class HeadImage(QLabel):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
-    def setHeadImage(self,data:Head_Type,size:tuple):
+    def setHeadImage(self,data:Head_Type):
         if isinstance(data,bytes):
             image = QImage()
             image.loadFromData(data)
             pix = QPixmap()
             fimage = pix.fromImage(image)
-            image_pix = fimage.scaled(*size)
+            image_pix = fimage.scaled(self.size())
             self.setPixmap(image_pix)
         elif isinstance(data,str):
             image = QImage()
             image.load(data)
             pix = QPixmap()
             fimage = pix.fromImage(image)
-            image_pix = fimage.scaled(*size)
+            image_pix = fimage.scaled(self.size())
             self.setPixmap(image_pix)

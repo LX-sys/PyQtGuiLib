@@ -43,9 +43,9 @@ class Message:
             "name": name,
             "data": data,
             "type": type,
+            "send_time":"",
             "head_image": {
                 "path": "",
-                "size": ""
             }
         }
 
@@ -55,9 +55,8 @@ class Message:
 
         self.bgTemplate = None
 
-    def setHeadImage(self, path: str, size: tuple = (50, 50)):
+    def setHeadImage(self, path: str):
         self.__data["head_image"]["path"] = path
-        self.__data["head_image"]["size"] = size
 
     def headImage(self) -> dict:
         return self.__data["head_image"]
@@ -69,6 +68,7 @@ class Message:
         return self.Max_Message_Num
 
     def name(self) -> str:
+        self.__data["send_time"] = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
         return self.__data["name"] + " {}".format(time.strftime("%H:%M:%S", time.localtime()))
 
     def dataType(self) -> str:
@@ -230,9 +230,7 @@ class BGTemplate(QFrame):
         self.profile_btn = HeadImage(self)
         self.profile_btn.setFixedSize(50, 50)
         if mes.isHeadImage():
-            self.profile_btn.setHeadImage(mes.headImage()["path"],mes.headImage()["size"])
-            # self.profile_btn.setIconSize(mes.headImage()["size"])
-            # self.profile_btn.setIcon(mes.headImage()["path"])
+            self.profile_btn.setHeadImage(mes.headImage()["path"])
 
         mes.setBGTemplate(self)
         mes.analysisText()
@@ -268,7 +266,6 @@ class BGTemplate(QFrame):
         self.profile_btn.setStyleSheet('''
 border:1px solid rgb(184, 184, 184);
 border-radius:25px;
-font: 11pt "等线";
         ''')
 
     def resizeEvent(self, e) -> None:

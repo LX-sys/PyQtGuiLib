@@ -40,7 +40,8 @@ class ChatRoom(QScrollArea):
 
         self.setWidget(self.body)
         self.setWidgetResizable(True)
-        # self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
         self.defaultStyle()
 
@@ -128,13 +129,13 @@ class Test(QWidget):
     def send_event(self,text):
         if text:
             mes = Message(None,text)
-            mes.setHeadImage(r"C:\Users\Administrator\Downloads\机器小狗-removebg-preview.png",(40,40))
+            mes.setHeadImage(r"C:\Users\Administrator\Downloads\机器小狗-removebg-preview.png")
             self.chat.sendText(mes)
 
     def receive_event(self,text):
         if text:
             mes = Message("铁蛋",text)
-            mes.setHeadImage(r"C:\Users\Administrator\Downloads\1-removebg-preview.png",(40,40))
+            mes.setHeadImage(r"C:\Users\Administrator\Downloads\1-removebg-preview.png")
             self.chat.receiveText(mes)
 
 
