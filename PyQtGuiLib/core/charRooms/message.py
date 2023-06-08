@@ -21,6 +21,8 @@ import time
 
 from PyQtGuiLib.core.charRooms.headImage import HeadImage
 
+from PyQtGuiLib.core.charRooms.utility import imageToPix,Head_Type
+
 Left = "left"
 Right = "right"
 
@@ -29,7 +31,7 @@ Type_Image = "image"
 
 
 class Message:
-    def __init__(self, name, data, type="text"):
+    def __init__(self, name:str, data:Head_Type, type="text"):
         '''
         {
             "data":xxxx
@@ -39,11 +41,16 @@ class Message:
 
         :param data:
         '''
+        if data.endswith(".png") or data.endswith(".jpg") or data.endswith(".jpeg") or data.endswith(".heic") or data.endswith("webp"):
+            type = "image"
+        
+        
+        
         self.__data = {
             "name": name,
             "data": data,
             "type": type,
-            "send_time":"",
+            "send_time":time.strftime("%Y-%m-%d %H:%M:%S",time.localtime()),
             "head_image": {
                 "path": "",
             }
@@ -54,6 +61,12 @@ class Message:
         self.Max_Message_Num = 2000  # 单条消息的最大字数
 
         self.bgTemplate = None
+
+    def isText(self) -> bool:
+        return True if self.dataType() == "text" else False
+
+    def isImage(self) -> bool:
+        return True if self.dataType() == "image" else False
 
     def setHeadImage(self, path: str):
         self.__data["head_image"]["path"] = path
@@ -68,7 +81,6 @@ class Message:
         return self.Max_Message_Num
 
     def name(self) -> str:
-        self.__data["send_time"] = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
         return self.__data["name"] + " {}".format(time.strftime("%H:%M:%S", time.localtime()))
 
     def dataType(self) -> str:
@@ -83,7 +95,7 @@ class Message:
     def setBGTemplate(self, obj):
         self.bgTemplate = obj
 
-    def getMaxStr(self, text_list) -> str:
+    def __getMaxStr(self, text_list) -> str:
         max_len = 0
         data = ""
         for text in text_list:
@@ -166,7 +178,7 @@ class Message:
         if "\n" in self.data():
             newline_character_number = len(period_text) + 1
 
-        max_period_text = self.getMaxStr(period_text)
+        max_period_text = self.__getMaxStr(period_text)
 
         f = QFont(max_period_text)
         f.setPointSize(12)
@@ -212,11 +224,14 @@ class MessageBody(QLabel):
                 ''')
 
     def setMes(self, mes: Message):
-        text = mes.data()
-        if re.findall("^http.*|^http.* ", text):
-            self.setText("<a href='{}'>{}</a>".format(text, text))
-        else:
-            self.setText("{}".format(text))
+        data = mes.data()
+        if mes.isText():
+            if re.findall("^http.*|^http.* ", data):
+                self.setText("<a href='{}'>{}</a>".format(text, data))
+            else:
+                self.setText("{}".format(data))
+        elif mes.isImage():
+            self.setPixmap(imageToPix(data,QSize(100,100)))
 
 
 # 单条消息模板

@@ -14,10 +14,7 @@ from PyQtGuiLib.header import (
     QImage,
     QPixmap
 )
-
-from typing import TypeVar
-
-Head_Type = TypeVar("Head_Type",str,bytes)
+from PyQtGuiLib.core.charRooms.utility import imageToPix,Head_Type
 
 
 class HeadImage(QLabel):
@@ -25,17 +22,4 @@ class HeadImage(QLabel):
         super().__init__(*args,**kwargs)
 
     def setHeadImage(self,data:Head_Type):
-        if isinstance(data,bytes):
-            image = QImage()
-            image.loadFromData(data)
-            pix = QPixmap()
-            fimage = pix.fromImage(image)
-            image_pix = fimage.scaled(self.size())
-            self.setPixmap(image_pix)
-        elif isinstance(data,str):
-            image = QImage()
-            image.load(data)
-            pix = QPixmap()
-            fimage = pix.fromImage(image)
-            image_pix = fimage.scaled(self.size())
-            self.setPixmap(image_pix)
+        self.setPixmap(imageToPix(data,self.size()))
