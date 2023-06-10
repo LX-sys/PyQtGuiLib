@@ -43,9 +43,7 @@ class Message:
         '''
         if data.endswith(".png") or data.endswith(".jpg") or data.endswith(".jpeg") or data.endswith(".heic") or data.endswith("webp"):
             type = "image"
-        
-        
-        
+
         self.__data = {
             "name": name,
             "data": data,
@@ -122,73 +120,77 @@ class Message:
                 e += self.Max_Line_Num
 
     def analysisText(self):
-        text = self.data()
-        newline_character_number = 1
+        if self.isText():
+            text = self.data()
+            newline_character_number = 1
 
-        period_text = text.split("\n")
+            period_text = text.split("\n")
 
-        # ---
-        '''
-            对文本折行,
-            如果文本只有一句话,则单行最大文字数量为 60
-            如果是多行,
-                在多行中,根据文章和的语言进行区分 单行最大文字数量
-                中文 > 英文 单行最大文字数量为 30
-              反之:
-                单行最大文字数量为 60
-
-        '''
-        chinese_data = re.findall(r"[\u4e00-\u9fa5]+", text)
-        en_data = re.findall(r"[a-z]+", text, re.I)
-        if chinese_data:
-            chinese_num = len("".join(chinese_data))
-        else:
-            chinese_num = 0
-        if en_data:
-            en_num = len("".join(en_data))
-        else:
-            en_num = 0
-
-        if len(period_text) == 1:
-            if chinese_num > en_num:
-                self.Max_Line_Num = 30
+            # ---
+            '''
+                对文本折行,
+                如果文本只有一句话,则单行最大文字数量为 60
+                如果是多行,
+                    在多行中,根据文章和的语言进行区分 单行最大文字数量
+                    中文 > 英文 单行最大文字数量为 30
+                  反之:
+                    单行最大文字数量为 60
+    
+            '''
+            chinese_data = re.findall(r"[\u4e00-\u9fa5]+", text)
+            en_data = re.findall(r"[a-z]+", text, re.I)
+            if chinese_data:
+                chinese_num = len("".join(chinese_data))
             else:
-                self.Max_Line_Num = 60
-            re_text = self.strFoldHalf(text)
-            if re_text:
-                period_text.clear()
-                period_text.extend(re_text)
-                self.__data["data"] = "\n".join(period_text)
-        else:
-            if chinese_num > en_num:
-                self.Max_Line_Num = 30
+                chinese_num = 0
+            if en_data:
+                en_num = len("".join(en_data))
             else:
-                self.Max_Line_Num = 50
+                en_num = 0
 
-            new_period_text = []
-            for nt in period_text:
-                re_text = self.strFoldHalf(nt)
-                if not re_text:
-                    new_period_text.append(nt)
+            if len(period_text) == 1:
+                if chinese_num > en_num:
+                    self.Max_Line_Num = 30
                 else:
-                    new_period_text.extend(re_text)
-            self.__data["data"] = "\n".join(new_period_text)
-            period_text = new_period_text
-        # ===
-        if "\n" in self.data():
-            newline_character_number = len(period_text) + 1
+                    self.Max_Line_Num = 60
+                re_text = self.strFoldHalf(text)
+                if re_text:
+                    period_text.clear()
+                    period_text.extend(re_text)
+                    self.__data["data"] = "\n".join(period_text)
+            else:
+                if chinese_num > en_num:
+                    self.Max_Line_Num = 30
+                else:
+                    self.Max_Line_Num = 50
 
-        max_period_text = self.__getMaxStr(period_text)
+                new_period_text = []
+                for nt in period_text:
+                    re_text = self.strFoldHalf(nt)
+                    if not re_text:
+                        new_period_text.append(nt)
+                    else:
+                        new_period_text.extend(re_text)
+                self.__data["data"] = "\n".join(new_period_text)
+                period_text = new_period_text
+            # ===
+            if "\n" in self.data():
+                newline_character_number = len(period_text) + 1
 
-        f = QFont(max_period_text)
-        f.setPointSize(12)
-        fsize = textSize(f, max_period_text)
+            max_period_text = self.__getMaxStr(period_text)
 
-        w, h = fsize.width() + 13, fsize.height() * newline_character_number + 5
-        if h < 30:
-            h = 30
-        # print("宽度,高度:", w, h)
+            f = QFont(max_period_text)
+            f.setPointSize(12)
+            fsize = textSize(f, max_period_text)
 
+            w, h = fsize.width() + 13, fsize.height() * newline_character_number + 5
+            if h < 30:
+                h = 30
+            # print("宽度,高度:", w, h)
+        elif self.isImage():
+            w, h = 300, 100
+
+        print("w h",w,h)
         self.__data["BGTemplate_Height"] = h + self.bgTemplate.profile_btn.height() + self.bgTemplate.profile_btn.pos().y()
         self.__data["MessageBody_Size"] = w, h
 

@@ -20,6 +20,7 @@ def imageToPix(data:Head_Type,size):
         image.loadFromData(data)
     elif isinstance(data, str):
         image.load(data)
+    print("-->",image.size())
     pix = QPixmap()
     fimage = pix.fromImage(image)
     return fimage.scaled(size)
