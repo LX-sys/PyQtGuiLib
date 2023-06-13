@@ -186,11 +186,9 @@ class Message:
             w, h = fsize.width() + 13, fsize.height() * newline_character_number + 5
             if h < 30:
                 h = 30
-            # print("宽度,高度:", w, h)
         elif self.isImage():
             w, h = 300, 100
 
-        print("w h",w,h)
         self.__data["BGTemplate_Height"] = h + self.bgTemplate.profile_btn.height() + self.bgTemplate.profile_btn.pos().y()
         self.__data["MessageBody_Size"] = w, h
 

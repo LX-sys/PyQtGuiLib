@@ -7,6 +7,8 @@
 from PyQtGuiLib.header import (
     PYQT_VERSIONS,
     QApplication,
+    is_win_sys,
+    is_mac_sys,
     sys,
     QWidget,
     QPushButton,
@@ -17,8 +19,25 @@ from PyQtGuiLib.header import (
     Qt,
     Signal,
     QFileDialog,
-    QTextEdit
+    QTextEdit,
+    QDragEnterEvent,
+    QDropEvent
 )
+
+
+class MesLineEdit(QLineEdit):
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, e:QDragEnterEvent) -> None:
+        e.accept()
+
+    def dropEvent(self, e:QDropEvent) -> None:
+        file_path = e.mimeData().text()  # type:str
+        if is_win_sys:
+            file_path = file_path.replace("file:/","")
+        print("event:",file_path)
 
 
 class Transmitter(QWidget):
@@ -31,7 +50,7 @@ class Transmitter(QWidget):
         self.vlay = QVBoxLayout(self)
         self.top_widget = QWidget()
         self.top_widget.setStyleSheet("border:2px solid red;")
-        self.top_widget.hide()
+        self.top_hlay = QHBoxLayout(self.top_widget)
 
         self.hlay = QHBoxLayout()
         self.hlay.setAlignment(Qt.AlignLeft)
@@ -41,7 +60,7 @@ class Transmitter(QWidget):
         self.emo.setFixedSize(40,40)
         self.emo.setText("😉")
         self.emo.setObjectName("emo")
-        self.line = QLineEdit()
+        self.line = MesLineEdit()
         self.line.setMinimumWidth(100)
         self.line.setFixedHeight(40)
         self.line.setPlaceholderText("输入消息")
@@ -50,7 +69,6 @@ class Transmitter(QWidget):
         self.st = QStackedWidget()
         self.st.setFixedHeight(50)
         self.st.setMaximumWidth(200)
-        # self.st.setStyleSheet("border:1px solid red;")
         self.ac_widget = QWidget()
         self.btn_widget = QWidget()
 
@@ -79,6 +97,7 @@ class Transmitter(QWidget):
 
     def acWidget(self):
         self.st_hlay = QHBoxLayout(self.ac_widget)
+        self.st_hlay.setContentsMargins(9,0,0,0)
         self.st_hlay.setAlignment(Qt.AlignLeft)
 
         self.file_dia = QPushButton()
@@ -131,21 +150,21 @@ border:none;
 background-color:#fff;
 }
 #emo{
-border-top-left-radius:20px;
-border-bottom-left-radius:20px;
+border-top-left-radius:10%;
+border-bottom-left-radius:10%;
 }
 #line{
-border-top-right-radius:20px;
-border-bottom-right-radius:20px;
+border-top-right-radius:10%;
+border-bottom-right-radius:10%;
 }
 #file_dia,#it_dia{
-border-radius:20%;
+border-radius:10%;
 }
 #send_btn:hover{
 background-color: rgb(65, 130, 195);
 }
 #send_btn,#send_btn:pressed{
-border-radius:20%;
+border-radius:10%;
 border:none;
 background-color:#55aaff;
 font: 10pt "等线";
