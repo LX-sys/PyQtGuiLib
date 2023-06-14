@@ -40,7 +40,7 @@ font-size:10px;
 
         self.ani = Animation()
         # self.ani.setStartMode(Animation.Parallel)
-        # self.ani.addAni(self.btn.pos(),QPoint(300,300),courseFunc=self.btn.move)
+        self.ani.addAni(self.btn.pos(),QPoint(300,300),courseFunc=self.btn.move)
         # self.ani.addAni(1,99,courseFunc=self.spbox.setValue)
         # self.ani.addAni(sv="this",ev=QRect(100,100,300,300),targetObj=self.btn,propertyName="geometry")
         # self.ani.addAni(sv="5px", ev=12, targetObj=self.btn, propertyName="font-size", selector="QPushButton")
