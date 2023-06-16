@@ -15,11 +15,16 @@ from PyQtGuiLib.header import (
     QPointF,
     QPainter,
     QBrush,
-    QOpenGLWidget
+    QOpenGLWidget,
+    QMouseEvent,
+    QPropertyAnimation,
+    QObject,
+    QEasingCurve
 )
 
 import random
 
+from functools import partial
 
 def rcolor()->QColor:
     return QColor(random.randint(0,255),random.randint(0,255),random.randint(0,255))
@@ -34,32 +39,46 @@ class ParticleAttr:
         self._flag = True
         self._num = 100
         self._cnum = 0
+        self.update(pos)
 
-    def update(self):
-        if self._flag and self._cnum < self._num:
-            self.pos += self.speed
-            self._cnum += 1
-            if self._cnum == 100:
-                self._flag = False
-        elif self._flag is False and self._cnum != 0:
-            self.pos -= self.speed
-            self._cnum -= 1
-            if self._cnum == 0:
-                self._flag = True
+    def update(self,pos):
+        self.pos = pos
+        # self.pos += QPointF(x,y)+self.mpos
 
 
 class ParticleSystem:
-    def __init__(self, num_particles):
+    def __init__(self, num_particles,parent):
         self.particles = [ParticleAttr(QPointF(random.random() * 400+100, random.random() * 200+100)) for _ in range(num_particles)]
+        self.parent = parent
 
         self._bru = QBrush(rcolor())
-        self.ss = random.randint(1,5)
-        self.ee = random.randint(1,5)
+        self.mpos = QPointF(10,10)
 
     # 更新粒子的位置
     def update(self):
+        es = [QEasingCurve.SineCurve,QEasingCurve.InCurve,QEasingCurve.OutCurve,
+              QEasingCurve.CosineCurve,QEasingCurve.Linear]
+
+
         for particle in self.particles:
-            particle.update()
+            ani = QPropertyAnimation(QObject(),b"pos",self.parent)
+            ani.setEasingCurve(random.choice(es))
+            # ani.setEasingCurve(es[-1])
+            ani.setStartValue(QPoint(int(particle.pos.x()),int(particle.pos.y())))
+            ani.setEndValue(self.mpos-QPoint(random.randint(20,60),
+                            random.randint(20,60))
+                            )
+            ani.valueChanged.connect(partial(self.ani_event,particle))
+            ani.start()
+
+
+    def ani_event(self,particle,pos):
+        particle.update(pos)
+        self.parent.update()
+
+
+    def setMouPos(self,pos:QPointF):
+        self.mpos = pos
 
     # 绘制粒子
     def draw(self, painter):
@@ -68,17 +87,25 @@ class ParticleSystem:
             painter.drawEllipse(particle.pos, 3, 3)
 
 
-class Test(QOpenGLWidget):
+class Test(QWidget):
     def __init__(self,*args,**kwargs):
         super().__init__(*args,**kwargs)
 
         self.setGeometry(100, 100, 400, 400)
 
-        self.particle_system = ParticleSystem(8000)
+        self.particle_system = ParticleSystem(100)
 
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.update_particles)
         self.timer.start(30)
+
+        self.setMouseTracking(True)
+
+        self.mouPos = QPointF(10,10)
+
+    def mouseMoveEvent(self,e:QMouseEvent) -> None:
+        self.particle_system.updateMouPos(QPointF(e.pos()))
+        super().mouseMoveEvent(e)
 
     def update_particles(self):
         self.particle_system.update()
@@ -94,8 +121,20 @@ class Test2(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.gp = Test(self)
-        self.gp.resize(600,600)
+        self.setMouseTracking(True)
+
+        self.part = ParticleSystem(200,self)
+
+    def mouseMoveEvent(self, e:QMouseEvent):
+        # print(e)
+        self.part.setMouPos(e.pos())
+        self.part.update()
+        super().mouseMoveEvent(e)
+
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.Antialiasing)
+        self.part.draw(painter)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
