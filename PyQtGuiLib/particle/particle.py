@@ -123,7 +123,7 @@ class Test2(QWidget):
 
         self.setMouseTracking(True)
 
-        self.part = ParticleSystem(200,self)
+        self.part = ParticleSystem(500,self)
 
     def mouseMoveEvent(self, e:QMouseEvent):
         # print(e)
