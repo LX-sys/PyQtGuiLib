@@ -35,19 +35,21 @@ class Test(QWidget):
 
     def test_ani(self):
         vobj = self.painter.virtualObj("arect")
+        print(vobj.getVirtualArgs())
         self.ani = Animation()
-        self.ani.addAni(QPoint(*vobj.getPos()),QPoint(100,100),courseFunc=self.updateRect)
+        self.ani.addAni(vobj.getVirtualArgs()[-1],100,courseFunc=self.updateRect)
         self.ani.start()
 
-    def updateRect(self,pos:QPoint):
+    def updateRect(self,r):
         vobj = self.painter.virtualObj("arect")
-        vobj.updateIndexToArgs(2,pos.x())
-        vobj.updateIndexToArgs(3,pos.y())
+        vobj.updateIndexToArgs(2,r)
         self.update()
 
     def paintEvent(self, e):
         self.painter.begin(self)
-        self.painter.drawRect(50,50,50,50,virtualObjectName="arect")
+        # self.painter.drawRect(50,50,50,50,virtualObjectName="arect")
+        # self.painter.drawCursor(50,50,50,50,25,openAttr={"c":"red","w":2},virtualObjectName="arect")
+        self.painter.drawRhomboid(100,100,30,brushAttr={"c":"green"},virtualObjectName="arect")
         self.painter.end()
 
 
