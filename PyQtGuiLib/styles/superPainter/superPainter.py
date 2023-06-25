@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 from PyQtGuiLib.header import (
     QPainter,
+    QPainterPath,
     QPen,
     QBrush,
     QFont,
@@ -389,6 +390,7 @@ class SuperPainterAttr(QPainter):
         self.drawTiledPixmap = decorator(self.drawTiledPixmap)
         # 自定义
         self.drawCursor = decorator(self.drawCursor)
+        self.drawRhomboid = decorator(self.drawRhomboid)
 
     # ------------下面代码是作为工具的提示代码------------
 
@@ -423,6 +425,17 @@ class SuperPainterAttr(QPainter):
         else:
             self.drawLine(x + w//2, y + h // 2, x + w // 2, lw)
         self.drawRoundedRect(x,y,w,h,r,r)
+
+    def drawRhomboid(self,x:int,y:int,ratio:float,openAttr:dict=None,brushAttr:dict=None,virtualObjectName:str=""):
+        path = QPainterPath(QPoint(x,y))
+        path.moveTo(x-ratio,y)
+
+        path.lineTo(x,y-ratio)
+        path.lineTo(x+ratio,y)
+        path.lineTo(x,y+ratio)
+        path.lineTo(x-ratio,y)
+        self.fillPath(path,self.__brush)
+
 
 
 class SuperPainter(SuperPainterAttr):
