@@ -20,9 +20,14 @@ class Animation:
     Parallel = 1
     Sequential = 2
 
+    STOP = 0
+    PAUSE = 1
+    START = 2
+
     def __init__(self,):
         self.__startMode = SequentialAnimationGroup()  # 默认串行
         self.__anis = []  # type:List[PropertyAnimation]
+        self.isBuilt = False
 
     def allAnins(self)->List[PropertyAnimation]:
         return self.__anis
@@ -179,7 +184,26 @@ class Animation:
                 return obj
         return None
 
-    def start(self):
-        group = self.startModeObj()
-        group.addAnimations(self.allAnins())
-        group.start()
+    def builtAni(self):
+        # 该方法只会生效一次
+        if not self.isBuilt:
+            self.startModeObj().addAnimations(self.allAnins())
+            self.isBuilt = True
+
+    def start(self,isBuilt:bool=True):
+        if isBuilt:
+            self.builtAni()
+        if not self.startModeObj().state():
+            self.startModeObj().start()
+
+    def state(self) -> int:
+        return self.startModeObj().state()
+
+    def resume(self):
+        self.startModeObj().resume()
+
+    def paused(self):
+        self.startModeObj().pause()
+
+    def stop(self):
+        self.startModeObj().stop()
