@@ -37,7 +37,7 @@ class BubbleWidget(WidgetABC):
         # 追踪的控件
         self.trackWidget = None #type:QWidget
 
-        self.direction = BubbleWidget.Down
+        self.__direction = BubbleWidget.Down
 
         #
         self.setText("气泡窗口")
@@ -66,7 +66,7 @@ class BubbleWidget(WidgetABC):
         fw = fs.width()
         fh = fs.height()
 
-        if self.direction in [BubbleWidget.Top,BubbleWidget.Down]:
+        if self.__direction in [BubbleWidget.Top,BubbleWidget.Down]:
             self.resize(fw + 30, self.height())
         else:
             self.resize(fw + 30+self._arrows_h, self.height())
@@ -78,7 +78,10 @@ class BubbleWidget(WidgetABC):
 
     # 设置气泡箭头方向
     def setDirection(self,d):
-        self.direction = d
+        self.__direction = d
+
+    def direction(self)->str:
+        return self.__direction
 
     # 控件追踪
     def setTrack(self, widget: QWidget):
@@ -92,11 +95,11 @@ class BubbleWidget(WidgetABC):
         cx = widget.x()+w//2-self.width()//2  # x轴中心
         cy = widget.y()+h//2-self.height()//2
 
-        if self.direction == BubbleWidget.Top:
+        if self.__direction == BubbleWidget.Top:
             self.move(cx,y+h)
-        elif self.direction == BubbleWidget.Left:
+        elif self.__direction == BubbleWidget.Left:
             self.move(x+w,cy)
-        elif self.direction == BubbleWidget.Right:
+        elif self.__direction == BubbleWidget.Right:
             self.move(x-self.width(),cy)
         else:
             self.move(cx,y-self.height())
@@ -129,7 +132,7 @@ class BubbleWidget(WidgetABC):
         # 画笔
         painter.setPen(qt.NoPen)
 
-        if self.direction == BubbleWidget.Top:
+        if self.__direction == BubbleWidget.Top:
             # 画三角
             ploys = [QPointF(lien_x,self._arrows_h,),QPointF(lien_x+line_w//2,1),
                      QPointF(lien_x+line_w,self._arrows_h)
@@ -139,7 +142,7 @@ class BubbleWidget(WidgetABC):
             # 文字位置
             x = self.width() // 2 - fw // 2
             y = rect_h//2 + fh//2+self._arrows_h
-        elif self.direction == BubbleWidget.Left:
+        elif self.__direction == BubbleWidget.Left:
             # 画三角
             ploys = [QPointF(1,line_y),QPointF(self._arrows_h,line_y-line_w//2),
                      QPointF(self._arrows_h,line_y+line_w//2)
@@ -148,7 +151,7 @@ class BubbleWidget(WidgetABC):
             # 文字位置
             x = self.width()//2-fw//2 + self._arrows_h//2
             y = self.height()//2 + fh//2
-        elif self.direction == BubbleWidget.Right:
+        elif self.__direction == BubbleWidget.Right:
             # 画三角
             ploys =[QPointF(rect_w,line_y-line_w//2),QPointF(rect_w+self._arrows_h,line_y),
                     QPointF(rect_w,line_y+line_w//2)
