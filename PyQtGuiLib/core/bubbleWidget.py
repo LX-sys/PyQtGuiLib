@@ -32,7 +32,7 @@ class BubbleWidget(WidgetABC):
         self._arrows_h = 16
 
         # 文字
-        self.text = ""
+        self._text = ""
 
         # 追踪的控件
         self.trackWidget = None #type:QWidget
@@ -51,15 +51,18 @@ class BubbleWidget(WidgetABC):
 
     # 设置文字
     def setText(self,text:str):
-        self.text = text
+        self._text = text
         self.textExtend()
+
+    def text(self)->str:
+        return self._text
 
     # 文字扩展
     def textExtend(self):
         f = QFont()
         f.setPointSize(self.get_fontSize())
         # 文字大小
-        fs = textSize(f, self.text)
+        fs = textSize(f, self._text)
         fw = fs.width()
         fh = fs.height()
 
@@ -113,7 +116,7 @@ class BubbleWidget(WidgetABC):
         f.setPointSize(self.get_fontSize())
         painter.setFont(f)
         # 文字大小
-        fs = textSize(f, self.text)
+        fs = textSize(f, self._text)
         fw = fs.width()
         fh = fs.height()
 
@@ -172,7 +175,7 @@ class BubbleWidget(WidgetABC):
         op = QPen()
         op.setColor(QColor(255, 255, 255))
         painter.setPen(op)
-        painter.drawText(x,y, self.text)
+        painter.drawText(x,y, self._text)
 
     def paintEvent(self, e:QPaintEvent) -> None:
         painter = QPainter(self)
