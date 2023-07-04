@@ -19,7 +19,8 @@ from PyQtGuiLib.header import (
 
 
 '''
-    加载进度条
+    加载进度条 
+    2023.7.4 该组件需要重写,无法适配在设计器上面
 '''
 class LoadBar(QWidget):
     # 进度改变时,发出信号

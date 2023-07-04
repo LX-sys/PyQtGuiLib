@@ -16,6 +16,7 @@ from PyQtGuiLib.header import (
 
 '''
     圆环进度条
+    2023.7.4 该组件需要重写,无法适配在设计器上面
 '''
 class CircularBar(QWidget):
     # 进度改变时,发出信号
