@@ -37,7 +37,7 @@ font-size:10px;
 
 
         self.ani = Animation()
-        self.ani.addAni(self.btn.pos(),QPoint(300,300),courseFunc=self.btn.move,duration=5000)
+        self.ani.addAni(self.btn.pos(),QPoint(300,300),courseFunc=self.btn.move,duration=5000,loopCount=-1)
 
         self.ani.start()
 
